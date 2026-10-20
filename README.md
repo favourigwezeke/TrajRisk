@@ -8,7 +8,7 @@ This repository draft contains the six audited core analysis scripts, preprocess
 
 ## Reproduce saved-model results
 
-Obtain the matching `TrajRisk_Repository_Check_2.zip` frozen-input packet. The code repository excludes large model/data archives; its input checksums are in `metadata/frozen_input_manifest.json`. A public archive URL will be added before release.
+Download the versioned frozen inputs using [the frozen-input reproduction instructions](docs/frozen_inputs.md). Input checksums are recorded in `metadata/frozen_input_manifest.json`.
 
 From this directory:
 
@@ -16,12 +16,12 @@ From this directory:
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install -r requirements-frozen.txt
-bash scripts/reproduce_saved.sh /path/to/TrajRisk_Repository_Check_2.zip
+bash scripts/reproduce_saved.sh build/downloads/TrajRisk_frozen_inputs.zip
 ```
 
 An existing environment with these dependencies can run the script directly. On Linux, CPU-only PyTorch can be installed first with `python3 -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu`.
 
-The command verifies the supplied assets, replays frozen reference and external mouse/human models, checks published metrics and derived results, and regenerates Figures S1–S5. Predictions, metrics and a JSON report go to `build/frozen_replay/`; plots go to `build/figures/supplementary/`. Canonical manuscript assets are preserved. For inference alone, use `python3 scripts/reproduce_frozen.py --bundle /path/to/TrajRisk_Repository_Check_2.zip --bootstrap-ci`.
+The command verifies the supplied assets, replays frozen reference and external mouse/human models, checks published metrics and derived results, and regenerates Figures S1–S5. Predictions, metrics and a JSON report go to `build/frozen_replay/`; plots go to `build/figures/supplementary/`. Canonical manuscript assets are preserved. For inference alone, use `python3 scripts/reproduce_frozen.py --bundle build/downloads/TrajRisk_frozen_inputs.zip --bootstrap-ci`.
 
 ## Check the supplied files
 
