@@ -1,0 +1,7 @@
+
+
+# BEGIN TRAJRISK PUBLICATION DATA BYTES
+/manuscript/data/** -text
+/manuscript/figures/data/** -text
+/manuscript/tables/data/** -text
+# END TRAJRISK PUBLICATION DATA BYTES

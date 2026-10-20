@@ -1,0 +1,77 @@
+\clearpage
+\section*{Supplementary data descriptions}
+\noindent Complete Data S1--S5 are provided as separate, machine-readable CSV files. The descriptions below define their observation units, columns, score configurations, and statistical roles.
+
+\Needspace{135pt}
+\subsection*{Data S1. Mouse risk and recovery gene signatures and their human orthologs.}
+\phantomsection\label{data:S1}
+\noindent\textbf{File:} \path{Data_S1_risk_recovery_gene_signatures.csv}.\par\smallskip
+\noindent The file contains 100 rows, one per signature gene, comprising 50 risk genes and 50 recovery genes derived from the Walesky mouse hepatocytes. Spearman correlations were computed between normalized Monocle 3 pseudotime and log-normalized gene expression; genes are traversed in descending correlation order for risk and ascending order for recovery until 50 genes with retained unique mouse-human mappings and counterparts present in the human expression matrix have been collected for each set. Each row supplies the mouse symbol and its mapped human symbol. The signatures comprise 100 distinct mouse genes and 100 distinct human orthologs. Correlations are dimensionless and are gene-selection statistics, not differential-expression p values.\par\smallskip
+\begin{description}
+\setlength{\itemsep}{1pt}\setlength{\parsep}{0pt}
+\item[\texttt{mouse\_gene}] Mouse gene symbol.
+\item[\texttt{human\_gene}] Corresponding human gene symbol.
+\item[\texttt{spearman\_rho}] Spearman correlation with normalized mouse pseudotime; positive for risk genes and negative for recovery genes.
+\item[\texttt{signature}] Gene-set membership, recorded as risk or recovery.
+\end{description}
+\noindent \textit{Cyp2e1/CYP2E1} belongs to the recovery set. It remains in this complete signature inventory but is excluded from recovery and net scoring in the Matchett spatial zonation analyses, leaving 49 recovery genes there; the 50-gene risk set is unchanged. Human-nucleus donor scoring uses the complete signature sets.\par\medskip
+
+\Needspace{135pt}
+\subsection*{Data S2. Human differential-expression results for reported mouse bottleneck-gene mappings.}
+\phantomsection\label{data:S2}
+\noindent\textbf{File:} \path{Data_S2_conserved_bottleneck_genes.csv}.\par\smallskip
+\noindent The file contains 1,036 reported mouse-to-human mapping rows retained at nominal human p \(\leq\) 0.05 from the bottleneck-program overlap analysis. It contains 1,036 distinct mouse gene symbols and 1,023 distinct human gene symbols because some mouse genes map to the same human symbol. Repeated human symbols retain their mouse mappings and identical human statistics. As described in the Methods, human log-normalized expression was first averaged within donor, and the APAP-ALF and healthy donor values were compared using a two-sided Mann-Whitney U test (10 and 9 donors, respectively). P values are nominal rather than adjusted for multiple testing.\par\smallskip
+\begin{description}
+\setlength{\itemsep}{1pt}\setlength{\parsep}{0pt}
+\item[\texttt{human\_gene}] Human gene symbol; it can recur for different mouse symbols.
+\item[\texttt{log2fc\_human}] Reported human log2 fold change for APAP-ALF versus healthy; positive values indicate higher expression in APAP-ALF.
+\item[\texttt{pval\_human}] Nominal two-sided human donor-comparison p value.
+\item[\texttt{mean\_alf}] Mean of donor-level mean log-normalized expression in the APAP-ALF group, in log-normalized expression units.
+\item[\texttt{mean\_healthy}] Mean of donor-level mean log-normalized expression in the healthy group, in the same units.
+\item[\texttt{mouse\_gene}] Associated mouse bottleneck-program gene symbol; one distinct mouse symbol per row.
+\end{description}
+\noindent The file supplies the nominally significant subset and does not contain the full tested background, mouse selection statistics, or per-scale membership. Human testing covered 2,549 mouse-gene mappings representing 2,534 distinct human symbols. Consequently, record-level overlap is 1,036/2,549 (40.6\%); distinct-human-gene overlap is 1,023/2,534 (40.4\%). The overlap criterion requires nominal significance in human donors, not agreement in mouse--human fold-change direction. The overlap is descriptive and was not tested against a matched liver-gene background.\par\medskip
+
+\Needspace{135pt}
+\subsection*{Data S3. Primary human donor-level TrajRisk and gene-signature scores.}
+\phantomsection\label{data:S3}
+\noindent\textbf{File:} \path{Data_S3_human_donor_primary_scores.csv}.\par\smallskip
+\noindent The file contains one row per Matchett donor in the primary cohort: 10 APAP-ALF donors and 9 healthy donors, representing 49,984 retained hepatocyte nuclei in total. Scores are averaged across retained nuclei within each donor. The primary TrajRisk configuration is \SelfOnly{}; Reference-KNN is a sensitivity configuration. TrajRisk scores are dimensionless on a 0--1 scale. Gene-signature scores are in log-normalized expression units; net score is risk minus recovery and can be negative.\par\smallskip
+\begin{description}
+\setlength{\itemsep}{1pt}\setlength{\parsep}{0pt}
+\item[\texttt{patient\_id}] Donor identifier.
+\item[\texttt{condition}] Clinical group, recorded as APAP\_ALF or Healthy.
+\item[\texttt{n\_cells}] Number of retained hepatocyte nuclei contributing to that donor; the legacy column name denotes nuclei here.
+\item[\texttt{risk\_2a}] Donor mean primary \SelfOnly{} TrajRisk score.
+\item[\texttt{risk\_2b}] Donor mean Reference-KNN TrajRisk score.
+\item[\texttt{sig\_net}] Donor mean net signature score: the 50-gene risk score minus the 50-gene recovery score.
+\item[\texttt{sig\_risk}] Donor mean raw 50-gene risk-signature score.
+\end{description}
+\noindent The file underlies \TableRef{S4B} and the Reference-KNN/net-signature concordance in \TableRef{S4C} and \MainFigRef{6}{D}. Group comparisons use unweighted donor values with a one-sided Mann-Whitney U alternative of APAP-ALF \(>\) healthy. AUROC uses the same direction. Concordance uses two-sided Spearman testing across all 19 donors. Donors are the inferential units; nucleus counts are not statistical weights.\par\medskip
+
+\Needspace{135pt}
+\subsection*{Data S4. Human donor-level scores after excluding low-nucleus-count APAP-ALF donors.}
+\phantomsection\label{data:S4}
+\noindent\textbf{File:} \path{Data_S4_human_donor_sensitivity_scores.csv}.\par\smallskip
+\noindent The file is a subset of \DataRef{S3} containing 15 donors: 6 APAP-ALF and 9 healthy, representing 49,181 retained hepatocyte nuclei. Four APAP-ALF donors with fewer than 300 retained nuclei are excluded: apap02 (94), apap05 (284), apap09 (291), and apap10 (134). All healthy donors are retained. The sensitivity analysis changes cohort membership; scores for retained donors are identical to \DataRef{S3}.\par\smallskip
+\noindent Columns and units are identical to \DataRef{S3}: patient\_id, condition, n\_cells, risk\_2a (primary \SelfOnly{}), risk\_2b (Reference-KNN), sig\_net, and sig\_risk. Scores remain unweighted donor means. One-sided Mann-Whitney U tests compare APAP-ALF \(>\) healthy; AUROC uses that direction. Reference-KNN/net-signature concordance uses two-sided Spearman testing across the 15 donors. The file underlies the sensitivity rows in \TableRefs{S4B}{S4C} and the primary-score sensitivity panel in \MainFigRef{6}{C}.\par\medskip
+
+\clearpage
+\Needspace{135pt}
+\subsection*{Data S5. Human spatial section-by-zone means of risk, recovery, and net signatures.}
+\phantomsection\label{data:S5}
+\noindent\textbf{File:} \path{Data_S5_human_spatial_section_zone_means.csv}.\par\smallskip
+\noindent The file contains 18 section-by-zone records: three zones for each of six Matchett human Visium sections, covering 16,273 in-tissue spots. Three APAP-ALF sections represent two donors (apap01 and apap03), and three healthy sections represent three donors (hea01, hea02, and hea10). The source condition label APAP denotes APAP-ALF. Pericentral spots have \textit{CYP2E1} CPM at or above the within-section 75th percentile; periportal spots are at or below the 25th percentile; the remaining spots are midlobular. Percentiles use linear interpolation, and all boundary ties enter the corresponding zone. Per-spot signature scores are mean CPM across 50 risk genes and 49 recovery genes, with \textit{CYP2E1} excluded from recovery scoring to avoid circularity with zone definition. Each reported zone score is the mean of these per-spot scores within that section and zone. Net score is risk minus corrected recovery.\par\smallskip
+\begin{description}
+\setlength{\itemsep}{1pt}\setlength{\parsep}{0pt}
+\item[\texttt{sample}] Spatial section identifier, including the GEO sample accession.
+\item[\texttt{donor}] Biological donor identifier; one donor can contribute more than one section.
+\item[\texttt{condition}] Recorded as APAP or Healthy; APAP denotes APAP-ALF.
+\item[\texttt{zone}] Recorded as midlobular, pericentral, or periportal.
+\item[\texttt{N\_spots}] Number of in-tissue spots contributing to the section-zone mean.
+\item[\texttt{Mean\_risk\_signature}] Mean 50-gene risk-signature score within that section and zone, in CPM.
+\item[\texttt{Mean\_recovery\_signature}] Mean corrected 49-gene recovery-signature score within that section and zone, in CPM.
+\item[\texttt{Mean\_net\_signature}] Mean net score within that section and zone, in CPM; risk minus corrected recovery.
+\end{description}
+\noindent The file underlies the section-level trajectories in \FigRef{S4}{F} and the unweighted section summaries in \TableRef{S5D}. \TableRef{S5D} averages the three section means within each condition and zone; its risk-signature SD is the sample SD of those three means. The section-level condition comparison is descriptive, with no case-control significance test. Repeated sections from one donor are not independent biological replicates.\par\medskip
+

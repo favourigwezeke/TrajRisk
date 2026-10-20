@@ -1,0 +1,8 @@
+Metric,Value,Note
+Unique one-to-one mouse-human mappings,13122.0,Mappings present in both Walesky and Matchett expression matrices
+Walesky mouse hepatocytes,6582.0,Mouse training/reference cells
+Matchett human hepatocyte nuclei,49984.0,10 APAP-ALF donors + 9 healthy donors
+Joint cross-species cells/nuclei,56566.0,Combined cross-species scVI dataset
+ASW (species labels),0.0347,Computed in 30-dimensional cross-species scVI latent space
+ASW (condition labels),0.0347,Cross-species latent-space diagnostic
+Cross-species TrajRisk validation AUROC,0.9219,Held-out Walesky validation set in cross-species coordinate system

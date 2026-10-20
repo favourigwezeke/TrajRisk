@@ -1,0 +1,4 @@
+Dataset,Analysis,N_pericentral,N_periportal,Pericentral_summary,Periportal_summary,Statistic,P_value
+Matchett human Visium,Risk signature: pericentral > periportal,4071.0,4104.0,3161.057692307692,3273.2236521803034,7547420.0,0.9999999999999793
+Matchett human Visium,Recovery signature excluding CYP2E1: pericentral < periportal,4071.0,4104.0,15411.255411255419,16112.652952016007,5542921.5,2.960768566572746e-153
+Matchett human Visium,CYP2E1 vs risk signature Spearman correlation,,,,,-0.16802480814807286,2.42213649947376e-103

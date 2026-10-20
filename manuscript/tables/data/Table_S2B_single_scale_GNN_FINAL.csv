@@ -1,0 +1,5 @@
+Scale,Development_AUROC,Validation_AUROC,Selected_by_development_AUROC
+Scale 1 (Acute Stress; 0h→6h),0.8219,0.8485,False
+Scale 2 (Peak Injury; 6h→24h),0.8427,0.8374,False
+Scale 3 (Fate Decision; 24h→48h),0.839,0.8496,False
+Scale 4 (Resolution; 48h→96h),0.8432,0.8502,True

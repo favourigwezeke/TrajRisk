@@ -1,0 +1,10 @@
+Method,Type,AUROC,AUROC_95CI_lower,AUROC_95CI_upper,AUPRC,Spearman_rho,Delta_AUROC_TrajRisk_minus_comparator_pp,One_sided_paired_bootstrap_p
+TrajRisk (full),Proposed,0.9071,0.8843,0.931,0.7707,0.5814,-0.0,—
+Initial XGBoost seed (W6),Baseline,0.8751,0.8535,0.8974,0.6745,,3.2,—
+B1: XGBoost (CV-tuned),Baseline,0.9582,0.9475,0.9682,0.826,0.7167,-5.11,1.000
+B2: Gaussian propagation,Baseline,0.8562,0.8329,0.8784,0.5026,0.5426,5.09,<0.001
+B3/A2: Single-scale GNN (best),Baseline/Ablation,0.8502,0.82,0.8824,0.6731,0.4852,5.69,<0.001
+B4: Expression distance,Baseline,0.8002,0.7687,0.8295,0.4936,0.4541,10.69,<0.001
+A1: Gaussian transitions,Ablation,0.8257,0.7937,0.8591,0.6519,0.458,8.14,<0.001
+A3: RF matrix propagation,Ablation,0.8536,0.8305,0.8762,0.5016,0.5538,5.35,<0.001
+A4: No XGBoost seed,Ablation,0.8281,0.7958,0.8618,0.6587,0.439,7.9,<0.001

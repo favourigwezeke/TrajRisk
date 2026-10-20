@@ -1,0 +1,4 @@
+Analysis,N_bottleneck_cells,N_bottleneck_high,Bottleneck_high_pct,Background_high_pct,Threshold,Odds_ratio,Fisher_alternative,Fisher_p
+Scale 3 source: high pseudotime,43,33,76.74418604651163,25.023969319271334,0.0923301125,11.173684210526316,greater,4.520825512661823e-13
+Scale 3 source: high predicted risk,43,43,100.0,25.023969319271334,0.0566794285,inf,greater,8.299407984938546e-28
+Scale 3 target: high pseudotime,380,72,18.94736842105263,25.054945054945055,0.08047163874999999,0.5604395604395604,less,0.00018744568274008593

@@ -1,5 +1,5 @@
 {
-  "release_tag": "v0.1.0-rc1",
+  "release_tag": "v0.1.0-rc2",
   "asset": "TrajRisk_frozen_inputs.zip",
   "archive_sha256": "e02575bdef206e3fdadcb8910fb4bce5f7cc30ba902191eb22db3bb3bec39457",
   "input_manifest_sha256": "ad5127aac02d978b282673c293ccbc271391ff053ec1cd24b6af749977403aee",

@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-05",
+  "units": "distinct human gene symbols",
+  "mouse_selection": {
+    "abs_log2fc": "> 0.20",
+    "nominal_p": "< 0.05",
+    "source": "saved per-scale mouse DE tables",
+    "provenance": "reconstructed final selection; original generator not recovered"
+  },
+  "human_selection": {
+    "nominal_p": "<= 0.05",
+    "test": "two-sided donor-level Mann-Whitney U",
+    "donors": {
+      "APAP_ALF": 10,
+      "Healthy": 9
+    },
+    "expression_verification": "user's Check 7; every saved p-value reproduced exactly"
+  },
+  "input_hashes": [
+    {
+      "member": "sources/results/week12_human_de_all_bottleneck_genes.csv",
+      "sha256": "74e16a578e555d3bd8abe3c93d56930e66baa5ffce35af2d68636d90b803b1fb"
+    },
+    {
+      "member": "sources/results/bottleneck_s3_de_scale1_acutestress.csv",
+      "sha256": "4719f9b18383b43c4ea0699e1f7099d02b5ca8291960ed728550fafbd20649ab"
+    },
+    {
+      "member": "sources/results/bottleneck_s3_de_scale2_peakinjury.csv",
+      "sha256": "292ce63a2cec8327a52b1df4b703215a0862423854b8f916d9e358c67be5a213"
+    },
+    {
+      "member": "sources/results/bottleneck_s3_de_scale3_fatedecision.csv",
+      "sha256": "e087ad3e756e185a8f6c40a07fedede7ce6f0f39891b7fb71cc6854ea547200f"
+    },
+    {
+      "member": "sources/results/bottleneck_s3_de_scale4_resolution.csv",
+      "sha256": "499165b0b1ffcd699127ba35e6b6ab0061d2ebbd6a241959c57a66ba032db479"
+    }
+  ],
+  "selected_mouse_gene_union": 2711,
+  "overall": {
+    "significant_unique_human_genes": 1023,
+    "tested_unique_human_genes": 2534,
+    "percentage": 40.37095501183899,
+    "percentage_display": "40.4",
+    "significant_mouse_records": 1036,
+    "tested_mouse_records": 2549
+  },
+  "scales": [
+    {
+      "scale": "scale1_acutestress",
+      "selected_mouse_genes": 183,
+      "tested_unique_human_genes": 161,
+      "significant_unique_human_genes": 75,
+      "percentage": 46.58385093167702,
+      "percentage_display": "46.6",
+      "mapped_mouse_records": 161,
+      "significant_mouse_records": 75
+    },
+    {
+      "scale": "scale2_peakinjury",
+      "selected_mouse_genes": 542,
+      "tested_unique_human_genes": 511,
+      "significant_unique_human_genes": 238,
+      "percentage": 46.57534246575342,
+      "percentage_display": "46.6",
+      "mapped_mouse_records": 516,
+      "significant_mouse_records": 242
+    },
+    {
+      "scale": "scale3_fatedecision",
+      "selected_mouse_genes": 1781,
+      "tested_unique_human_genes": 1674,
+      "significant_unique_human_genes": 633,
+      "percentage": 37.81362007168459,
+      "percentage_display": "37.8",
+      "mapped_mouse_records": 1677,
+      "significant_mouse_records": 636
+    },
+    {
+      "scale": "scale4_resolution",
+      "selected_mouse_genes": 959,
+      "tested_unique_human_genes": 906,
+      "significant_unique_human_genes": 380,
+      "percentage": 41.94260485651214,
+      "percentage_display": "41.9",
+      "mapped_mouse_records": 909,
+      "significant_mouse_records": 382
+    }
+  ],
+  "unweighted_scale_mean_percentage": 43.22885458140679,
+  "multiplicity": "nominal exploratory comparisons; no new correction applied"
+}
