@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-20",
+  "basis": "Current laptop source packet; all six hashes match the completed equation audit",
+  "scripts": [
+    {
+      "path": "scripts/week5_transition_matrices.py",
+      "audited_original_sha256": "2be777dd0c2704f3f476b8f50fe3a63f79ff8f6a61eb07119d2edc3f2aa56329",
+      "portable_sha256": "e24a14cf022bfa74b6e5bdfccf641b3c21a841a38ee73997b5d4b2270e7cde8d",
+      "change": "Project-root assignment and module-docstring cd example only",
+      "scientific_ast_unchanged": true,
+      "execution_tested_after_port": false
+    },
+    {
+      "path": "scripts/week6_gnn_architecture.py",
+      "audited_original_sha256": "c4e8dba6221ff80b3250d87baeb82769b338f6d5e92c2f04afaf3c2565ed319d",
+      "portable_sha256": "95c08f4b578135499ddbbce206cbf049551638454f47769c1efb81492b1de48a",
+      "change": "Project-root assignment and module-docstring cd example only",
+      "scientific_ast_unchanged": true,
+      "execution_tested_after_port": false
+    },
+    {
+      "path": "scripts/week7_full_training.py",
+      "audited_original_sha256": "4ceba15a846619db37019532ad8c779bfb6339fa9488fdf03829bd541d7177f7",
+      "portable_sha256": "000a3cea01d9c12a5cf260cad07b57fbeebd0730ca8e39c87983b6d379739534",
+      "change": "Project-root assignment and module-docstring cd example only",
+      "scientific_ast_unchanged": true,
+      "execution_tested_after_port": false
+    },
+    {
+      "path": "scripts/week8_baselines_ablations.py",
+      "audited_original_sha256": "bf0c4cefed0471fcc444fa1e75f0d7d124c8bbaf760bc6f3df1d2052c2e100f1",
+      "portable_sha256": "f89cfe96eb657daa11d86c6e3578aefebc186423547fbdcd63add98400649bce",
+      "change": "Project-root assignment and module-docstring cd example only",
+      "scientific_ast_unchanged": true,
+      "execution_tested_after_port": false
+    },
+    {
+      "path": "scripts/week9a_mouse_cross_dataset_final.py",
+      "audited_original_sha256": "7bbae518f6e464abd552b88473a44ca9ca17df78dec864e18911e66f68fe8922",
+      "portable_sha256": "2307973787a4354ea9d99adc1d1c2216f67092a2b5fad6751af5456f98ae3bf5",
+      "change": "Project-root assignment and module-docstring cd example only",
+      "scientific_ast_unchanged": true,
+      "execution_tested_after_port": false,
+      "frozen_definitions_replayed": true,
+      "full_training_script_executed": false
+    },
+    {
+      "path": "scripts/week9b_human_cross_species.py",
+      "audited_original_sha256": "34db603202f0892602a2faf026ca7d76cbd7d3a76a8b1983a2864cb9f2a014d3",
+      "portable_sha256": "2fbfd7040fee5039c60d41c03d885ee9df5f7a6bf9b6164aa1452861d49d47c7",
+      "change": "Project-root assignment and module-docstring cd example only; scale-vote/tie docstring corrected to match the unchanged executable implementation",
+      "scientific_ast_unchanged": true,
+      "execution_tested_after_port": false,
+      "frozen_definitions_replayed": true,
+      "full_training_script_executed": false
+    }
+  ]
+}

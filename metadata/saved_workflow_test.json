@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-20",
+  "command": "bash scripts/reproduce_saved.sh <matching frozen input ZIP>",
+  "exit_code": 0,
+  "fresh_environment": true,
+  "environment": "Linux / CPython 3.12.14 / CPU PyTorch 2.10.0",
+  "dependency_check": "No broken requirements found",
+  "numerical_checks_passed": 79,
+  "input_files_verified_unchanged": 135,
+  "plots": [
+    {
+      "figure": "S1",
+      "pdf": "Figure_S1_external_dataset_QC_FINAL.pdf",
+      "pdf_sha256": "c6d3934a96eeb84754583d7c6d9392533ba00ad0e042bc87fa99407df4dde611",
+      "png": "Figure_S1_external_dataset_QC_FINAL.png",
+      "png_pixels": [
+        9237,
+        6886
+      ],
+      "plot_layout_inspected": true
+    },
+    {
+      "figure": "S2",
+      "pdf": "Figure_S2_pseudotime_representation_FINAL.pdf",
+      "pdf_sha256": "bc1c37e180503d5e157142114e3c949e69cd95ba9cab1f94967315eafc7a560e",
+      "png": "Figure_S2_pseudotime_representation_FINAL.png",
+      "png_pixels": [
+        9197,
+        2543
+      ],
+      "plot_layout_inspected": true
+    },
+    {
+      "figure": "S3",
+      "pdf": "Figure_S3_cross_species_diagnostics_FINAL.pdf",
+      "pdf_sha256": "e5fb856eba468f565f2f84f811f33414d109ed25ea6139a97d51328d4ebb38be",
+      "png": "Figure_S3_cross_species_diagnostics_FINAL.png",
+      "png_pixels": [
+        10114,
+        2480
+      ],
+      "plot_layout_inspected": true
+    },
+    {
+      "figure": "S4",
+      "pdf": "Figure_S4_spatial_validation_FINAL.pdf",
+      "pdf_sha256": "4772f39c0d6ab331885569a08ee6ad13635e3c7c53c280fffe113488e151e212",
+      "png": "Figure_S4_spatial_validation_FINAL.png",
+      "png_pixels": [
+        8845,
+        4686
+      ],
+      "plot_layout_inspected": true
+    },
+    {
+      "figure": "S5",
+      "pdf": "Figure_S5_bottleneck_sensitivity_FINAL.pdf",
+      "pdf_sha256": "f9d1ab065a531b13072cccaa07b46b2e3a36dbb63a77ca5a6de4730ebe363b6e",
+      "png": "Figure_S5_bottleneck_sensitivity_FINAL.png",
+      "png_pixels": [
+        6276,
+        2348
+      ],
+      "plot_layout_inspected": true
+    }
+  ],
+  "canonical_figure_pdfs_replaced": false,
+  "path_or_credential_scan_findings": [],
+  "limitations": "Frozen inference and saved-output reproduction; raw-data retraining and all main-figure assembly remain pending."
+}

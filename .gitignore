@@ -1,0 +1,16 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+.venv/
+Data/
+models/
+results/
+build/
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz

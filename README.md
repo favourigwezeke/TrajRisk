@@ -1,92 +1,62 @@
-# TrajRisk: Multi-Scale Graph Neural Network for Trajectory-Informed Risk Propagation
+# TrajRisk
 
-[![bioRxiv](https://img.shields.io/badge/bioRxiv-2025.07.XXXXX-b31b1b.svg)](https://biorxiv.org/YOURLINK)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+TrajRisk learns treatment-aware, directed transition graphs at four temporal scales and integrates expression-derived features with a graph neural network. Its dimensionless score estimates normalized Monocle 3 pseudotime in a mouse injury–recovery reference.
 
-**Predicting drug-induced hepatotoxicity through trajectory-aware risk propagation in single-cell transcriptomics.**
+## Current contents
 
-## Overview
+This repository draft contains the six audited core analysis scripts, preprocessing notebooks and R trajectory source, supplementary-figure generators, the active LaTeX manuscript, Figures 1–7 and S1–S5, 20 table CSV components, and Data S1–S5. Portable scripts use relative input paths and isolated build outputs. Source provenance is in `metadata/workflow_sources.json`.
 
-TrajRisk models cellular toxicity as a dynamic process unfolding through developmental trajectories. Using multi-scale graph neural networks, we propagate risk from early responses to predict late outcomes and identify critical transition bottlenecks.
+## Reproduce saved-model results
 
-**Key Features:**
-- 🧬 Multi-scale graph construction from cellular trajectories
-- 🤖 Learnable transition probabilities via Random Forest
-- 🔥 Graph neural network for trajectory-aware risk propagation
-- 🎯 Systematic bottleneck analysis via edge perturbation
-- 📊 Cross-dataset and human validation
+Obtain the matching `TrajRisk_Repository_Check_2.zip` frozen-input packet. The code repository excludes large model/data archives; its input checksums are in `metadata/frozen_input_manifest.json`. A public archive URL will be added before release.
 
-## Installation
+From this directory:
+
 ```bash
-git clone https://github.com/yourusername/TrajRisk.git
-cd TrajRisk
-
-conda create -n trajrisk python=3.9
-conda activate trajrisk
-
-pip install -r requirements.txt
-pip install -e .
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install -r requirements-frozen.txt
+bash scripts/reproduce_saved.sh /path/to/TrajRisk_Repository_Check_2.zip
 ```
 
-## Quick Start
-```python
-import trajrisk as tr
-import scanpy as sc
+An existing environment with these dependencies can run the script directly. On Linux, CPU-only PyTorch can be installed first with `python3 -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu`.
 
-# Load data
-adata = sc.read_h5ad("path/to/data.h5ad")
+The command verifies the supplied assets, replays frozen reference and external mouse/human models, checks published metrics and derived results, and regenerates Figures S1–S5. Predictions, metrics and a JSON report go to `build/frozen_replay/`; plots go to `build/figures/supplementary/`. Canonical manuscript assets are preserved. For inference alone, use `python3 scripts/reproduce_frozen.py --bundle /path/to/TrajRisk_Repository_Check_2.zip --bootstrap-ci`.
 
-# Build multi-scale graphs
-graphs = tr.build_multiscale_graphs(
-    adata, 
-    pseudotime_key='dpt_pseudotime',
-    scales=[0.05, 0.1, 0.2]
-)
+## Check the supplied files
 
-# Train GNN
-model = tr.TrajRiskGNN(input_dim=30, hidden_dim=64)
-trainer = tr.Trainer(model, graphs)
-trainer.train(epochs=100)
+From this directory, run:
 
-# Predict risk
-risk_scores = model.predict(adata)
-
-# Identify bottlenecks
-bottlenecks = tr.find_bottlenecks(model, graphs, top_k=10)
-```
-
-## Reproducing Paper Results
 ```bash
-# Download data
-python scripts/download_data.py
-
-# Run full pipeline
-python scripts/run_trajrisk.py --config configs/default.yaml
-
-# Generate figures
-python scripts/generate_figures.py
+python scripts/verify_release_assets.py
 ```
 
-## Citation
-```bibtex
-@article{yourname2025trajrisk,
-  title={TrajRisk: Multi-Scale Graph Neural Network Framework for Trajectory-Informed Risk Propagation},
-  author={Your Name},
-  journal={bioRxiv},
-  year={2025},
-  doi={10.1101/2025.07.XXXXX}
-}
-```
+This checks file hashes, citation matching, equation count, and the supplied CSV structures. It does not rerun models or regenerate plots.
 
-## Documentation
+## Compile the combined review PDF
 
-See [notebooks](notebooks/) for tutorials and examples.
+Upload `manuscript/` to Overleaf, select `review_all.tex`, and use pdfLaTeX. Alternatively, run `python scripts/build_manuscript.py` with pdfLaTeX installed. The combined review is the canonical reading version and includes the supplement. Its scientific sources retain the approved 178-word abstract, 126 references, and 26 numbered equations.
 
-## License
+## Environment
 
-MIT License - see [LICENSE](LICENSE) file.
+The frozen workflow has been tested in a new Linux/Python 3.12 environment. Its resolved package snapshot is `environments/frozen-linux-py312.lock.txt`. Plot typography follows available fonts; the generators request Arial. The root `environment.yml` and `requirements.txt` record the broader project dependencies; full observed Python/Conda snapshots are in `environments/`. A clean installation of the full training environment remains to be tested.
 
-## Contact
+## Analysis workflow
 
-For questions: your.email@university.edu
+1. Acquire and preprocess the datasets described in `docs/datasets.md`.
+2. Integrate expression data with scVI and derive Walesky Monocle 3 pseudotime.
+3. Construct temporal transition matrices with `week5_transition_matrices.py`.
+4. Build the graph inputs with `week6_gnn_architecture.py` and train with `week7_full_training.py`.
+5. Evaluate baselines with `week8_baselines_ablations.py`.
+6. Evaluate mouse and human transfer with `week9a_mouse_cross_dataset_final.py` and `week9b_human_cross_species.py`.
+7. Use the supported frozen workflow for supplementary plots and checked endpoints. Complete final main-figure assembly and remaining table reproduction before claiming end-to-end reproduction.
+
+Training scripts expect `Data/processed/`, `models/`, and `results/` beneath the project root. Full expression, RF and scVI model archives remain separate inputs. The user-confirmed trajectory environment is RStudio R 4.5.1 / Monocle 3 1.4.27. `docs/reproduction_status.md` records the tested scope and remaining work.
+
+## Interpretation
+
+The score describes a model-derived trajectory state. Reference evaluation is transductive, external performance varies across cohorts, and the candidate recovery gateway is a hypothesis for experimental testing. The manuscript reports expression-only comparators and null signature/spatial findings.
+
+## Before public release
+
+Complete final main-figure generator alignment, remaining table/raw-data reproduction, and versioned data/model deposition. Add the author-approved code license, citation metadata, repository URL and release identifier. This repository supports the TrajRisk preprint workflow. PyPI packaging can follow the preprint.

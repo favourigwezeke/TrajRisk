@@ -1,0 +1,485 @@
+{
+  "date": "2026-10-20",
+  "collected_files": 47,
+  "notebook_code_cells": 97,
+  "excluded_backup_files": 10,
+  "files": [
+    {
+      "original_path": "scripts/extract_figure_data OLD.py",
+      "original_sha256": "1f7c623fd3afc0300bdfb61059fa2029102fe18e49cb3031f21b9dc6d747ff36",
+      "status": "excluded_backup",
+      "repository_path": null
+    },
+    {
+      "original_path": "scripts/extract_figure_data.py",
+      "original_sha256": "46995f40024aece970a64c534c21730b9a16a6b582c7b6d43cecef049457b084",
+      "collected_sha256": "46995f40024aece970a64c534c21730b9a16a6b582c7b6d43cecef049457b084",
+      "repository_path": "archive/earlier_figures/extract_figure_data.py",
+      "portable_sha256": "ce7e3d2271e8d094536ba9fed7b8a4b97ca68da56f406316e419d2ebc4d1b04a",
+      "status": "superseded_figure_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/figure_audit.py",
+      "original_sha256": "f46401c222a5f558e2c37d5c215badc741e07d0398d690e11bba64db86e2a262",
+      "collected_sha256": "f46401c222a5f558e2c37d5c215badc741e07d0398d690e11bba64db86e2a262",
+      "repository_path": "scripts/diagnostics/figure_audit.py",
+      "portable_sha256": "b507b20ba4c95cd00c4082345f90d28474bd05812c4d46df1f0e6b57b8ad6a0f",
+      "status": "diagnostic_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/generate_bottleneck_figures.py",
+      "original_sha256": "a0d26d7fb9a1d44198bca42fa0199944c8093f77144048c96e1cc27bff6c75e1",
+      "collected_sha256": "a0d26d7fb9a1d44198bca42fa0199944c8093f77144048c96e1cc27bff6c75e1",
+      "repository_path": "scripts/figures/candidates/generate_bottleneck_figures.py",
+      "portable_sha256": "54956d89df3d9dca0113d08025ca297e6c50d4f1e838bcc36b6a693d46174c47",
+      "status": "main_figure_component_pending_final_alignment",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/generate_bottleneck_figures_OLD.py",
+      "original_sha256": "8a25c00581070d638086a330ddb938f985c7e2087ee2202c1af1c8df18ca9058",
+      "status": "excluded_backup",
+      "repository_path": null
+    },
+    {
+      "original_path": "scripts/generate_bottleneck_figures_OLD_1.py",
+      "original_sha256": "9b5a00abe7fc691fca9711428a96eb32f95666bd92a0391bed3f6a611b84f5b7",
+      "status": "excluded_backup",
+      "repository_path": null
+    },
+    {
+      "original_path": "scripts/generate_bottleneck_figures_OLD_2.py",
+      "original_sha256": "12f9289f59645ce20772db7d9518fb58ac0788e9abe5fa0362a63eaabe6f30af",
+      "status": "excluded_backup",
+      "repository_path": null
+    },
+    {
+      "original_path": "scripts/generate_figure1b.py",
+      "original_sha256": "5988fe91091f0e9c444a4ee21fd44de8880caa9a059c4d5044f56d4b094aa199",
+      "collected_sha256": "5988fe91091f0e9c444a4ee21fd44de8880caa9a059c4d5044f56d4b094aa199",
+      "repository_path": "scripts/figures/candidates/generate_figure1b.py",
+      "portable_sha256": "b6c751f308330defd9c51250666b89136a873cab68e38cc7d7d71b2b857cf2a3",
+      "status": "main_figure_component_pending_final_alignment",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/generate_figures OLD.py",
+      "original_sha256": "53e8fd37e0a3c233285a5f5c3b64223340d87c2e3849e5828f59a2cb178f98bd",
+      "status": "excluded_backup",
+      "repository_path": null
+    },
+    {
+      "original_path": "scripts/generate_figures.py",
+      "original_sha256": "9f6e883efcc43918b0592a24f54b47839c3c297f6e9fd72968a67d0f87eadc71",
+      "collected_sha256": "9f6e883efcc43918b0592a24f54b47839c3c297f6e9fd72968a67d0f87eadc71",
+      "repository_path": "archive/earlier_figures/generate_figures.py",
+      "portable_sha256": "b00cd9a2a159ec44a32c760b6fe909d7aa60f6235f2f2f85fee25704904cfebd",
+      "status": "superseded_figure_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/generate_umap_figure OLD.py",
+      "original_sha256": "ed49eb25a6d6d5a654b27af34071a2eec09a16b8ef303b0c89c931638eaafadb",
+      "status": "excluded_backup",
+      "repository_path": null
+    },
+    {
+      "original_path": "scripts/generate_umap_figure.py",
+      "original_sha256": "b62ba6c958c51d496a9f0ed6f3f8d601fb0f07272204ae19568426aa505a0312",
+      "collected_sha256": "b62ba6c958c51d496a9f0ed6f3f8d601fb0f07272204ae19568426aa505a0312",
+      "repository_path": "archive/earlier_figures/generate_umap_figure.py",
+      "portable_sha256": "92bcd1a011e7f7d93370d8dba0109bd744e410a85a046871804407f3e4c75c56",
+      "status": "superseded_figure_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/generate_week13_panels.py",
+      "original_sha256": "f882496a95d17ee36c5a813025a15e2454108137f801976ecbca9b924df0633f",
+      "collected_sha256": "f882496a95d17ee36c5a813025a15e2454108137f801976ecbca9b924df0633f",
+      "repository_path": "archive/earlier_figures/generate_week13_panels.py",
+      "portable_sha256": "df9a50f5cd75caf1d97ffd2242ee7673c1f4b6c816a70c924324aa51cad7724e",
+      "status": "superseded_figure_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/generate_week2_panels.py",
+      "original_sha256": "f81d268264b84a4c1ec67df7b8e371e2f61894f2e3efa7182323f09b14cbb997",
+      "collected_sha256": "f81d268264b84a4c1ec67df7b8e371e2f61894f2e3efa7182323f09b14cbb997",
+      "repository_path": "scripts/figures/candidates/generate_week2_panels.py",
+      "portable_sha256": "ac0462e8b5118ec8b5b7f8038db54398c445d563968fb15aa3fcaffdde7c12d9",
+      "status": "main_figure_component_pending_final_alignment",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/generate_week3_panels.py",
+      "original_sha256": "128b1a9de4feb6aae57295daccc48c649bbc1815239dfc90783dd03e751d6e0b",
+      "collected_sha256": "128b1a9de4feb6aae57295daccc48c649bbc1815239dfc90783dd03e751d6e0b",
+      "repository_path": "archive/earlier_figures/generate_week3_panels.py",
+      "portable_sha256": "4bd98a106e4f053b89b923be7abff996a8652429aaca40ddf6470b716bb3e124",
+      "status": "superseded_figure_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/make_figure_s1.py",
+      "original_sha256": "d62f3440d9e0ae1fc276209991a98ecd86292eeb06ecd1183d1694c127663400",
+      "collected_sha256": "d62f3440d9e0ae1fc276209991a98ecd86292eeb06ecd1183d1694c127663400",
+      "repository_path": "scripts/figures/make_figure_s1.py",
+      "portable_sha256": "9d4e3921b0c1744e3fac6eac5d620a975dc2cfed89fec90ddaec9f11a0bac936",
+      "status": "supplementary_figure_candidate_pending_input_replay",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": true,
+      "frozen_replay_changes": "Explicit compact metadata reader for S1\u2013S3; S5 normalizes the previously corrected Q4 display endpoint in memory. Plot calculations unchanged.",
+      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/.",
+      "presentation_change": "Limit scatter-axis major ticks to avoid overlap under fallback fonts."
+    },
+    {
+      "original_path": "scripts/make_figure_s2.py",
+      "original_sha256": "f57373b1318ad250aa02d47f4b331c8c8f0d5fd99f56c204439a508c648a2e2d",
+      "collected_sha256": "f57373b1318ad250aa02d47f4b331c8c8f0d5fd99f56c204439a508c648a2e2d",
+      "repository_path": "scripts/figures/make_figure_s2.py",
+      "portable_sha256": "da3487494c008b3e7db87f2c6ac82ed939f289fadc495486f27fa02c76671793",
+      "status": "supplementary_figure_candidate_pending_input_replay",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": true,
+      "frozen_replay_changes": "Explicit compact metadata reader for S1\u2013S3; S5 normalizes the previously corrected Q4 display endpoint in memory. Plot calculations unchanged.",
+      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/."
+    },
+    {
+      "original_path": "scripts/make_figure_s3.py",
+      "original_sha256": "9a48d3188ab3420396832a7c303c9663bc7613c9f7272e3f105a3eb8239932ca",
+      "collected_sha256": "9a48d3188ab3420396832a7c303c9663bc7613c9f7272e3f105a3eb8239932ca",
+      "repository_path": "scripts/figures/make_figure_s3.py",
+      "portable_sha256": "091290d41753fdb9e795cb4d62ef4af3e1c23e9f8b2fa17c94048173f0aae9f7",
+      "status": "supplementary_figure_candidate_pending_input_replay",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": true,
+      "frozen_replay_changes": "Explicit compact metadata reader for S1\u2013S3; S5 normalizes the previously corrected Q4 display endpoint in memory. Plot calculations unchanged.",
+      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/."
+    },
+    {
+      "original_path": "scripts/make_figure_s4.py",
+      "original_sha256": "a49557d00ecc986aab48243c664fc4dc99ba33f2e8ba20fa9418ebddd3aabc69",
+      "collected_sha256": "a49557d00ecc986aab48243c664fc4dc99ba33f2e8ba20fa9418ebddd3aabc69",
+      "repository_path": "scripts/figures/make_figure_s4.py",
+      "portable_sha256": "e144ce479b6b4aed85e9692124a2b862e06bf98e9d2397fed98f478c014346a3",
+      "status": "supplementary_figure_candidate_pending_input_replay",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": true,
+      "frozen_replay_changes": "Explicit compact metadata reader for S1\u2013S3; S5 normalizes the previously corrected Q4 display endpoint in memory. Plot calculations unchanged.",
+      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/."
+    },
+    {
+      "original_path": "scripts/make_figure_s5.py",
+      "original_sha256": "fadabf85604fef542842cf8c971879cb71284bb1fc92779bf7aa66f98ff4c5d9",
+      "collected_sha256": "fadabf85604fef542842cf8c971879cb71284bb1fc92779bf7aa66f98ff4c5d9",
+      "repository_path": "scripts/figures/make_figure_s5.py",
+      "portable_sha256": "e7bec197a5f3464817c724aad78aa6f60cc19eb2e5eec1ece79b5478f671edc0",
+      "status": "supplementary_figure_candidate_pending_input_replay",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": true,
+      "frozen_replay_changes": "Explicit compact metadata reader for S1\u2013S3; S5 normalizes the previously corrected Q4 display endpoint in memory. Plot calculations unchanged.",
+      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/."
+    },
+    {
+      "original_path": "scripts/week5_transition_matrices.py",
+      "original_sha256": "2be777dd0c2704f3f476b8f50fe3a63f79ff8f6a61eb07119d2edc3f2aa56329",
+      "collected_sha256": "2be777dd0c2704f3f476b8f50fe3a63f79ff8f6a61eb07119d2edc3f2aa56329",
+      "repository_path": "scripts/week5_transition_matrices.py",
+      "portable_sha256": "e24a14cf022bfa74b6e5bdfccf641b3c21a841a38ee73997b5d4b2270e7cde8d",
+      "status": "audited_core",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/week6_gnn_architecture.py",
+      "original_sha256": "c4e8dba6221ff80b3250d87baeb82769b338f6d5e92c2f04afaf3c2565ed319d",
+      "collected_sha256": "c4e8dba6221ff80b3250d87baeb82769b338f6d5e92c2f04afaf3c2565ed319d",
+      "repository_path": "scripts/week6_gnn_architecture.py",
+      "portable_sha256": "95c08f4b578135499ddbbce206cbf049551638454f47769c1efb81492b1de48a",
+      "status": "audited_core",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/week7_full_training.py",
+      "original_sha256": "4ceba15a846619db37019532ad8c779bfb6339fa9488fdf03829bd541d7177f7",
+      "collected_sha256": "4ceba15a846619db37019532ad8c779bfb6339fa9488fdf03829bd541d7177f7",
+      "repository_path": "scripts/week7_full_training.py",
+      "portable_sha256": "000a3cea01d9c12a5cf260cad07b57fbeebd0730ca8e39c87983b6d379739534",
+      "status": "audited_core",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/week7_full_training_old.py",
+      "original_sha256": "2e17f23652ca8549335812b0ce78d7559c0d0b2b3ad286412a6950dbb7bff46c",
+      "status": "excluded_backup",
+      "repository_path": null
+    },
+    {
+      "original_path": "scripts/week8_baselines_ablations.py",
+      "original_sha256": "bf0c4cefed0471fcc444fa1e75f0d7d124c8bbaf760bc6f3df1d2052c2e100f1",
+      "collected_sha256": "bf0c4cefed0471fcc444fa1e75f0d7d124c8bbaf760bc6f3df1d2052c2e100f1",
+      "repository_path": "scripts/week8_baselines_ablations.py",
+      "portable_sha256": "f89cfe96eb657daa11d86c6e3578aefebc186423547fbdcd63add98400649bce",
+      "status": "audited_core",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/week8_supplementary_analysis.py",
+      "original_sha256": "d732ef83d92427f626c09b0b71539a9a7dc0b281a3228f6ab3c9c290a92d861c",
+      "collected_sha256": "d732ef83d92427f626c09b0b71539a9a7dc0b281a3228f6ab3c9c290a92d861c",
+      "repository_path": "scripts/week8_supplementary_analysis.py",
+      "portable_sha256": "474e943da883a4da95f3186ae2055f91b69d80b29f53fb7a228a0a01e90f1b29",
+      "status": "supplementary_analysis_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/week8_supplementary_analysis_OLD.py",
+      "original_sha256": "2466fc7232f97463ca6037f3e72bc66263b7396dd772471ea50d6e744ceb0f70",
+      "status": "excluded_backup",
+      "repository_path": null
+    },
+    {
+      "original_path": "scripts/week9_mouse_cross_dataset.py",
+      "original_sha256": "c463954c14d63fb1a53bee5ca5a4879c7aecbb1ad49baf32f90903e111159bf4",
+      "collected_sha256": "c463954c14d63fb1a53bee5ca5a4879c7aecbb1ad49baf32f90903e111159bf4",
+      "repository_path": "archive/earlier_transfer/week9_mouse_cross_dataset.py",
+      "portable_sha256": "d0f7ed18b0847e667756c2d53cde218e5bd629866e8e92b74990dd51bac39dc1",
+      "status": "earlier_transfer_or_diagnostic_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/week9_mouse_reference_knn.py",
+      "original_sha256": "39e86e8f58efe6fefa764dbc2ed33f831eda6ba2056ba089596e8c811ca15555",
+      "collected_sha256": "39e86e8f58efe6fefa764dbc2ed33f831eda6ba2056ba089596e8c811ca15555",
+      "repository_path": "archive/earlier_transfer/week9_mouse_reference_knn.py",
+      "portable_sha256": "40543f8f1c36230087c2ad2090368b45e03ed3205d49c4940f1ef3f27d7cbd05",
+      "status": "earlier_transfer_or_diagnostic_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/week9_mouse_reference_knn_corrected.py",
+      "original_sha256": "8f554c04e56e5cda3ea9c573cdc2427098fc45caa28073dcc07cbd54acb9aef3",
+      "collected_sha256": "8f554c04e56e5cda3ea9c573cdc2427098fc45caa28073dcc07cbd54acb9aef3",
+      "repository_path": "archive/earlier_transfer/week9_mouse_reference_knn_corrected.py",
+      "portable_sha256": "597cb0c3aafe715d32e1a9cfdd197b2f1dccffd5e3dfe37a8dbeef68d75c0f2e",
+      "status": "earlier_transfer_or_diagnostic_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/week9_reference_projection_diagnostics.py",
+      "original_sha256": "a8955b6f02a41b19ca23fd650e6c5be8b23a0ded0b7a6a2cc279e478c00e9430",
+      "collected_sha256": "a8955b6f02a41b19ca23fd650e6c5be8b23a0ded0b7a6a2cc279e478c00e9430",
+      "repository_path": "archive/earlier_transfer/week9_reference_projection_diagnostics.py",
+      "portable_sha256": "a0523ac12996bc5c65207f5fe1bc36b5e544014482d572f3c83cbdd6a8473ab3",
+      "status": "earlier_transfer_or_diagnostic_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/week9a_mouse_cross_dataset_final.py",
+      "original_sha256": "7bbae518f6e464abd552b88473a44ca9ca17df78dec864e18911e66f68fe8922",
+      "collected_sha256": "7bbae518f6e464abd552b88473a44ca9ca17df78dec864e18911e66f68fe8922",
+      "repository_path": "scripts/week9a_mouse_cross_dataset_final.py",
+      "portable_sha256": "2307973787a4354ea9d99adc1d1c2216f67092a2b5fad6751af5456f98ae3bf5",
+      "status": "audited_core",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false,
+      "frozen_definitions_replayed": true,
+      "full_training_script_executed": false
+    },
+    {
+      "original_path": "scripts/week9b_audit OLD.py",
+      "original_sha256": "dae6c2637db45f8ef4b444f79e89b162bc36a45dc8eef5d7630cd980c705df96",
+      "status": "excluded_backup",
+      "repository_path": null
+    },
+    {
+      "original_path": "scripts/week9b_audit.py",
+      "original_sha256": "69c9865117bf5a5d96d1e06344f1cbda247b2626665c9477ed5c4f298379cbed",
+      "collected_sha256": "69c9865117bf5a5d96d1e06344f1cbda247b2626665c9477ed5c4f298379cbed",
+      "repository_path": "archive/earlier_transfer/week9b_audit.py",
+      "portable_sha256": "8ba39193ae55b71470f709097054d4bf77a782b19745d0065dd99f35bc3b60ab",
+      "status": "earlier_transfer_or_diagnostic_source",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false
+    },
+    {
+      "original_path": "scripts/week9b_human_cross_species OLD.py",
+      "original_sha256": "10742b4e7491cafeb2a6b36858763e0bc271b3088cdc49b5282294897a078d43",
+      "status": "excluded_backup",
+      "repository_path": null
+    },
+    {
+      "original_path": "scripts/week9b_human_cross_species.py",
+      "original_sha256": "34db603202f0892602a2faf026ca7d76cbd7d3a76a8b1983a2864cb9f2a014d3",
+      "collected_sha256": "34db603202f0892602a2faf026ca7d76cbd7d3a76a8b1983a2864cb9f2a014d3",
+      "repository_path": "scripts/week9b_human_cross_species.py",
+      "portable_sha256": "2fbfd7040fee5039c60d41c03d885ee9df5f7a6bf9b6164aa1452861d49d47c7",
+      "status": "audited_core",
+      "scientific_ast_unchanged": true,
+      "executed_after_port": false,
+      "documentation_correction": "Scale-assignment docstring now states the implemented phase vote and first-encountered tie rule. Executable statements unchanged.",
+      "frozen_definitions_replayed": true,
+      "full_training_script_executed": false
+    },
+    {
+      "original_path": "notebooks/01_walesky_loading.ipynb",
+      "original_sha256": "c55071f72be0c8e41dd705c790553326827d22996d95c272020b5a7f8b12cfcd",
+      "collected_sha256": "c2cc74056c8dcac25312f7567a0302fc132f292cc6f2b8567b73dd6e339d7582",
+      "repository_path": "notebooks/01_walesky_loading.ipynb",
+      "portable_sha256": "70f57e657f3700928c9f036c027161acda9f03f325a02f129245e441c2fee064",
+      "status": "preprocessing_notebook_source_not_clean_run_verified",
+      "changed_path_cells": [
+        0
+      ],
+      "scientific_ast_unchanged": true,
+      "notebook_code_cells": 13
+    },
+    {
+      "original_path": "notebooks/02_umbaugh_2h_loading.ipynb",
+      "original_sha256": "949bb20b862b8f4716d385004e4585be3bf486b93675a47c06cddb56cc20491c",
+      "collected_sha256": "321173ae34a5c40879d885d3f0070f38db1bee5b6d35030d7584aad11dfd49b2",
+      "repository_path": "notebooks/02_umbaugh_2h_loading.ipynb",
+      "portable_sha256": "b061e28dd57276efdb5a35abd9d9139c8dc9458f664b0065d19564bd8e3a1b14",
+      "status": "preprocessing_notebook_source_not_clean_run_verified",
+      "changed_path_cells": [
+        0
+      ],
+      "scientific_ast_unchanged": true,
+      "notebook_code_cells": 11
+    },
+    {
+      "original_path": "notebooks/03_benmoshe_loading.ipynb",
+      "original_sha256": "97dbb876788ef972d716cba24f50fbbfd42802a208c293fba0ef29b33f5651e2",
+      "collected_sha256": "43d3966813d3ef96d2d7f509f1d362806a9c668af882d529b47341319cd0d1d2",
+      "repository_path": "notebooks/03_benmoshe_loading.ipynb",
+      "portable_sha256": "ff828ff2594830a7971d055bf6491f35b78d16ed0a632f061ddb6d3d56c43293",
+      "status": "preprocessing_notebook_source_not_clean_run_verified",
+      "changed_path_cells": [
+        0
+      ],
+      "scientific_ast_unchanged": true,
+      "notebook_code_cells": 10
+    },
+    {
+      "original_path": "notebooks/04_umbaugh_48h72h_loading.ipynb",
+      "original_sha256": "74fbca09a85ebedbf90db3a20be0d180c39819b318e1b6bb4db3de7902b721c4",
+      "collected_sha256": "f4cf10168fa661c9229216274dd39c694d7263f70c40891b8bb4d79ec6109e56",
+      "repository_path": "notebooks/04_umbaugh_48h72h_loading.ipynb",
+      "portable_sha256": "aebdf7fcc1e36faccd0acdb8f29842746424f2fd3b45e1bd8fab38509a2cdab3",
+      "status": "preprocessing_notebook_source_not_clean_run_verified",
+      "changed_path_cells": [
+        0
+      ],
+      "scientific_ast_unchanged": true,
+      "notebook_code_cells": 9
+    },
+    {
+      "original_path": "notebooks/05_matchett_human_loading.ipynb",
+      "original_sha256": "4014ef0786a1e818d14315c8c16aa1c2984f4357f552c296b4c4750fc32d49f2",
+      "collected_sha256": "42b099e5a490178a8e82b9235a582f727b3876ca606aa24a3a702a99d65703ce",
+      "repository_path": "notebooks/05_matchett_human_loading.ipynb",
+      "portable_sha256": "3f95a3e790cc89d4004135aee35cdfca2431d7471f1e9fc63f5be8ace5ce298a",
+      "status": "preprocessing_notebook_source_not_clean_run_verified",
+      "changed_path_cells": [
+        0
+      ],
+      "scientific_ast_unchanged": true,
+      "notebook_code_cells": 9
+    },
+    {
+      "original_path": "notebooks/06_week1_master_summary.ipynb",
+      "original_sha256": "daa830363c356c77f6d7c0b4bf3fe07be9ba7f3ccf9f6ce91135a0e94dff879d",
+      "collected_sha256": "66a18222d0a74730a3cf26845140210b1dce734decdf8d03a2f5beaf2e9da055",
+      "repository_path": "notebooks/06_week1_master_summary.ipynb",
+      "portable_sha256": "618bd92d2f5345a98549ea9a9252d6bf776a15840e16a4138ae1d66577044733",
+      "status": "preprocessing_notebook_source_not_clean_run_verified",
+      "changed_path_cells": [
+        0
+      ],
+      "scientific_ast_unchanged": true,
+      "notebook_code_cells": 2
+    },
+    {
+      "original_path": "notebooks/07_week2_normalization_clustering.ipynb",
+      "original_sha256": "739b2f146b5285acab57ce3793a01b52f89477085402c8d11c57bee933bd05ce",
+      "collected_sha256": "746e2d81c170f171efb105fd12a97a05345fbdda4e987dcb1041f24372fd8e75",
+      "repository_path": "notebooks/07_week2_normalization_clustering.ipynb",
+      "portable_sha256": "a621f727b91f71e3968d76825d1ab2d9427c9c6577f7961dbe8d879cb7f71111",
+      "status": "preprocessing_notebook_source_not_clean_run_verified",
+      "changed_path_cells": [
+        0
+      ],
+      "scientific_ast_unchanged": true,
+      "notebook_code_cells": 9
+    },
+    {
+      "original_path": "notebooks/08_scvi_integration.ipynb",
+      "original_sha256": "3065d75562e0b32189b2737aad5ec215851bfe3c7f5f762d61a87852445542a1",
+      "collected_sha256": "a509d5889e55ee0e78cdd886333793f7abed2d143cd5d2cdb6029c4e23ae0a37",
+      "repository_path": "notebooks/08_scvi_integration.ipynb",
+      "portable_sha256": "d4db80f1f35271add2510ebc34aa337c40cf5b0bbe1dccd1776be9c7e641c581",
+      "status": "preprocessing_notebook_source_not_clean_run_verified",
+      "changed_path_cells": [
+        0
+      ],
+      "scientific_ast_unchanged": true,
+      "notebook_code_cells": 16
+    },
+    {
+      "original_path": "notebooks/09_monocle_export.ipynb",
+      "original_sha256": "9d679a60aa4ae2d2e63ffd989a2630e27d7b14029834e65907110310f1367f0f",
+      "collected_sha256": "4b753a67f5058b4217bc3ce867390ebb5ec487e06fcf1b2ebe21f0c3996fcf59",
+      "repository_path": "notebooks/09_monocle_export.ipynb",
+      "portable_sha256": "197221cc589396c7351cd05648e537cafe3ab57ac9ca5ee2c44064b3df40ff58",
+      "status": "preprocessing_notebook_source_not_clean_run_verified",
+      "changed_path_cells": [
+        0
+      ],
+      "scientific_ast_unchanged": true,
+      "notebook_code_cells": 2
+    },
+    {
+      "original_path": "notebooks/10_pseudotime_import.ipynb",
+      "original_sha256": "6d70edda57aacf2ea487cb4633cdb02b1dc5c0894d5fc9086a83a536ac4725d4",
+      "collected_sha256": "0a5b146ff821056af418c97a15f9cef97187c5fcd511dd820b68957d8c787b46",
+      "repository_path": "notebooks/10_pseudotime_import.ipynb",
+      "portable_sha256": "6dda9acb75dd7c728025da1bea7236d6b90211a3fc4a9d23a8df3ab62a4014a8",
+      "status": "preprocessing_notebook_source_not_clean_run_verified",
+      "changed_path_cells": [
+        0,
+        5,
+        14
+      ],
+      "scientific_ast_unchanged": true,
+      "notebook_code_cells": 16
+    },
+    {
+      "original_path": "notebooks/monocle3_trajectory.R",
+      "original_sha256": "4d6ca5b6111e4850b5c863102af5268a88ca43922d0bacfc772dd4c9ca6d4039",
+      "collected_sha256": "4d6ca5b6111e4850b5c863102af5268a88ca43922d0bacfc772dd4c9ca6d4039",
+      "repository_path": "notebooks/monocle3_trajectory.R",
+      "portable_sha256": "d174890067ac1177c7efa1174c6baac3a5746afaab1c751faafd683ebd8eeebc",
+      "status": "trajectory_source",
+      "change": "Project-root selection only; R session not rerun"
+    }
+  ]
+}

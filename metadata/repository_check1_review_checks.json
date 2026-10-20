@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-20",
+  "packet_sources_verified": 47,
+  "retained_sources": 37,
+  "excluded_backups": 10,
+  "audited_core_matches": 6,
+  "notebook_code_cells": 97,
+  "python_distributions": 214,
+  "conda_records": 591,
+  "publication_source_assets_unchanged": 101,
+  "private_path_or_credential_findings": [],
+  "research_scripts_executed": false,
+  "collector_fixture": {
+    "collector_fixture": "passed",
+    "categorical_metadata": true,
+    "nullable_metadata": true,
+    "latent_array_exact_match": true,
+    "large_expression_dataset_read": false,
+    "untrusted_model_loaded": false,
+    "filesystem_paths_omitted": true,
+    "input_hashes_unchanged": true,
+    "missing_required_fixture_files_reported": 21
+  }
+}

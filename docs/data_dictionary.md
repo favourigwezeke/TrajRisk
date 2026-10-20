@@ -1,0 +1,76 @@
+# Supplementary data dictionary
+
+## Data S1
+
+Mouse risk and recovery gene signatures and their human orthologs.
+
+The file contains 100 rows, one per signature gene, comprising 50 risk genes and 50 recovery genes derived from the Walesky mouse hepatocytes. Spearman correlations were computed between normalized Monocle 3 pseudotime and log-normalized gene expression; genes are traversed in descending correlation order for risk and ascending order for recovery until 50 genes with retained unique mouse-human mappings and counterparts present in the human expression matrix have been collected for each set. Each row supplies the mouse symbol and its mapped human symbol. The signatures comprise 100 distinct mouse genes and 100 distinct human orthologs. Correlations are dimensionless and are gene-selection statistics, not differential-expression p values.
+
+- `mouse_gene`: Mouse gene symbol.
+- `human_gene`: Corresponding human gene symbol.
+- `spearman_rho`: Spearman correlation with normalized mouse pseudotime; positive for risk genes and negative for recovery genes.
+- `signature`: Gene-set membership, recorded as risk or recovery.
+
+Cyp2e1/CYP2E1 belongs to the recovery set. It remains in this complete signature inventory but is excluded from recovery and net scoring in the Matchett spatial zonation analyses, leaving 49 recovery genes there; the 50-gene risk set is unchanged. Human-nucleus donor scoring uses the complete signature sets.
+
+## Data S2
+
+Human differential-expression results for reported mouse bottleneck-gene mappings.
+
+The file contains 1,036 reported mouse-to-human mapping rows retained at nominal human p <= 0.05 from the bottleneck-program overlap analysis. It contains 1,036 distinct mouse gene symbols and 1,023 distinct human gene symbols because some mouse genes map to the same human symbol. Repeated human symbols retain their mouse mappings and identical human statistics. As described in the Methods, human log-normalized expression was first averaged within donor, and the APAP-ALF and healthy donor values were compared using a two-sided Mann-Whitney U test (10 and 9 donors, respectively). P values are nominal rather than adjusted for multiple testing.
+
+- `human_gene`: Human gene symbol; it can recur for different mouse symbols.
+- `log2fc_human`: Reported human log2 fold change for APAP-ALF versus healthy; positive values indicate higher expression in APAP-ALF.
+- `pval_human`: Nominal two-sided human donor-comparison p value.
+- `mean_alf`: Mean of donor-level mean log-normalized expression in the APAP-ALF group, in log-normalized expression units.
+- `mean_healthy`: Mean of donor-level mean log-normalized expression in the healthy group, in the same units.
+- `mouse_gene`: Associated mouse bottleneck-program gene symbol; one distinct mouse symbol per row.
+
+The file supplies the nominally significant subset and does not contain the full tested background, mouse selection statistics, or per-scale membership. Human testing covered 2,549 mouse-gene mappings representing 2,534 distinct human symbols. Consequently, record-level overlap is 1,036/2,549 (40.6%); distinct-human-gene overlap is 1,023/2,534 (40.4%). The overlap criterion requires nominal significance in human donors, not agreement in mouse--human fold-change direction. The overlap is descriptive and was not tested against a matched liver-gene background.
+
+## Data S3
+
+Primary human donor-level TrajRisk and gene-signature scores.
+
+The file contains one row per Matchett donor in the primary cohort: 10 APAP-ALF donors and 9 healthy donors, representing 49,984 retained hepatocyte nuclei in total. Scores are averaged across retained nuclei within each donor. The primary TrajRisk configuration is W_self-only; Reference-KNN is a sensitivity configuration. TrajRisk scores are dimensionless on a 0-1 scale. Gene-signature scores are in log-normalized expression units; net score is risk minus recovery and can be negative.
+
+- `patient_id`: Donor identifier.
+- `condition`: Clinical group, recorded as APAP_ALF or Healthy.
+- `n_cells`: Number of retained hepatocyte nuclei contributing to that donor; the legacy column name denotes nuclei here.
+- `risk_2a`: Donor mean primary W_self-only TrajRisk score.
+- `risk_2b`: Donor mean Reference-KNN TrajRisk score.
+- `sig_net`: Donor mean net signature score: the 50-gene risk score minus the 50-gene recovery score.
+- `sig_risk`: Donor mean raw 50-gene risk-signature score.
+
+The file underlies Table S4B and the Reference-KNN/net-signature concordance in Table S4C and Figure 6D. Group comparisons use unweighted donor values with a one-sided Mann-Whitney U alternative of APAP-ALF > healthy. AUROC uses the same direction. Concordance uses two-sided Spearman testing across all 19 donors. Donors are the inferential units; nucleus counts are not statistical weights.
+
+## Data S4
+
+Human donor-level scores after excluding low-nucleus-count APAP-ALF donors.
+
+The file is a subset of Data S3 containing 15 donors: 6 APAP-ALF and 9 healthy, representing 49,181 retained hepatocyte nuclei. Four APAP-ALF donors with fewer than 300 retained nuclei are excluded: apap02 (94), apap05 (284), apap09 (291), and apap10 (134). All healthy donors are retained. The sensitivity analysis changes cohort membership; scores for retained donors are identical to Data S3.
+
+
+
+Columns and units are identical to Data S3: patient_id, condition, n_cells, risk_2a (primary W_self-only), risk_2b (Reference-KNN), sig_net, and sig_risk. Scores remain unweighted donor means. One-sided Mann-Whitney U tests compare APAP-ALF > healthy; AUROC uses that direction. Reference-KNN/net-signature concordance uses two-sided Spearman testing across the 15 donors. The file underlies the sensitivity rows in Tables S4B and S4C and the primary-score sensitivity panel in Figure 6C.
+
+## Data S5
+
+Human spatial section-by-zone means of risk, recovery, and net signatures.
+
+The file contains 18 section-by-zone records: three zones for each of six Matchett human Visium sections, covering 16,273 in-tissue spots. Three APAP-ALF sections represent two donors (apap01 and apap03), and three healthy sections represent three donors (hea01, hea02, and hea10). The source condition label APAP denotes APAP-ALF. Pericentral spots have CYP2E1 CPM at or above the within-section 75th percentile; periportal spots are at or below the 25th percentile; the remaining spots are midlobular. Percentiles use linear interpolation, and all boundary ties enter the corresponding zone. Per-spot signature scores are mean CPM across 50 risk genes and 49 recovery genes, with CYP2E1 excluded from recovery scoring to avoid circularity with zone definition. Each reported zone score is the mean of these per-spot scores within that section and zone. Net score is risk minus corrected recovery.
+
+- `sample`: Spatial section identifier, including the GEO sample accession.
+- `donor`: Biological donor identifier; one donor can contribute more than one section.
+- `condition`: Recorded as APAP or Healthy; APAP denotes APAP-ALF.
+- `zone`: Recorded as midlobular, pericentral, or periportal.
+- `N_spots`: Number of in-tissue spots contributing to the section-zone mean.
+- `Mean_risk_signature`: Mean 50-gene risk-signature score within that section and zone, in CPM.
+- `Mean_recovery_signature`: Mean corrected 49-gene recovery-signature score within that section and zone, in CPM.
+- `Mean_net_signature`: Mean net score within that section and zone, in CPM; risk minus corrected recovery.
+
+The file underlies the section-level trajectories in Figure S4F and the unweighted section summaries in Table S5D. Table S5D averages the three section means within each condition and zone; its risk-signature SD is the sample SD of those three means. The section-level condition comparison is descriptive, with no case-control significance test. Repeated sections from one donor are not independent biological replicates.
+
+## File conventions
+
+CSV files use UTF-8 text, a single header row, and decimal points. All five supplied Data files have complete records with no blank or NaN cells. Numeric zero remains a measured or calculated zero. Legacy field names are retained and explained above. Table-component CSVs retain their original missing-value conventions; those are not rewritten during packaging.

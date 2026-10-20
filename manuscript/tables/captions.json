@@ -1,0 +1,124 @@
+{
+  "S1": {
+    "title": "Random Forest transition classifier performance and transition graph statistics across four temporal scales.",
+    "summary": "Classifier performance, retained edges, sparsity, transition entropy, and agreement with distance-only Gaussian transitions.",
+    "notes": "Five-fold stratified cross-validation was used to evaluate each scale-specific classifier; CV AUROC is reported as mean ± standard deviation across folds. OOB denotes out-of-bag accuracy. Raw RF probabilities below 0.30 were discarded before row normalization; when no target met this threshold, the 15 highest-probability targets were retained. Normalized probabilities below 0.001 were subsequently removed as a final sparsification step. Full-graph adjacency sparsity was calculated relative to the complete 6,582 × 6,582 cell graph. Transition entropy is Shannon entropy of outgoing transition probabilities in nats, summarized across source cells as mean ± standard deviation. RF–Gaussian Pearson r denotes the mean row-wise correlation between learned RF transitions and distance-only Gaussian transitions. Elapsed time is in hours; training-pair and edge counts are integers. RF, Random Forest; CV, cross-validation; AUROC, area under the receiver operating characteristic curve.",
+    "parts": {
+      "S1": {
+        "title": "Classifier and transition-graph statistics.",
+        "notes": "The four windows are 0–6, 6–24, 24–48, and 48–96 h. Sparsity is reported as a percentage of the complete cell graph, rather than of admissible pairs within each time window."
+      }
+    }
+  },
+  "S2": {
+    "title": "Internal performance of TrajRisk, comparator models, and component ablations.",
+    "summary": "(A) Global benchmarks and ablations. (B) Development-based selection of the single-scale GNN. (C) Performance within recovery timepoints and after excluding 6 h cells.",
+    "notes": "All final validation metrics use the same timepoint-stratified Walesky validation split of 1,318 cells, or the explicitly listed subset of that split. Binary labels are defined by normalized Monocle pseudotime > 0.10. Columns labeled high-risk refer to this elevated-pseudotime class, not observed future adverse outcomes. AUROC and AUPRC are dimensionless; AUPRC is average precision. Spearman rho measures association with continuous normalized pseudotime. The primary model was selected using validation AUROC; GNN ablations were selected on an inner development set. This checkpoint-selection asymmetry favors the primary model. GNN, graph neural network; CI, confidence interval; pp, percentage points; RF, Random Forest; CV, cross-validation; AUROC, area under the receiver operating characteristic curve; AUPRC, area under the precision–recall curve. The internal comparison is transductive: validation cells remain in the preconstructed graphs and their reference pseudotime values enter transition-pair features. All comparators share expression-derived features and targets.",
+    "parts": {
+      "S2A": {
+        "title": "Global baselines and ablations.",
+        "notes": "AUROC 95% CIs use 1,000 bootstrap resamples. Delta AUROC is 100 × (TrajRisk AUROC minus comparator AUROC), in percentage points. One-sided paired bootstrap p values evaluate the directional comparison in favor of TrajRisk, using matched resamples of validation cells. An em dash denotes an unreported or inapplicable statistic; the seed's missing Spearman coefficient is not zero. The full-model delta is displayed as 0.00. B1 predicts continuous pseudotime from 30 scVI features using CV-tuned XGBoost. B2 propagates the scalar XGBoost seed through Gaussian matrices with damping 0.5. B3/A2 is the development-selected single-scale GNN. B4 is normalized expression-space distance from baseline controls. A1 substitutes Gaussian edge weights in the GNN. A3 uses scalar RF-matrix propagation with damping 0.5, jointly removing nonlinear aggregation and 31-dimensional node-feature integration. A4 omits the seed feature."
+      },
+      "S2B": {
+        "title": "Single-scale GNN selection.",
+        "notes": "Four one-scale GNNs were compared using development-set AUROC. Scale 4 was selected by that criterion; the held-out validation AUROC was subsequently reported. True/False indicates development-based selection, not selection on the validation results."
+      },
+      "S2C": {
+        "title": "Within-timepoint and non-6 h validation performance.",
+        "notes": "N is the number of validation cells in the indicated subset; N_high_risk is the number with normalized pseudotime > 0.10. Prevalence and random AUPRC equal N_high_risk/N and are recorded as fractions. Non-6 h excludes all 6 h cells. The 24, 48, and 96 h groups contain 209, 182, and 162 validation cells, respectively. No additional hypothesis test is reported for these within-timepoint comparisons."
+      }
+    }
+  },
+  "S3": {
+    "title": "External mouse-cohort discrimination and association with Cdkn1a expression.",
+    "summary": "(A) APAP-versus-control discrimination in three external mouse cohorts. (B) Cdkn1a detection and continuous-expression associations in the Umbaugh 48/72 h cohort.",
+    "notes": "The Walesky-trained mouse model and comparators were transferred without refitting. W_self-only inference uses the learned self pathway without incoming reference edges. Reference-KNN inference adds the 15 nearest Walesky reference neighbors in the integrated 30-dimensional scVI space. AUROC CIs use 1,000 bootstrap resamples. Random AUPRC equals the positive-class prevalence. Reported fractions and model scores are dimensionless. APAP, acetaminophen; KNN, k-nearest neighbors; CI, confidence interval; AUROC, area under the receiver operating characteristic curve; AUPRC, area under the precision–recall curve.",
+    "parts": {
+      "S3A": {
+        "title": "External APAP-versus-control classification.",
+        "notes": "APAP treatment is the positive class. N includes all evaluated cells, including controls, in each cohort: Ben-Moshe, 2,770; Umbaugh 2 h, 21,409; Umbaugh 48/72 h, 5,306. N_positive counts APAP-treated cells. The Ben-Moshe label identifies the APAP sampling times and does not exclude its baseline controls. These tests distinguish treatment condition, rather than observed future cell fate. Pairwise significance tests between methods are not reported for these comparisons."
+      },
+      "S3B": {
+        "title": "Cdkn1a expression association in 5,306 Umbaugh 48/72 h hepatocytes.",
+        "notes": "The detection task compares cells with Cdkn1a expression > 0 against those with zero expression; the positive-class prevalence is 0.3407. Spearman rho and its two-sided nominal p value use continuous Cdkn1a expression across all 5,306 cells. Group means summarize model scores. One-sided Mann–Whitney U tests evaluate greater scores in Cdkn1a-expressing cells. Detection of Cdkn1a transcript is the operational label; it does not directly measure p21 protein."
+      }
+    }
+  },
+  "S4": {
+    "title": "Cross-species integration, human donor-level validation, and signature concordance.",
+    "summary": "(A) Integration diagnostics. (B) Donor-level discrimination in primary and sensitivity cohorts. (C) Reference-KNN score concordance with the net orthologous gene signature.",
+    "notes": "The shared scVI representation contains 6,582 Walesky mouse hepatocytes and 49,984 Matchett human hepatocyte nuclei on 13,122 retained unique mouse–human gene-symbol pairs, with 30 latent dimensions. The cross-species GNN and seeder were trained on mouse cells in these shared coordinates; human donor labels were not used for model training. W_self-only is the primary human analysis and Reference-KNN is a sensitivity analysis. APAP-ALF, acetaminophen-induced acute liver failure; ASW, average silhouette width; GNN, graph neural network; KNN, k-nearest neighbors; AUROC, area under the receiver operating characteristic curve.",
+    "parts": {
+      "S4A": {
+        "title": "Cross-species integration characteristics.",
+        "notes": "Species and condition ASW were independently calculated on the same 10,000-observation subsample of the joint 30-dimensional latent space. Their values (0.0346643 and 0.0346610, respectively) both round to 0.0347; the matching displayed values are not duplicate measurements. Low ASW describes label mixing and does not alone establish preservation of biological condition structure. The validation AUROC of 0.9219 is for held-out Walesky mouse cells in the cross-species coordinate system, rather than human donors. Cell/nucleus and retained gene-symbol-pair counts are integers; ASW and AUROC are dimensionless."
+      },
+      "S4B": {
+        "title": "Human donor-level condition discrimination.",
+        "notes": "Nucleus scores are averaged within each donor before analysis. Condition means are unweighted means of donor values. The primary cohort contains 10 APAP-ALF and 9 healthy donors. The sensitivity cohort excludes four APAP-ALF donors with fewer than 300 retained hepatocyte nuclei, leaving 6 APAP-ALF and 9 healthy donors. One-sided Mann–Whitney U tests evaluate APAP-ALF > healthy. AUROC uses APAP-ALF as the positive class and preserves the recorded score direction. The raw risk signature averages log-normalized expression of mapped risk genes; the net signature subtracts the recovery signature. No direction reversal was applied to improve signature AUROC."
+      },
+      "S4C": {
+        "title": "Reference-KNN score and net-signature concordance.",
+        "notes": "Spearman rho and two-sided nominal p values compare donor-mean Reference-KNN TrajRisk scores with donor-mean net signature scores across 19 primary-cohort or 15 sensitivity-cohort donors. This table concerns the Reference-KNN variant, not the primary W_self-only score. Both summaries use the same donor expression data and the association is not independent biological replication."
+      }
+    }
+  },
+  "S5": {
+    "title": "Spatial risk- and recovery-signature analyses in mouse and human liver.",
+    "summary": "(A) Ben-Moshe fibrogenic enrichment. (B,C) Matchett mouse and human zonation. (D) Descriptive human section-level condition summaries.",
+    "notes": "Spatial scores are mean counts per million (CPM) across signature genes after spot-level library-size normalization. These are gene-signature scores, rather than spatially projected GNN score predictions. The risk signature contains 50 genes. Matchett zones are defined using the upper and lower within-section quartiles of Cyp2e1/CYP2E1 CPM for pericentral and periportal spots, respectively; remaining spots are midlobular. Cyp2e1/CYP2E1 is excluded from Matchett recovery and net scoring, leaving 49 recovery genes, to avoid circularity with zonation. P values are nominal and spot-pooled tests do not use donors as independent inferential units. APAP-ALF, acetaminophen-induced acute liver failure; CPM, counts per million; GNN, graph neural network; SD, standard deviation.",
+    "parts": {
+      "S5A": {
+        "title": "Ben-Moshe fibrogenic risk-signature enrichment.",
+        "notes": "Deposited fibrogenic annotations define the comparison. Six sections from two mice per timepoint contain 17,370 spots: 3,395 fibrogenic and 13,975 non-fibrogenic. Counts, medians, and means are listed for pooled data and for each timepoint. The one-sided Mann–Whitney U alternative is fibrogenic > non-fibrogenic. The pooled p value recorded as 0.0 is displayed as <10^−300, consistent with the manuscript's reporting convention."
+      },
+      "S5B": {
+        "title": "Matchett mouse zonation and Cyp2e1 association.",
+        "notes": "Eleven sections contribute 6,335 pericentral and 6,334 periportal spots. One-sided Mann–Whitney U alternatives are pericentral > periportal for the risk signature and pericentral < periportal for the corrected recovery signature. Statistic is U for these comparisons and Spearman rho for the Cyp2e1 association. Empty zonation-summary fields in the correlation record are inapplicable. Group summaries are medians of pooled spot scores. The correlation p value recorded as 0.0 is displayed as numerical underflow."
+      },
+      "S5C": {
+        "title": "Matchett human zonation and CYP2E1 association.",
+        "notes": "Six sections contribute 4,071 pericentral and 4,104 periportal spots. One-sided Mann–Whitney U alternatives are pericentral > periportal for risk and pericentral < periportal for corrected recovery. Statistic is U for group comparisons and Spearman rho for the CYP2E1 association; correlation p values are two-sided. Empty zonation-summary fields in the correlation record are inapplicable. Group summaries are medians of pooled spot scores."
+      },
+      "S5D": {
+        "title": "Descriptive human section-level signatures by condition and zone.",
+        "notes": "Each row summarizes three section-level mean scores for the indicated condition and zone. The three healthy sections represent three donors; the three APAP-ALF sections represent two donors. SD is the between-section standard deviation of risk-signature means. Net signature is risk minus the corrected recovery signature. The source label APAP denotes APAP-ALF sections. No condition-comparison significance test was performed."
+      }
+    }
+  },
+  "S6": {
+    "title": "Risk-flux summaries, bottleneck enrichment, and frozen-model graph perturbations.",
+    "summary": "(A) Flux by scale. (B) Scale ablations. (C) Unique bottleneck-cell summaries. (D) Scale 3 enrichment. (E) Threshold sensitivity. (F) Quartile perturbations. (G) Embedding shifts.",
+    "notes": "Analyses use the frozen mouse TrajRisk model and its 421,477 directed edges on 6,582 Walesky cells. Top-flux edges are selected within each temporal scale. Source and target summaries count unique cells unless the column explicitly counts edges. Edge-removal analyses retain model weights and node features and rerun inference without retraining. Predicted TrajRisk scores, normalized pseudotime, and score changes are dimensionless; reported percentages use the indicated cell or edge population. Fisher and Mann–Whitney p values are nominal. RF, Random Forest; GNN, graph neural network; APAP, acetaminophen; SD, standard deviation.",
+    "parts": {
+      "S6A": {
+        "title": "Scale-level edge flux and amplification summaries.",
+        "notes": "Total and mean flux summarize retained edges within each scale. Top1pct_flux_share_pct is 100 × the flux carried by selected top-1% edges divided by total scale flux. Positive/negative amplification percentages use all retained edges in that scale as the denominator."
+      },
+      "S6B": {
+        "title": "Risk sensitivity to removal of each temporal scale.",
+        "notes": "All edges of one scale are removed for each forward pass. Absolute risk change is measured relative to the unperturbed model. Total, mean, maximum, and percentages increasing or decreasing use all 6,582 cells. A decrease or increase is counted when the signed score change is less than −0.01 or greater than 0.01, respectively. Timepoint-specific means use all cells at that timepoint: 0 h, 3,401; 6 h, 419; 24 h, 1,043; 48 h, 910; 96 h, 809. Zero is a recorded absence of risk change, not a missing value."
+      },
+      "S6C": {
+        "title": "Unique sources and targets of top-1% flux edges.",
+        "notes": "Risk, normalized pseudotime, and APAP composition are summarized once per unique source or target cell in the selected edge set. Sampling times are in hours. Treatment percentages use the respective unique-source or unique-target count as the denominator."
+      },
+      "S6D": {
+        "title": "Scale 3 source enrichment and target depletion.",
+        "notes": "The top-1% Scale 3 set contains 1,175 edges, 43 unique 24 h sources, and 380 unique 48 h targets. High pseudotime and high predicted TrajRisk score use the respective within-timepoint 75th-percentile thresholds recorded in the table. Background_high_pct uses all 1,043 source-timepoint or 910 target-timepoint cells. Fisher's exact tests compare selected cells with the remaining cells of the same timepoint: greater for source enrichment and less for target depletion. The infinite odds ratio for high-score sources reflects a zero cell in the contingency table; it is not a finite effect-size estimate."
+      },
+      "S6E": {
+        "title": "Scale 3 high-pseudotime source enrichment across flux thresholds.",
+        "notes": "Thresholds select the top 0.5%, 1%, 2%, 5%, or 10% of Scale 3 edges by flux. Enrichment percentages count high-pseudotime cells among unique sources at each threshold; the background is all 1,043 Walesky 24 h cells. High pseudotime uses the same 75th-percentile threshold (0.0923301125) as S6D. One-sided Fisher's exact tests use the greater alternative against the remaining 24 h cells."
+      },
+      "S6F": {
+        "title": "Risk changes after Scale 3 source-quartile edge removal.",
+        "notes": "Quartiles group all 1,043 source cells at 24 h by normalized pseudotime. Cutoffs are the 25th, 50th, and 75th percentiles computed with linear interpolation at full precision: 0.016547829, 0.056113873, and 0.0923301125. The first three intervals include their lower boundary and exclude their upper boundary; the final interval includes 1.000. A source exactly at a cutoff enters the higher quartile. Displayed boundaries are rounded to three decimal places. Q1–Q4 contain 261, 260, 261, and 261 source cells, respectively; all Scale 3 edges originating from the selected quartile are removed. Total absolute delta summarizes model risk changes. Mean and maximum delta columns separately summarize all 910 cells at 48 h and all 809 cells at 96 h. All 96 h effects are recorded as zero."
+      },
+      "S6G": {
+        "title": "Embedding shifts on bottleneck and background edges.",
+        "notes": "Top-1% flux edges are compared with all remaining edges in each scale. Shift is an edge-wise distance in the corresponding learned 64-dimensional embedding, in embedding-coordinate units. One-sided Mann–Whitney U tests evaluate larger shifts on top-flux edges; Spearman rho and two-sided p values evaluate the association between flux and shift across all edges of the scale. P values recorded as 0.0 are displayed as numerical underflow. Edges sharing cells are not independent biological replicates."
+      }
+    }
+  }
+}

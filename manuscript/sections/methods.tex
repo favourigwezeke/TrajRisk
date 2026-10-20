@@ -1,0 +1,326 @@
+% Converted from the reference-locked manuscript.
+% Mathematical definitions verified against current scripts and Equation Checks 1--6.
+\section*{Methods}\label{sec:methods}
+
+\subsection*{Data acquisition}
+
+Four publicly available mouse hepatocyte single-cell RNA-sequencing (scRNA-seq) datasets were obtained from GEO or Zenodo. The Walesky dataset (GEO: GSE136679)\cite{ref010} provided 6,582 quality-filtered hepatocytes spanning an acetaminophen (APAP) injury time course (0~h, 6~h, 24~h, 48~h, and 96~h); partial-hepatectomy samples from the same deposit were excluded to restrict the analysis to APAP-induced injury. The Umbaugh early-injury dataset (GEO: GSE200771)\cite{ref009} provided 21,409 hepatocytes from 0~h control and 2~h APAP conditions (300 mg/kg APAP). The Umbaugh late-injury dataset (GEO: GSE255834)\cite{ref061} provided 5,306 hepatocytes from control and APAP-treated mice at 48~h and 72~h and was used to assess association with \textit{Cdkn1a} (p21) expression. The Ben-Moshe dataset (Zenodo: 6035873)\cite{ref011} provided 2,770 hepatocytes spanning 0~h, 48~h, and 72~h of APAP recovery on an independent sequencing platform.
+
+For cross-species validation, we used the Matchett human single-nucleus RNA-sequencing (snRNA-seq) dataset (GEO: GSE223581),\cite{ref019} comprising liver nuclei from patients with APAP-induced acute liver failure (APAP-ALF) and healthy donors. The GEO series contains 11 APAP-ALF libraries corresponding to 10 APAP-ALF donors because one donor was represented by two libraries; these libraries were merged at the donor level for statistical analysis. After quality filtering and hepatocyte selection, 49,984 hepatocyte nuclei from 10 APAP-ALF donors and 9 healthy donors were retained.
+
+\subsection*{Quality control and preprocessing}
+
+Unless otherwise specified, analyses were performed in Python \textbf{v3.10.20}. Input expression matrices were processed with Scanpy v1.11.5.\cite{ref109} The Walesky and Ben-Moshe datasets were used as deposited without additional cell-level filtering. The Umbaugh 2~h, Umbaugh 48~h/72~h, and Matchett datasets were filtered to retain cells or nuclei with more than 1,000 detected genes. Mitochondrial content was calculated from genes prefixed mt- in mouse or MT- in human but was not used as an additional exclusion criterion. Across retained datasets, median mitochondrial fractions ranged from 1.5\% to 16.6\%.
+
+Post-filtering median genes/UMI per cell or nucleus were: Walesky, 1,747/2,347; Umbaugh 2~h, 2,063/7,788; Ben-Moshe, 1,012/1,862; Umbaugh 48~h/72~h, 2,662/9,903; and Matchett, 2,441/5,758. The Matchett dataset was further restricted to nuclei with detectable expression of canonical hepatocyte markers (\textit{ALB, APOA1, APOB, TTR, HP, FGA,} and \textit{SERPINA1}), reducing 443,074 initially filtered nuclei to 49,984 hepatocyte nuclei.
+
+Hepatocyte identity was assessed using core hepatocyte markers (\textit{Alb/ALB, Apoa1/APOA1,} and \textit{Ttr/TTR}), pericentral zonation markers (\textit{Cyp2e1/CYP2E1} and \textit{Cyp1a2/CYP1A2}), periportal zonation markers (\textit{Ass1/ASS1} and \textit{Arg1/ARG1}), and stress/injury markers (\textit{Hmox1/HMOX1} and \textit{Gsta1/GSTA1}). \textit{Alb/ALB} was detected in 94--100\% of cells or nuclei across datasets. \textit{Hmox1} was detected in 31.6\% of cells in the Umbaugh 2~h early-injury cohort compared with 1.4--6.0\% in baseline controls.
+
+Each dataset was independently total-count normalized to 10,000 counts per cell and log1p-transformed. The top 2,000 highly variable genes were selected per dataset using the Seurat flavor. For per-dataset quality assessment, principal component analysis (PCA; 50 components), a k-nearest-neighbor graph (30 PCs, 15 neighbors), UMAP (min\_dist=0.3),\cite{ref110} and Leiden clustering (resolution 0.5; 7--23 clusters across datasets)\cite{ref111} were computed.
+
+\subsection*{Batch correction and multi-dataset integration}
+
+All four mouse datasets were jointly integrated with scVI (scvi-tools v1.3.3).\cite{ref112,ref113} Batch-aware highly variable genes (4,000; batch\_key='dataset') were selected from the 16,288 genes shared across all four cohorts. The scVI model used 30 latent dimensions, two encoder/decoder layers, 128 hidden units, dropout 0.1, and a Gaussian gene likelihood. A Gaussian likelihood was used because the Walesky and Ben-Moshe datasets were deposited as preprocessed expression values rather than raw UMI counts, precluding a count-based negative-binomial likelihood for the combined analysis. Dataset identity was the only batch covariate; treatment and timepoint were excluded from the batch model to preserve injury-associated biological variation for downstream trajectory inference. Training used 90\% of observations for fitting, batch size 128, and a maximum of 400 epochs with early stopping on validation ELBO (patience 20), terminating at epoch 47 (best validation ELBO, -2,431.7). The resulting 30-dimensional latent representation contained all 36,067 mouse hepatocytes.
+
+Integration quality was quantified using Average Silhouette Width (ASW) for dataset labels (0.039) and treatment labels (0.074), each evaluated on a 5,000-cell random subsample with random seed 42, together with temporal structure in the latent representation. Dataset ASW indicated substantial cross-dataset mixing, while the non-zero treatment ASW indicated that treatment-associated structure was not completely removed. Temporal structure was assessed by Spearman correlation between experimental time and individual principal components of the 30-dimensional latent space (largest absolute correlation among the first 10 components, 0.2832) and by multivariable linear regression across those 10 components (\(R^2 = 0.0914\), \(R = 0.3024\)).
+
+\subsection*{Trajectory inference}
+
+Pseudotemporal ordering was performed with Monocle 3 v1.4.27\cite{ref047,ref114,ref115} in R v4.5.1 and was restricted to the Walesky cohort (6,582 cells, 0--96~h). Although all four mouse datasets were integrated in a common scVI space, trajectory inference was not extended to the full integrated dataset because residual cross-platform variation between Seq-Well and 10x Chromium confounded the trajectory axis despite batch correction. Restricting trajectory inference to the single-platform Walesky cohort preserved the injury-associated trajectory while retaining the integrated latent space for subsequent cross-dataset validation.
+
+The 30-dimensional Walesky scVI representation replaced the default PCA representation before Monocle UMAP construction (min\_dist=0.1, n\_neighbors=15).\cite{ref116} Leiden clustering\cite{ref111} at resolution 0.001 identified 10 clusters. A single connected principal graph was learned with use\_partition=FALSE, and pseudotime was rooted at the 3,401 uninjured 0~h control hepatocytes.
+
+Pseudotime correlated with experimental sampling time (Spearman \(\rho = 0.5051\), \(p < 2.2\times10^{-16}\)) but was not monotonic with clock time: 6~h hepatocytes showed the greatest displacement from baseline (median raw Monocle pseudotime 8.23), while later timepoints occupied increasingly heterogeneous states during recovery or persistent compensation. Let \(\mathcal V\) denote the \(N=6{,}582\) Walesky reference cells and \(\tau_i\) the raw Monocle pseudotime of cell \(i\in\mathcal V\). The normalized regression target was
+\begin{equation}\label{eq:pseudotime}
+y_i=\frac{\tau_i-\tau_{\min}}{\tau_{\max}-\tau_{\min}},
+\qquad y_i\in[0,1],
+\end{equation}
+where \(\tau_{\min}\) and \(\tau_{\max}\) are the minimum and maximum over \(\mathcal V\). This target is referred to below as pseudotime\_norm and was also used in transition-pair features. Biological coherence of the ordering was assessed by examining injury markers (\textit{Hmox1, Gsta1}) and hepatocyte-identity markers (\textit{Alb, Cyp2e1}) along pseudotime.
+
+\subsection*{Multi-scale transition graph construction}
+
+Transition direction was defined by experimental time (0~h, 6~h, 24~h, 48~h, and 96~h) rather than by pseudotime rank because pseudotime was non-monotonic with clock time. Pseudotime was retained as a node-pair feature. Four non-overlapping temporal scales were defined: Scale 1---Acute Stress (0~h to 6~h; elapsed interval 6~h), Scale 2---Peak Injury (6~h to 24~h; elapsed interval 18~h), Scale 3---Fate Decision (24~h to 48~h; elapsed interval 24~h), and Scale 4---Resolution (48~h to 96~h; elapsed interval 48~h) (\TableRef{S1}).
+
+For scale \(s\in\{1,2,3,4\}\), let \(\mathcal V_s^-\) and \(\mathcal V_s^+\) denote its source- and target-timepoint cells, respectively. Each directed graph \(G_s=(\mathcal V,\mathcal E_s,\mathbf T_s)\) uses the complete reference node set, with edges restricted to \(\mathcal V_s^-\times\mathcal V_s^+\). The entry \(T_{ij}^{(s)}\) of \(\mathbf T_s\) is oriented from source \(i\) to target \(j\). The four-graph family is denoted by \(\mathcal G=(G_1,G_2,G_3,G_4)\).
+
+Source-target pairs were labeled as positive transitions when the target was among the 15 nearest target-timepoint neighbors of the source in the 30-dimensional scVI latent space using Euclidean distance. Negative examples were sampled uniformly from non-neighbor pairs at a 2:1 negative-to-positive ratio. Each pair was represented by
+\begin{equation}\label{eq:pair-features}
+\boldsymbol\phi_{ij,s}=
+\big[\boldsymbol z_i^{\mathsf T},\boldsymbol z_j^{\mathsf T},
+\Delta t_s,d_{ij},\chi_i,\chi_j,y_i,y_j\big]^{\mathsf T},
+\end{equation}
+where \(\boldsymbol z_i,\boldsymbol z_j\in\mathbb R^{30}\) are the scVI latent vectors, \(t_i,t_j\) are sampling times in hours, \(\Delta t_s=t_j-t_i\) is the elapsed interval, and \(d_{ij}=\|\boldsymbol z_j-\boldsymbol z_i\|_2\) is Euclidean distance. The treatment indicator \(\chi_i\) equals 0 for Control and 1 for APAP. The normalized pseudotimes \(y_i,y_j\) are defined in Eq.~\eqref{eq:pseudotime}. Thus \(\boldsymbol\phi_{ij,s}\in\mathbb R^{66}\), with the feature blocks in the displayed order. Treatment indicators allow the transition classifier to distinguish APAP-to-APAP disease progression or recovery from transitions into biologically distinct untreated control cells even when expression-space distances are similar.
+
+\subsection*{Random Forest transition classifiers}
+
+One Random Forest classifier was trained for each temporal scale using scikit-learn v1.7.2\cite{ref117} (n\_estimators=200, max\_depth=15, max\_features='sqrt', min\_samples\_leaf=5, class\_weight='balanced', oob\_score=True, n\_jobs=-1, random\_state=42). Training-set sizes were 153,045, 18,855, 46,935, and 40,950 labeled pairs for Scales 1--4, respectively. Five-fold stratified cross-validation was performed before fitting each final classifier on its complete scale-specific pair set. Out-of-bag accuracy was recorded as an additional internal generalization estimate.
+
+For each temporal scale, the fitted classifier was applied to all admissible source-target pairs to obtain the positive-class probability \(\pi_{ij}^{(s)}\). For source \(i\), the retained target set \(\mathcal R_{i,s}\) contained targets with \(\pi_{ij}^{(s)}\geq0.30\); if this set was empty, the 15 targets with the highest raw probabilities were retained. Let \(Z_{i,s}=\sum_{k\in\mathcal R_{i,s}}\pi_{ik}^{(s)}\). Its guarded normalization denominator \(Z_{i,s}^*\) equals \(Z_{i,s}\) when \(Z_{i,s}\geq10^{-10}\), and 1 otherwise. The source-oriented weights were
+\begin{equation}\label{eq:rf-transitions}
+\begin{aligned}
+\bar T_{ij}^{(s)}
+&=\frac{\pi_{ij}^{(s)}\mathbf1\{j\in\mathcal R_{i,s}\}}{Z_{i,s}^*},\\
+T_{ij}^{(s)}
+&=\bar T_{ij}^{(s)}\mathbf1\{\bar T_{ij}^{(s)}\geq10^{-3}\},
+\end{aligned}
+\end{equation}
+for \(i\in\mathcal V_s^-\), \(j\in\mathcal V_s^+\), with all other entries zero. Here \(\mathbf1\{\cdot\}\) is the indicator function. The final cleanup was not followed by another normalization. Source-row sums remained numerically indistinguishable from 1.0 (mean = 1.000; SD < 5.2 \ensuremath{\times} 10\textsuperscript{-8}; minimum > 0.9999998). Conversion to PyTorch Geometric\cite{ref118} retained \(\mathcal E_s=\{(i,j):T_{ij}^{(s)}>10^{-3}\}\), with source-target indices and the corresponding weights. The final graphs contained 167,633, 63,673, 117,408, and 72,763 directed edges for Scales 1--4, respectively, corresponding to 99.6--99.9\% full-graph sparsity, with no backward-directed transitions. Per-source-cell transition entropy was computed as Shannon entropy in nats.
+
+\subsection*{Node features and initial risk seeding}
+
+Each Walesky hepatocyte was represented by a 31-dimensional node feature vector
+\begin{equation}\label{eq:node-features}
+\boldsymbol x_i=\big[\boldsymbol z_i^{\mathsf T},r_i^{(0)}\big]^{\mathsf T}
+\in\mathbb R^{31},
+\end{equation}
+where \(r_i^{(0)}\in[0,1]\) is the positive-class output of the initial XGBoost seeder. Normalized pseudotime was excluded from node features because it served as the regression target, and treatment status was not supplied directly as a node feature. The node-feature matrix \(\mathbf X\in\mathbb R^{N\times31}\) has row \(\boldsymbol x_i^{\mathsf T}\).
+
+The initial seed was generated with an XGBoost classifier (XGBoost v3.2.0;\cite{ref048} n\_estimators=300, max\_depth=6, learning\_rate=0.05, subsample=0.8, colsample\_bytree=0.8, random\_state=42, eval\_metric='auc'). The classifier was trained only on 0~h control hepatocytes (n = 3,401) and 6~h APAP hepatocytes (n = 419). Class imbalance was addressed with scale\_pos\_weight=3401/419. The endpoint cells were split 80/20 with stratification and random seed 42; the validation subset was used to report endpoint-discrimination AUROC. The classifier was fit with 300 estimators; no intermediate-recovery cells were used for fitting. After training, it was applied to all 6,582 Walesky hepatocytes to obtain \(\boldsymbol r^{(0)}=(r_1^{(0)},\ldots,r_N^{(0)})^{\mathsf T}\). The 24~h, 48~h, and 96~h cells were therefore scored only by inference, preventing their pseudotime labels from entering the initial seeding model. The seed scores resemblance to the 6~h APAP rather than 0~h control training class; it is distinct from the final pseudotime-regression score.
+
+\subsection*{TrajRisk graph neural network architecture}
+
+TrajRisk was implemented in PyTorch v2.10.0\cite{ref119} and \textbf{PyTorch Geometric v2.7.0}.\cite{ref118} Each scale used directed, edge-weighted graph convolutions. The source-normalized transition weights were used directly, without additional symmetric degree normalization.\cite{ref044}
+
+Let \(\mathcal N_s^-(j)=\{i:(i,j)\in\mathcal E_s\}\) be the incoming neighbors of target cell \(j\), and initialize \(\boldsymbol h_{j,s}^{(0)}=\boldsymbol x_j\). At layer \(\ell\in\{1,2\}\), incoming messages and the convolution output were
+\begin{equation}\label{eq:convolution}
+\begin{aligned}
+\boldsymbol m_{j,s}^{(\ell)}
+&=\sum_{i\in\mathcal N_s^-(j)}T_{ij}^{(s)}\boldsymbol h_{i,s}^{(\ell-1)},\\
+\boldsymbol u_{j,s}^{(\ell)}
+&=\mathbf W_{\mathrm{nbr},s}^{(\ell)}\boldsymbol m_{j,s}^{(\ell)}\\
+&\quad+\mathbf W_{\mathrm{self},s}^{(\ell)}\boldsymbol h_{j,s}^{(\ell-1)}
++\boldsymbol b_s^{(\ell)}.
+\end{aligned}
+\end{equation}
+Here \(\boldsymbol m\) is the weighted incoming sum, \(\boldsymbol u\) is the pre-normalization convolution output, and \(\mathbf W_{\mathrm{nbr},s}^{(\ell)}\) and \(\mathbf W_{\mathrm{self},s}^{(\ell)}\) are learned neighbor and self maps. Both maps have dimension \(64\times31\) at the first layer and \(64\times64\) at the second. The bias \(\boldsymbol b_s^{(\ell)}\in\mathbb R^{64}\) belongs to the self map; the neighbor map has no bias. Both weight matrices were Xavier-uniform initialized and the self bias was initialized to zero. For an empty incoming-neighbor set, \(\boldsymbol m=\boldsymbol0\), preserving the learned self pathway. The aggregation is a sum of source-weighted messages, rather than normalization over the incoming neighbors of a target.
+
+TrajRiskGNN contains four independent scale branches, each with two convolutions followed by batch normalization and ReLU:
+\begin{equation}\label{eq:branch}
+\boldsymbol h_{j,s}^{(\ell)}=
+\operatorname{ReLU}\!\left(\operatorname{BN}_s^{(\ell)}
+(\boldsymbol u_{j,s}^{(\ell)})\right).
+\end{equation}
+The branch parameters are not shared across scales. During frozen inference, batch normalization used the saved running mean \(\boldsymbol\mu_s^{(\ell)}\), running variance \(\boldsymbol v_s^{(\ell)}\), and learned affine vectors \(\boldsymbol\gamma_s^{(\ell)},\boldsymbol\beta_s^{(\ell)}\):
+\begin{equation}\label{eq:batchnorm}
+\operatorname{BN}_s^{(\ell)}(\boldsymbol u)=
+\boldsymbol\gamma_s^{(\ell)}\odot
+\frac{\boldsymbol u-\boldsymbol\mu_s^{(\ell)}}
+{\sqrt{\boldsymbol v_s^{(\ell)}+10^{-5}}}
++\boldsymbol\beta_s^{(\ell)}.
+\end{equation}
+The product, division and square root in Eq.~\eqref{eq:batchnorm} operate elementwise; \(\odot\) denotes elementwise multiplication. Training used the corresponding current-batch statistics. The four final scale embeddings were concatenated as
+\begin{equation}\label{eq:concatenation}
+\boldsymbol h_j^{\mathrm{cat}}=
+\big[(\boldsymbol h_{j,1}^{(2)})^{\mathsf T},\ldots,
+(\boldsymbol h_{j,4}^{(2)})^{\mathsf T}\big]^{\mathsf T}
+\in\mathbb R^{256}.
+\end{equation}
+The prediction head then computed
+\begin{equation}\label{eq:head}
+\begin{aligned}
+\boldsymbol a_j^{(1)}&=\operatorname{ReLU}(\mathbf U_1\boldsymbol h_j^{\mathrm{cat}}+\boldsymbol c_1),\\
+\boldsymbol a_j^{(2)}&=\operatorname{ReLU}\!\left(\mathbf U_2
+\operatorname{Drop}_{0.3}(\boldsymbol a_j^{(1)})+\boldsymbol c_2\right),\\
+r_j&=\operatorname{sigmoid}(\mathbf U_3\boldsymbol a_j^{(2)}+c_3).
+\end{aligned}
+\end{equation}
+Here \(\mathbf U_1\in\mathbb R^{128\times256}\), \(\mathbf U_2\in\mathbb R^{32\times128}\), and \(\mathbf U_3\in\mathbb R^{1\times32}\), with matching biases \(\boldsymbol c_1,\boldsymbol c_2,c_3\). The hidden vectors \(\boldsymbol a_j^{(1)}\) and \(\boldsymbol a_j^{(2)}\) have dimensions 128 and 32. During training, dropout independently set coordinates to zero with probability 0.3 and divided retained coordinates by 0.7; it was the identity during evaluation. The sigmoid constrains the final scalar score \(r_j\) to \([0,1]\). The complete network contains 87,233 trainable parameters. We denote its prediction vector by \(\boldsymbol r=f_{\theta}(\mathbf X,\mathcal G)\), where \(\theta\) contains the learned network parameters.
+
+\subsection*{Model training}
+
+TrajRiskGNN was trained with Adam\cite{ref120} to minimize
+\begin{equation}\label{eq:loss}
+\mathcal L(\theta)=\frac{1}{|\mathcal I_{\mathrm{train}}|}
+\sum_{i\in\mathcal I_{\mathrm{train}}}(r_i-y_i)^2,
+\end{equation}
+where \(\mathcal I_{\mathrm{train}}\) is the training index set, \(r_i\) the model prediction, and \(y_i\) the normalized pseudotime target. This dimensionless trajectory-state estimate is not an adverse-outcome probability. A fixed timepoint-stratified 80/20 split was used (5,264 training cells and 1,318 validation cells; random seed 42). Training and validation cells remained in the same preconstructed graphs; the regression loss was evaluated only on training cells. Normalized pseudotime was available for all cells during the preceding transition-feature construction, so this is a transductive within-graph evaluation.
+
+Training proceeded in two stages. First, a grid search over learning rates \(\{0.01, 0.001, 0.0001\}\) and weight decays \(\{0, 10^{-5}, 10^{-4}\}\) evaluated nine configurations for at most 50 epochs each, with early stopping based on validation MSE (patience 10). Hyperparameter configurations were ranked by validation AUROC, yielding learning rate 0.001 and weight decay \(10^{-4}\). Second, the model was retrained from scratch with the selected hyperparameters for at most 300 epochs, with early stopping based on validation MSE (patience 25), a ReduceLROnPlateau scheduler (factor 0.5, patience 10, minimum learning rate \(10^{-6}\)), and gradient-norm clipping at 1.0.
+
+During final training, both lowest-validation-MSE and highest-validation-AUROC checkpoints were retained. The AUROC-best checkpoint occurred at epoch 144 and was restored into the final model used for downstream mouse analyses. This checkpoint-selection protocol is explicitly accounted for in the ablation design below.
+
+\subsection*{Baseline comparisons}
+
+Four baselines were evaluated on the same held-out validation set (n = 1,318; \TableRef{S2A}). Binary elevated-pseudotime labels used only for AUROC/AUPRC evaluation were \(\mathbf1\{y_i>0.10\}\); this threshold was fixed before baseline comparison and was not tuned to maximize comparator performance.
+
+\textbf{B1, expression-only XGBoost.} An XGBRegressor predicted continuous pseudotime\_norm from the 30-dimensional scVI representation. Hyperparameters were selected on the training set only by five-fold cross-validation, with folds stratified by the binary elevated-pseudotime label to ensure positive examples in every fold. The search grid was n\_estimators \(\{200, 500\}\), max\_depth \(\{4, 6\}\), and learning\_rate \(\{0.05, 0.1\}\), with subsample=0.8 and colsample\_bytree=0.8; the model itself was fit to continuous pseudotime and scored by AUROC after thresholding the held-out labels.
+
+\textbf{B2, Gaussian propagation.} Define the Gaussian kernel \(k(\delta;\sigma)=\exp[-\delta^2/(2\sigma^2)]\), where \(\delta\) is Euclidean distance and \(\sigma\) is its bandwidth. Gaussian weights were computed on the same temporal windows using the 30-dimensional scVI vectors. Within scale \(s\), the bandwidth \(\sigma_s^{G}\) was the median of all admissible source-target distances plus \(10^{-8}\). Let \(\mathcal K_s(i)\) contain the 15 highest-weight targets for source \(i\). The source-oriented weights were
+\begin{equation}\label{eq:gaussian-transitions}
+T_{ij}^{G,s}=
+\frac{k(d_{ij};\sigma_s^{G})\mathbf1\{j\in\mathcal K_s(i)\}}
+{\sum_{a\in\mathcal K_s(i)}k(d_{ia};\sigma_s^{G})},
+\end{equation}
+with all entries outside the corresponding temporal window zero. A zero denominator was replaced by 1. The incoming scalar-propagation operator \(\mathbf M_s^{G}\) has entry \((M_s^{G})_{ji}=T_{ij}^{G,s}\), reversing the matrix index order but preserving the source-to-target edge direction. For the RF graph, \((M_s^{\mathrm{RF}})_{ji}=T_{ij}^{(s)}\) on \(\mathcal E_s\), and is zero elsewhere. For either operator-family index \(\nu\in\{G,\mathrm{RF}\}\), single-step propagation was
+\begin{equation}\label{eq:scalar-propagation}
+\boldsymbol r_\nu=
+\operatorname{clip}_{[0,1]}\!\left[
+\tfrac12\boldsymbol r^{(0)}+
+\tfrac18\sum_{s=1}^{4}\mathbf M_s^{\nu}\boldsymbol r^{(0)}\right].
+\end{equation}
+Clipping operates componentwise. B2 uses \(\boldsymbol r_{\mathrm{B2}}=\boldsymbol r_G\). This baseline performs one scalar propagation step per scale, averages the four propagated vectors, and combines that mean with the original seed using damping 0.5. It contains no learned feature transformation or nonlinear message passing.
+
+\textbf{B3, single-scale GNN.} Four one-scale versions of TrajRiskGNN were trained, one per temporal scale, using the same node features and GNN hyperparameters. The reported single-scale baseline was selected by development-set AUROC without consulting the final held-out validation set.
+
+\textbf{B4, expression distance.} For each cell, Euclidean distance between its scVI representation and the mean scVI representation of 0~h control hepatocytes was computed and min-max normalized to \([0,1]\).
+
+RNA velocity was not included as a baseline because the deposited Walesky expression matrix does not contain the separate spliced and unspliced count layers required for RNA-velocity estimation.
+
+\subsection*{Ablation studies}
+
+Four ablations assessed the contribution of individual TrajRisk components while holding the remaining implementation fixed. \textbf{A1 (Gaussian transitions)} replaced the learned RF graphs with the Gaussian graphs used in B2 on the same temporal source-target windows. Because the Gaussian construction retained 15 targets per source, this comparison changes both edge weights and the retained edge set. \textbf{A2 (single-scale)} was identical to B3 and is reported as both a reduced baseline and a multi-scale ablation. \textbf{A3 (RF matrix propagation)} retained the learned RF transition matrices but replaced the GNN with scalar linear propagation of the XGBoost risk seed. For each scale, the initial risk vector was multiplied once by its RF transition matrix; propagated scores were averaged across scales and combined with the unpropagated seed using damping 0.5, then clipped to \([0,1]\). A3 therefore removes nonlinear GNN aggregation and 31-dimensional feature integration jointly and should be interpreted as a comparison of full GNN feature integration against scalar linear diffusion, not as an isolated test of GNN nonlinearity. \textbf{A4 (no initial risk seed)} removed the XGBoost risk feature and retrained TrajRiskGNN with 30-dimensional scVI-only node features.
+
+A3 uses \(\boldsymbol r_{\mathrm{A3}}=\boldsymbol r_{\mathrm{RF}}\) in Eq.~\eqref{eq:scalar-propagation}, with the incoming operators built from the learned RF graph weights.
+
+For the ablation variants, the original GNN training set was divided into an inner training subset (n = 4,212) and development subset (n = 1,052) using a random permutation with seed 42 and a development fraction of 20\%, rounded down to a whole-cell count. Ablation GNNs were trained for at most 200 epochs on the inner training subset and checkpointed/early-stopped using development AUROC (patience 25); the original held-out validation set (n = 1,318) was used only for their final metrics. The primary TrajRisk checkpoint was selected using held-out validation AUROC, giving it a checkpoint-selection advantage relative to the ablations.
+
+\subsection*{Cross-dataset validation: external mouse cohorts}
+
+The final mouse-only TrajRisk model was applied without retraining to three external mouse cohorts embedded in the integrated 30-dimensional scVI space: Ben-Moshe (n = 2,770), Umbaugh 2~h (n = 21,409), and Umbaugh 48~h/72~h (n = 5,306; \TableRef{S3A}). External node features were assembled identically to the Walesky features using each cell's scVI representation and the Walesky-trained XGBoost seeder. Let \(q\) index an external query cell.
+
+\textbf{Two transfer configurations were evaluated.} In \textbf{\SelfOnly{}}, external cells were appended to the node tensor without incoming reference edges. For these cells, \(\boldsymbol m_{q,s}^{(\ell)}=\boldsymbol0\) at both layers of every branch in Eq.~\eqref{eq:convolution}; prediction retains the learned self maps, frozen batch normalization, ReLU and fusion head. This configuration tests feature-space transfer without trajectory-graph messages. In \textbf{Reference-KNN}, the \(K=15\) nearest Walesky reference hepatocytes were identified using biologically matched temporal anchor sets. Control cells were connected to Walesky 0~h control anchors through Scale 1; Umbaugh 2~h APAP cells were connected to Walesky 0~h and 6~h anchors through Scale 1 (Acute Stress); 48~h APAP cells were connected to Walesky 24~h and 48~h anchors through Scale 3 (Fate Decision); and 72~h APAP cells were connected to Walesky 48~h and 96~h anchors through Scale 4 (Resolution).
+
+Let \(\mathcal N_K(q)\) contain the query's 15 reference neighbors, and \(d_{qi}=\|\boldsymbol z_q-\boldsymbol z_i\|_2\) their distance in the shared mouse scVI space. The query-specific bandwidth \(\sigma_q^{M}\) was the median of its positive neighbor distances, with fallback 1 if all distances were zero. The directed reference-to-query edge \(i\to q\) had weight
+\begin{equation}\label{eq:mouse-transfer}
+w_{iq}^{M}=\frac{k(d_{qi};\sigma_q^{M})}
+{\sum_{a\in\mathcal N_K(q)}k(d_{qa};\sigma_q^{M})+10^{-8}}.
+\end{equation}
+Weights were normalized over the reference neighbors of each query. The original reference graphs were retained, and reference-to-query edges were added only to the corresponding scale branch. Model parameters and node features were held fixed during inference. Gaussian rather than Random Forest transition weights were used because external cells do not have Walesky pseudotime\_norm values and therefore cannot be scored by the RF transition classifier.
+
+For the Umbaugh 48~h/72~h mechanistic analysis, cells with detectable \textit{Cdkn1a} expression were classified as p21-expressing, and Spearman rank correlation between continuous \textit{Cdkn1a} expression and predicted TrajRisk score was computed across all 5,306 cells.
+
+\subsection*{Human cross-species validation}
+
+Walesky mouse hepatocytes (6,582 cells) were integrated with Matchett human hepatocyte nuclei (49,984 nuclei) using 13,122 uniquely mapped mouse--human gene-symbol pairs retained from an Ensembl BioMart table.\cite{ref121} The integration filter retained only rows whose mouse symbol and human symbol each occurred exactly once in the mapping table, then restricted those rows to genes present in both expression matrices. Mouse genes were renamed to the corresponding human symbols to create a shared gene axis. Both datasets were total-count normalized to 10,000 and log1p-transformed before concatenation if their input expression values were not already log-normalized.
+
+Cross-species scVI integration (56,566 observations: 6,582 mouse cells and 49,984 human nuclei; 13,122 genes) used batch\_key='sample', species as an explicit categorical covariate, 30 latent dimensions, two layers, 128 hidden units, dropout 0.1, and a Gaussian gene likelihood. Training proceeded for at most 400 epochs with early stopping on validation ELBO (patience 20). Species and condition ASW were calculated in the 30-dimensional joint latent space on the same random 10,000-observation subsample. These diagnostics describe label mixing rather than independently verifying biological conservation.
+
+Because latent dimensions from independently trained scVI models are not coordinate-wise interchangeable, the original mouse-only TrajRiskGNN was not applied directly to human cross-species coordinates. Instead, TrajRiskGNN was retrained on the 6,582 Walesky hepatocytes using their cross-species scVI representations while preserving the original architecture, transition graphs, pseudotime\_norm labels, train/validation split, and selected hyperparameters. A new XGBoost seeder was trained analogously on Walesky 0~h control versus 6~h APAP cells in the cross-species latent space. Cross-species TrajRisk training used learning rate 0.001, weight decay \(10^{-4}\), at most 200 epochs, early-stopping patience 25, ReduceLROnPlateau (factor 0.5, patience 10, minimum learning rate \(10^{-6}\)), and gradient-norm clipping at 1.0; the best validation-AUROC checkpoint was retained. The original mouse-only model remained unchanged and was used for all mouse analyses. Human outputs are transferred trajectory-state scores in the shared expression space; no human pseudotime was inferred.
+
+\textbf{Two human transfer variants were evaluated.} \textbf{\SelfOnly{}} was the primary analysis: human nuclei were appended without incoming reference edges, so prediction used the learned self pathway in the shared cross-species coordinate system. \textbf{Reference-KNN} was evaluated as a sensitivity analysis. For each human nucleus, the \(K=15\) nearest Walesky hepatocytes were identified in the 30-dimensional cross-species scVI latent space. Each reference neighbor was mapped to a temporal branch according to its Walesky sampling time: 0~h and 6~h to Scale 1 (Acute Stress), 24~h to Scale 2 (Peak Injury), 48~h to Scale 3 (Fate Decision), and 96~h to Scale 4 (Resolution). The nucleus was assigned to the branch represented by the largest number of neighbors. If branches tied for the largest count, the first tied branch encountered in the ordered neighbor list was selected. Directed Walesky-to-human edges from all 15 neighbors were added only to that branch.
+
+For human queries, distances \(d_{qi}^{H}\) were computed between human nuclei and Walesky reference cells in the joint cross-species scVI coordinates. The shared bandwidth \(\sigma^{H}\) was the median of all positive distances across the full human-query-by-15-neighbor array, with fallback 1 if all distances were zero. The edge weight was
+\begin{equation}\label{eq:human-transfer}
+w_{iq}^{H}=\frac{k(d_{qi}^{H};\sigma^{H})}
+{\max\!\left\{\sum_{a\in\mathcal N_K(q)}k(d_{qa}^{H};\sigma^{H}),10^{-12}\right\}}.
+\end{equation}
+The normalization is over each nucleus's 15 reference neighbors, while the bandwidth is shared across nuclei. This differs from the query-specific mouse bandwidth in Eq.~\eqref{eq:mouse-transfer}. Because human nuclei have no experimentally defined position along the Walesky trajectory, branch assignment was treated as reference projection rather than human trajectory inference. Gaussian rather than RF transition weights were used because human nuclei have no defined Walesky pseudotime\_norm value required by the RF transition classifier. Both human transfer variants used the frozen cross-species-coordinate model after its Walesky-only training.
+
+A separate orthologous gene signature was derived from all 16,288 genes in the Walesky expression matrix. Let \(e_{ig}^{M}\) denote log-normalized expression of mouse gene \(g\) in reference cell \(i\). With average ranks for ties, define \(\eta_i=\operatorname{rank}(y_i)\) and \(\xi_{ig}=\operatorname{rank}(e_{ig}^{M})\). The correlation used for ranking was
+\begin{equation}\label{eq:signature-correlation}
+\rho_g=
+\frac{\sum_{i\in\mathcal V}(\eta_i-\bar\eta)(\xi_{ig}-\bar\xi_g)}
+{\sqrt{\sum_{i\in\mathcal V}(\eta_i-\bar\eta)^2}
+\sqrt{\sum_{i\in\mathcal V}(\xi_{ig}-\bar\xi_g)^2}+10^{-12}},
+\end{equation}
+where \(\bar\eta\) and \(\bar\xi_g\) are the respective mean ranks over \(\mathcal V\). Genes were ranked in descending correlation order for the risk signature and ascending order for the recovery signature. Each ranked list was traversed until 50 genes with retained unique mouse-human mappings and counterparts present in the human expression matrix had been collected.
+
+Let \(\mathcal J_c\) be the 50 mapped human genes for signature \(c\in\{\mathrm{risk},\mathrm{recovery}\}\), and \(e_{qg}^{H}\) their stored log-normalized expression in human nucleus \(q\). The expression matrix was already log-normalized and was used without an additional transformation for signature scoring. Scores were
+\begin{equation}\label{eq:signature-scores}
+\begin{aligned}
+S_q^{c}&=\frac{1}{|\mathcal J_c|}\sum_{g\in\mathcal J_c}e_{qg}^{H},\\
+S_q^{\mathrm{net}}&=S_q^{\mathrm{risk}}-S_q^{\mathrm{recovery}}.
+\end{aligned}
+\end{equation}
+The risk and recovery names denote positive and negative association with mouse pseudotime, respectively, rather than independently measured future outcomes.
+
+Primary human statistics were computed at the donor level. If \(\mathcal I_d\) contains the \(n_d\) nuclei belonging to donor \(d\), mean TrajRisk and signature scores were
+\begin{equation}\label{eq:donor-scores}
+\bar r_d^{H}=\frac{1}{n_d}\sum_{q\in\mathcal I_d}r_q^{H},
+\qquad
+\bar S_d^{c}=\frac{1}{n_d}\sum_{q\in\mathcal I_d}S_q^{c}.
+\end{equation}
+Here \(r_q^{H}\) denotes either human transfer variant, summarized separately, and the signature mean also includes \(c=\mathrm{net}\). This yielded 10 APAP-ALF and 9 healthy donor values. One-sided Mann-Whitney U tests (alternative='greater') and donor-level AUROC were computed for each scoring method. Concordance between donor-level Reference-KNN TrajRisk and net-signature scores was assessed by two-sided Spearman correlation across all 19 donors (\TableRef{S4C}). A sensitivity analysis excluded four APAP-ALF donors with fewer than 300 profiled hepatocyte nuclei (apap02, 94; apap05, 284; apap09, 291; apap10, 134), retaining 6 APAP-ALF and 9 healthy donors; the donor-level analyses were then repeated.
+
+\subsection*{Spatial validation}
+
+Three Visium datasets were used. The Ben-Moshe mouse dataset (Zenodo: 6035873)\cite{ref011} provided six sections (two mice per timepoint at 24~h, 48~h, and 72~h post-APAP; 17,370 spots total). Spot coordinates and the deposited binary fibrogenic/pericentral-boundary annotation, derived by the original authors from collagen-gene enrichment, were used directly. The Matchett mouse dataset (GEO: GSE223560)\cite{ref019} provided 11 sections (3 healthy, 2 at 24~h, 2 at 36~h, and 4 at 48~h post-APAP). The Matchett human dataset (GEO: GSE223559)\cite{ref019} provided three APAP-ALF sections from two donors and three healthy sections from three donors. Two non-A-E hepatitis acute-liver-failure (NAE-ALF) sections were excluded because that etiology was not represented in the primary cross-species analysis.
+
+For Ben-Moshe, gene expression was extracted for the 100 TrajRisk signature genes together with canonical zonation markers \textit{Cyp2e1, Glul, Ass1,} and \textit{Hal}; \textit{Cyp2f2} was additionally queried in mouse spatial datasets. For Matchett mouse and human Visium data, Matrix Market count matrices were restricted to spots annotated as in tissue, yielding 1,491--3,478 spots per mouse section and 1,776--4,350 spots per human section. \textit{CYP2F2} was absent from the human matrix, while all 50 risk and 50 recovery human orthologs required for signature scoring were present. Count matrices were normalized to counts per million (CPM) per spot.
+
+Per-spot risk and recovery signature scores were calculated as the mean CPM across the corresponding mapped gene sets, and net signature score was defined as risk minus recovery. For Ben-Moshe, the deposited fibrogenic annotation was used directly. Matchett datasets had no deposited zone labels; within each section, the 25th and 75th percentiles of \textit{Cyp2e1/CYP2E1} CPM were computed with linear interpolation. Spots at or above the 75th-percentile cutoff were designated pericentral, those at or below the 25th-percentile cutoff periportal, and the remainder midlobular. All boundary ties were retained in the corresponding zone, so the resulting groups could exceed 25\% of a section. Because \textit{Cyp2e1/CYP2E1} itself was a member of the recovery signature and was also used to define these zones, it was excluded from recovery- and net-signature scoring in the Matchett zonation analyses to avoid circularity. For spot \(v\), let \(C_{vg}\) denote the CPM expression of gene \(g\), and \(g_*\) the relevant \textit{Cyp2e1/CYP2E1} marker. The corrected recovery score was
+\begin{equation}\label{eq:spatial-recovery}
+\widetilde S_v^{\mathrm{recovery}}=
+\frac{50S_v^{\mathrm{recovery}}-C_{vg_*}}{49}.
+\end{equation}
+Here \(S_v^{\mathrm{recovery}}\) is the original mean of the 50 recovery-gene CPM values. Equation~\eqref{eq:spatial-recovery} equals the mean of the remaining 49 genes. The corrected net score was \(S_v^{\mathrm{risk}}-\widetilde S_v^{\mathrm{recovery}}\). The 50-gene risk signature was unchanged because the zone-defining marker was not a member of that set.
+
+Zone-level comparisons used one-sided Mann--Whitney U tests: fibrogenic greater than non-fibrogenic for the Ben-Moshe risk signature, pericentral greater than periportal for the Matchett risk signature, and pericentral less than periportal for the corrected Matchett recovery signature. Matchett pericentral/periportal group summaries are medians of pooled spot scores (\TableRefs{S5B}{S5C}). Spot-level Spearman correlations between \textit{Cyp2e1/CYP2E1} expression and the risk signature were also computed. APAP-ALF versus healthy comparisons in the Matchett human spatial dataset were reported descriptively only because spots from the same tissue section are not independent biological replicates.
+
+\subsection*{Bottleneck analysis}
+
+For every directed edge across all four temporal scales (421,477 edges total), risk flux and risk amplification were computed from the frozen trained model without additional fitting. These operational terms summarize the model-derived trajectory-state score across inferred edges. For source cell \(i\), target cell \(j\), and scale \(s\), risk flux was
+\begin{equation}\label{eq:flux}
+F_{ij}^{(s)}=T_{ij}^{(s)}r_i,
+\end{equation}
+using the final model score \(r_i\), and risk amplification was the signed score difference
+\begin{equation}\label{eq:amplification}
+A_{ij}^{(s)}=r_j-r_i.
+\end{equation}
+Both quantities are dimensionless; negative amplification denotes a lower target score along a forward-directed edge.
+
+Within each scale, bottleneck edges were selected by their average-rank percentile among all scale edges:
+\begin{equation}\label{eq:bottleneck}
+\begin{aligned}
+\Psi_{ij}^{(s)}&=\frac{100}{|\mathcal E_s|}
+\operatorname{rank}_{\mathcal E_s}^{\mathrm{avg}}(F_{ij}^{(s)}),\\
+\mathcal B_s&=\{(i,j)\in\mathcal E_s:\Psi_{ij}^{(s)}\geq99\}.
+\end{aligned}
+\end{equation}
+Here \(\Psi_{ij}^{(s)}\) is the flux-rank percentile. Ranks are ascending, with tied flux values assigned their average rank. This defines the top-1\% edge set \(\mathcal B_s\); its source and target cell sets contain each participating cell once. Sensitivity was assessed by retaining the top 0.5\%, 1\%, 2\%, 5\%, and 10\% of edges ranked by flux within Scale 3; enrichment of persistent-compensation source cells remained significant at each threshold.
+
+Two perturbation analyses used the trained, frozen model. For perturbation \(P\), let \(\mathcal G^{P}\) be the modified graph family. The signed per-cell change was
+\begin{equation}\label{eq:perturbation}
+\Delta_i^{P}=\big[f_{\theta}(\mathbf X,\mathcal G^{P})\big]_i-r_i.
+\end{equation}
+In \textbf{scale-level ablation}, \(\mathcal G^{P}\) replaced one scale's complete edge set by the empty set, retaining all nodes, features, other graphs and model parameters. Four forward passes were performed. Total, mean and maximum absolute changes were \(\sum_{i\in\mathcal V}|\Delta_i^{P}|\), \(N^{-1}\sum_{i\in\mathcal V}|\Delta_i^{P}|\), and \(\max_{i\in\mathcal V}|\Delta_i^{P}|\), respectively. The percentages decreasing or increasing counted \(\Delta_i^{P}<-0.01\) or \(\Delta_i^{P}>0.01\), with all \(N=6{,}582\) cells as the denominator (\TableRef{S6B}). These changes quantify sensitivity of the frozen predictor to removal of each scale.
+
+In \textbf{pseudotime-group perturbation}, all 1,043 source cells at 24~h were partitioned using full-precision, linearly interpolated quartiles of \(y_i\) (cutoffs 0.016547829, 0.056113873, and 0.0923301125). Intervals included their lower boundary and excluded their upper boundary, with the final interval including the normalized endpoint 1.000; boundary ties entered the higher quartile. For each quartile in turn, all Scale 3 edges originating from its source cells were removed. The full forward pass was repeated with model weights and node features frozen. For timepoint \(t\), mean and maximum absolute changes were computed over \(\mathcal V_t=\{i:t_i=t\}\):
+\begin{equation}\label{eq:perturbation-summary}
+\begin{aligned}
+D_t^{P}&=\frac{1}{|\mathcal V_t|}\sum_{i\in\mathcal V_t}|\Delta_i^{P}|,\\
+H_t^{P}&=\max_{i\in\mathcal V_t}|\Delta_i^{P}|.
+\end{aligned}
+\end{equation}
+Here \(D_t^{P}\) and \(H_t^{P}\) denote the mean and maximum, using all 910 cells at 48~h or all 809 cells at 96~h (\TableRef{S6F}).
+
+For each scale, unique source and target cells participating in top-1\% bottleneck edges were characterized by TrajRisk-score distribution, pseudotime\_norm, and treatment composition. For Scale 3, one-sided Fisher's exact tests compared selected bottleneck cells with the remaining cells at the same sampling time. Source-cell tests used alternative='greater' for enrichment in high pseudotime (pseudotime\_norm at or above the 24~h 75th-percentile threshold, 0.0923301125) and high predicted TrajRisk score (at or above the 24~h 75th-percentile threshold, 0.0566794285). The source population contained 1,043 cells. The target-cell high-pseudotime test used alternative='less' for depletion relative to the 910-cell 48~h population (75th-percentile threshold, 0.08047163875). These within-timepoint quartile indicators are distinct from the global pseudotime\_norm > 0.10 label used for performance evaluation (\TableRef{S6D}).
+
+% Original gene-selection/pathway cutoffs are retained without new source verification at the user's request.
+Differential expression between bottleneck and non-bottleneck target cells at the same timepoint was assessed by Wilcoxon rank-sum testing (\textbf{SciPy v1.15.2}\cite{ref122}). Genes were tested if expressed in at least 10\% of cells in either group. For gene \(g\) and scale \(s\), let \(\mu_{g,s}^{B}\) and \(\mu_{g,s}^{O}\) be the mean stored log-normalized expression over unique bottleneck target cells and the remaining cells at that target timepoint, respectively. Log2 fold change was calculated as
+\begin{equation}\label{eq:mouse-fold-change}
+L_{g,s}^{M}=\log_2\!\left(
+\frac{\mu_{g,s}^{B}+10^{-6}}{\mu_{g,s}^{O}+10^{-6}}\right).
+\end{equation}
+The pseudocount \(10^{-6}\) was added to each group mean. This statistic is the log2 ratio of mean log-normalized expression values. Pathway enrichment used Enrichr\cite{ref123} through gseapy v1.3.0\cite{ref124} with separate up- and down-regulated gene sets. KEGG\_2019\_Mouse\cite{ref104} and GO\_Biological\_Process\_2023\cite{ref125} libraries were queried, and pathway significance was assessed using Enrichr-adjusted p values. KEGG Parkinson, Alzheimer, and Huntington disease terms appearing in Scale 1 were treated as annotation artifacts arising from shared mitochondrial electron-transport-chain genes rather than interpreted as disease-specific findings.
+
+Per-scale 64-dimensional cell embeddings were extracted after the second convolution, batch normalization, and ReLU, as defined in Eq.~\eqref{eq:branch}. For each edge, embedding shift was
+\begin{equation}\label{eq:embedding-shift}
+d_{ij,s}^{\mathrm{emb}}=
+\|\boldsymbol h_{j,s}^{(2)}-\boldsymbol h_{i,s}^{(2)}\|_2.
+\end{equation}
+This is Euclidean distance between the source and target embeddings of the same scale. Association between flux and embedding shift was assessed by Spearman correlation and by a one-sided Mann-Whitney U test comparing top-1\%-flux edges with all remaining edges within the same scale.
+
+For cross-species overlap analysis, mouse bottleneck-associated genes were selected within each temporal scale using \(|L_{g,s}^{M}|>0.20\) and nominal p < 0.05, yielding 2,711 distinct mouse genes across the four scales. Human differential-expression testing covered 2,549 mouse-gene mappings representing 2,534 distinct human symbols. Repeated human targets were retained as separate mouse-gene records with identical human statistics; record-level and distinct-human-gene overlap fractions were calculated separately. For each per-scale summary, both the numerator and denominator counted distinct human symbols. This mapping policy is separate from the strict gene-symbol uniqueness filtering used for cross-species integration.
+
+Human expression was first averaged within each biological donor using the stored expression matrix without additional normalization. Samples apap09A and apap09B were merged into donor apap09. For condition \(\kappa\in\{\mathrm{ALF},\mathrm{Healthy}\}\), let \(\mathcal D_\kappa\) denote its donor set. The condition mean and human log2 fold change were
+\begin{equation}\label{eq:human-fold-change}
+\begin{aligned}
+\mu_{g,\kappa}^{H}&=\frac{1}{|\mathcal D_\kappa|}
+\sum_{d\in\mathcal D_\kappa}\left(\frac{1}{n_d}\sum_{q\in\mathcal I_d}e_{qg}^{H}\right),\\
+L_g^{H}&=\log_2\!\left(
+\frac{\mu_{g,\mathrm{ALF}}^{H}+10^{-6}}
+{\mu_{g,\mathrm{Healthy}}^{H}+10^{-6}}\right).
+\end{aligned}
+\end{equation}
+Thus each donor contributed equally to its condition mean, irrespective of its number of nuclei. APAP-ALF donors (n = 10) were compared with healthy donors (n = 9) using a two-sided Mann-Whitney U test on the donor-level expression means, with automatic method selection and continuity correction. A gene was counted in the reported human differential-expression overlap when its human comparison had nominal p \(\leq0.05\), irrespective of agreement in fold-change direction with the mouse comparison. These overlap percentages were descriptive and were not benchmarked against a randomly selected liver-gene background.
+
+\subsection*{Statistical analysis}
+
+Discriminative performance was quantified by AUROC as the primary metric and average precision (AUPRC) as a secondary metric, with AUPRC emphasized for imbalanced within-timepoint subsets.\cite{ref126} Metrics were computed with \textbf{scikit-learn v1.7.2}.\cite{ref117} Spearman rank correlation was used for continuous ranking analyses. Ninety-five percent bootstrap confidence intervals for AUROC were the 2.5th and 97.5th percentiles of 1,000 resampled AUROCs using random seed 42; resamples lacking either outcome class were omitted. One-sided paired bootstrap tests compared TrajRisk with each comparator using the same resampled cells for both methods. The empirical p value was the fraction of valid resamples in which TrajRisk AUROC minus comparator AUROC was less than or equal to zero. This is a paired bootstrap procedure, not the DeLong test for correlated ROC curves.
+
+Mann-Whitney U, Fisher's exact, and Wilcoxon rank-sum tests were implemented in \textbf{SciPy v1.15.2}.\cite{ref122} Tests were one-sided where a directional alternative is specified in the relevant analysis above and two-sided otherwise. Pathway enrichment used Enrichr-adjusted p values. No additional multiplicity correction was applied to the discrete comparisons described above; nominal p values are explicitly identified where used for exploratory gene-level analyses.
+
+\subsection*{Code and data availability}
+
+TrajRisk code will be available at [X]. All datasets analyzed in this study are publicly available from the GEO and Zenodo accessions listed above.

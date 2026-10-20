@@ -1,0 +1,19 @@
+\subsection*{Table S6D. Scale 3 source enrichment and target depletion.}\phantomsection\label{tab:S6D}
+\noindent The top-1\% Scale 3 set contains 1,175 edges, 43 unique 24~h sources, and 380 unique 48~h targets. High pseudotime and high predicted TrajRisk score use the respective within-timepoint 75th-percentile thresholds recorded in the table. Background\_high\_pct uses all 1,043 source-timepoint or 910 target-timepoint cells. Fisher's exact tests compare selected cells with the remaining cells of the same timepoint: greater for source enrichment and less for target depletion. The infinite odds ratio for high-score sources reflects a zero cell in the contingency table; it is not a finite effect-size estimate.
+
+\Needspace{170pt}
+\begingroup\small\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.23}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.34\textwidth}*{3}{>{\raggedright\arraybackslash}X}}
+\toprule
+\textbf{Metric} & \textbf{Scale 3 source: high pseudotime} & \textbf{Scale 3 source: high predicted risk} & \textbf{Scale 3 target: high pseudotime} \\ \midrule
+Bottleneck cells (n) & 43 & 43 & 380 \\
+High bottleneck cells (n) & 33 & 43 & 72 \\
+High bottleneck cells (\%) & 76.7442 & 100 & 18.9474 \\
+High background cells (\%) & 25.0240 & 25.0240 & 25.0549 \\
+Threshold & 0.0923 & 0.0567 & 0.0805 \\
+Odds ratio & 11.1737 & \(\infty\) & 0.5604 \\
+Fisher alternative & greater & greater & less \\
+Fisher p & \(4.521\times10^{-13}\) & \(8.299\times10^{-28}\) & \(1.874\times10^{-4}\) \\
+\bottomrule
+\end{tabularx}
+\endgroup\par\medskip

@@ -1,0 +1,20 @@
+\phantomsection\label{tab:S1}
+\noindent The four windows are 0--6, 6--24, 24--48, and 48--96~h. Sparsity is reported as a percentage of the complete cell graph, rather than of admissible pairs within each time window.
+
+\Needspace{170pt}
+\begingroup\small\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.23}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.34\textwidth}*{4}{>{\raggedright\arraybackslash}X}}
+\toprule
+\textbf{Metric} & \textbf{Scale 1 (Acute Stress)} & \textbf{Scale 2 (Peak Injury)} & \textbf{Scale 3 (Fate Decision)} & \textbf{Scale 4 (Resolution)} \\ \midrule
+Transition & 0~h \(\rightarrow\) 6~h & 6~h \(\rightarrow\) 24~h & 24~h \(\rightarrow\) 48~h & 48~h \(\rightarrow\) 96~h \\
+Elapsed time (h) & 6 & 18 & 24 & 48 \\
+Training pairs (n) & 153,045 & 18,855 & 46,935 & 40,950 \\
+CV AUROC (mean \(\pm\) SD) & 0.9936 \(\pm\) 0.0002 & 0.9871 \(\pm\) 0.0011 & 0.9901 \(\pm\) 0.0004 & 0.9929 \(\pm\) 0.0009 \\
+OOB accuracy & 0.9610 & 0.9490 & 0.9550 & 0.9650 \\
+Retained edges (n) & 167,633 & 63,673 & 117,408 & 72,763 \\
+Full-graph sparsity (\%) & 99.6130 & 99.8530 & 99.7290 & 99.8320 \\
+Transition entropy (mean \(\pm\) SD, nats) & 3.81 \(\pm\) 0.26 & 4.88 \(\pm\) 0.42 & 4.58 \(\pm\) 0.39 & 4.24 \(\pm\) 0.43 \\
+RF--Gaussian mean row Pearson r & 0.2460 & 0.1870 & 0.2490 & 0.4030 \\
+\bottomrule
+\end{tabularx}
+\endgroup\par\medskip

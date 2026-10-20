@@ -1,0 +1,21 @@
+\subsection*{Table S6G. Embedding shifts on bottleneck and background edges.}\phantomsection\label{tab:S6G}
+\noindent Top-1\% flux edges are compared with all remaining edges in each scale. Shift is an edge-wise distance in the corresponding learned 64-dimensional embedding, in embedding-coordinate units. One-sided Mann--Whitney U tests evaluate larger shifts on top-flux edges; Spearman rho and two-sided p values evaluate the association between flux and shift across all edges of the scale. P values recorded as 0.0 are displayed as numerical underflow. Edges sharing cells are not independent biological replicates.
+
+\Needspace{170pt}
+\begingroup\small\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.23}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.34\textwidth}*{4}{>{\raggedright\arraybackslash}X}}
+\toprule
+\textbf{Metric} & \textbf{Scale 1 --- Acute Stress} & \textbf{Scale 2 --- Peak Injury} & \textbf{Scale 3 --- Fate Decision} & \textbf{Scale 4 --- Resolution} \\ \midrule
+Top-1\% edges (n) & 1,677 & 637 & 1,175 & 728 \\
+Background edges (n) & 165,956 & 63,036 & 116,233 & 72,035 \\
+Mean shift top1pct & 42.8176 & 17.3759 & 24.8533 & 13.2218 \\
+Mean shift background & 36.3832 & 11.7116 & 15.1750 & 13.8244 \\
+Median shift top1pct & 45.6457 & 16.9434 & 24.4913 & 10.2151 \\
+Median shift background & 35.4716 & 10.4593 & 12.8057 & 10.5033 \\
+Mann Whitney U & 166,964,258 & 30,310,425 & 100,674,931.5000 & 24,756,891 \\
+One-sided U-test p (top > background) & \(1.788\times10^{-45}\) & \(3.337\times10^{-109}\) & \(4.870\times10^{-173}\) & 0.9953 \\
+Flux--shift Spearman rho & 0.1343 & 0.3185 & 0.4285 & 0.2067 \\
+Spearman p & \textit{underflow} & \textit{underflow} & \textit{underflow} & \textit{underflow} \\
+\bottomrule
+\end{tabularx}
+\endgroup\par\medskip

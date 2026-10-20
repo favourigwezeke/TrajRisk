@@ -1,0 +1,15 @@
+# Minimal frozen-model and supplementary-plot replay; tested on Linux/Python 3.12.
+# Raw-expression preprocessing, scVI fitting, and the R trajectory are separate.
+numpy==2.2.6
+scipy==1.15.2
+pandas==2.3.3
+torch==2.10.0
+torch-geometric==2.7.0
+scikit-learn==1.7.2
+xgboost==3.2.0
+joblib==1.5.3
+matplotlib==3.10.8
+umap-learn==0.5.11
+numba==0.65.0
+llvmlite==0.47.0
+pynndescent==0.5.13

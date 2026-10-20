@@ -1,0 +1,14 @@
+\subsection*{Table S2B. Single-scale GNN selection.}\phantomsection\label{tab:S2B}
+\noindent Four one-scale GNNs were compared using development-set AUROC. Scale 4 was selected by that criterion; the held-out validation AUROC was subsequently reported. True/\allowbreak{}False indicates development-based selection, not selection on the validation results.
+
+\Needspace{170pt}
+\begingroup\small\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.23}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.34\textwidth}*{4}{>{\raggedright\arraybackslash}X}}
+\toprule
+\textbf{Metric} & \textbf{Scale 1 (Acute Stress; 0~h\(\rightarrow\)6~h)} & \textbf{Scale 2 (Peak Injury; 6~h\(\rightarrow\)24~h)} & \textbf{Scale 3 (Fate Decision; 24~h\(\rightarrow\)48~h)} & \textbf{Scale 4 (Resolution; 48~h\(\rightarrow\)96~h)} \\ \midrule
+Development AUROC & 0.8219 & 0.8427 & 0.8390 & 0.8432 \\
+Validation AUROC & 0.8485 & 0.8374 & 0.8496 & 0.8502 \\
+Selected by development AUROC & False & False & False & True \\
+\bottomrule
+\end{tabularx}
+\endgroup\par\medskip

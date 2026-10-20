@@ -1,0 +1,65 @@
+\clearpage
+\section*{Table S1. Random Forest transition classifier performance and transition graph statistics across four temporal scales.}
+
+\noindent Five-fold stratified cross-validation was used to evaluate each scale-specific classifier; CV AUROC is reported as mean \(\pm\) standard deviation across folds. OOB denotes out-of-bag accuracy. Raw RF probabilities below 0.30 were discarded before row normalization; when no target met this threshold, the 15 highest-probability targets were retained. Normalized probabilities below 0.001 were subsequently removed as a final sparsification step. Full-graph adjacency sparsity was calculated relative to the complete 6,582 \(\times\) 6,582 cell graph. Transition entropy is Shannon entropy of outgoing transition probabilities in nats, summarized across source cells as mean \(\pm\) standard deviation. RF--Gaussian Pearson r denotes the mean row-wise correlation between learned RF transitions and distance-only Gaussian transitions. Elapsed time is in hours; training-pair and edge counts are integers. RF, Random Forest; CV, cross-validation; AUROC, area under the receiver operating characteristic curve.
+
+\input{tables/S1}
+\clearpage
+\section*{Table S2. Internal performance of TrajRisk, comparator models, and component ablations.}
+\phantomsection\label{tab:S2}
+\noindent All final validation metrics use the same timepoint-stratified Walesky validation split of 1,318 cells, or the explicitly listed subset of that split. Binary labels are defined by normalized Monocle pseudotime > 0.10. Columns labeled high-risk refer to this elevated-pseudotime class, not observed future adverse outcomes. AUROC and AUPRC are dimensionless; AUPRC is average precision. Spearman rho measures association with continuous normalized pseudotime. The primary model was selected using validation AUROC; GNN ablations were selected on an inner development set. This checkpoint-selection asymmetry favors the primary model. The internal comparison is transductive: validation cells remain in the preconstructed graphs and their reference pseudotime values enter transition-pair features. All comparators share expression-derived features and targets. GNN, graph neural network; CI, confidence interval; pp, percentage points; RF, Random Forest; CV, cross-validation; AUROC, area under the receiver operating characteristic curve; AUPRC, area under the precision--recall curve.
+
+\input{tables/S2A}
+\clearpage
+\input{tables/S2B}
+\clearpage
+\input{tables/S2C}
+\clearpage
+\section*{Table S3. External mouse-cohort discrimination and association with \textit{Cdkn1a} expression.}
+\phantomsection\label{tab:S3}
+\noindent The Walesky-trained mouse model and comparators were transferred without refitting. \SelfOnly{} inference uses the learned self pathway without incoming reference edges. Reference-KNN inference adds the 15 nearest Walesky reference neighbors in the integrated 30-dimensional scVI space. AUROC CIs use 1,000 bootstrap resamples. Random AUPRC equals the positive-class prevalence. Reported fractions and model scores are dimensionless. APAP, acetaminophen; KNN, k-nearest neighbors; CI, confidence interval; AUROC, area under the receiver operating characteristic curve; AUPRC, area under the precision--recall curve.
+
+\input{tables/S3A}
+\clearpage
+\input{tables/S3B}
+\clearpage
+\section*{Table S4. Cross-species integration, human donor-level validation, and signature concordance.}
+\phantomsection\label{tab:S4}
+\noindent The shared scVI representation contains 6,582 Walesky mouse hepatocytes and 49,984 Matchett human hepatocyte nuclei on 13,122 retained unique mouse--human gene-symbol pairs, with 30 latent dimensions. The cross-species GNN and seeder were trained on mouse cells in these shared coordinates; human donor labels were not used for model training. \SelfOnly{} is the primary human analysis and Reference-KNN is a sensitivity analysis. APAP-ALF, acetaminophen-induced acute liver failure; ASW, average silhouette width; GNN, graph neural network; KNN, k-nearest neighbors; AUROC, area under the receiver operating characteristic curve.
+
+\input{tables/S4A}
+\clearpage
+\input{tables/S4B}
+\clearpage
+\input{tables/S4C}
+\clearpage
+\section*{Table S5. Spatial risk- and recovery-signature analyses in mouse and human liver.}
+\phantomsection\label{tab:S5}
+\noindent Spatial scores are mean counts per million (CPM) across signature genes after spot-level library-size normalization. These are gene-signature scores, rather than spatially projected GNN score predictions. The risk signature contains 50 genes. Matchett pericentral spots have \textit{Cyp2e1}/\allowbreak{}\textit{CYP2E1} CPM at or above the within-section 75th percentile; periportal spots are at or below the 25th percentile; remaining spots are midlobular. Percentiles use linear interpolation, and all boundary ties enter the corresponding zone. \textit{Cyp2e1}/\allowbreak{}\textit{CYP2E1} is excluded from Matchett recovery and net scoring, leaving 49 recovery genes, to avoid circularity with zonation. P values are nominal and spot-pooled tests do not use donors as independent inferential units. APAP-ALF, acetaminophen-induced acute liver failure; CPM, counts per million; GNN, graph neural network; SD, standard deviation.
+
+\input{tables/S5A}
+\clearpage
+\input{tables/S5B}
+\clearpage
+\input{tables/S5C}
+\clearpage
+\input{tables/S5D}
+\clearpage
+\section*{Table S6. Risk-flux summaries, bottleneck enrichment, and frozen-model graph perturbations.}
+\phantomsection\label{tab:S6}
+\noindent Analyses use the frozen mouse TrajRisk model and its 421,477 directed edges on 6,582 Walesky cells. Top-flux edges are selected within each temporal scale. Source and target summaries count unique cells unless the column explicitly counts edges. Edge-removal analyses retain model weights and node features and rerun inference without retraining. Predicted TrajRisk scores, normalized pseudotime, and score changes are dimensionless; reported percentages use the indicated cell or edge population. Fisher and Mann--Whitney p values are nominal. RF, Random Forest; GNN, graph neural network; APAP, acetaminophen; SD, standard deviation.
+
+\input{tables/S6A}
+\clearpage
+\input{tables/S6B}
+\clearpage
+\input{tables/S6C}
+\clearpage
+\input{tables/S6D}
+\clearpage
+\input{tables/S6E}
+\clearpage
+\input{tables/S6F}
+\clearpage
+\input{tables/S6G}
+\par\medskip\noindent\textit{Numerical precision:} Displayed numeric results are rounded to four decimal places or shown in scientific notation where needed. AUROC differences are shown to two decimal places in percentage points. P values that underflow numerically are identified accordingly; the pooled Ben-Moshe result is reported as p < 10\textsuperscript{-300}.

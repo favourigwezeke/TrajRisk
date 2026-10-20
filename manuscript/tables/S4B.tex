@@ -1,0 +1,33 @@
+\subsection*{Table S4B. Human donor-level condition discrimination.}\phantomsection\label{tab:S4B}
+\noindent Nucleus scores are averaged within each donor before analysis. Condition means are unweighted means of donor values. The primary cohort contains 10 APAP-ALF and 9 healthy donors. The sensitivity cohort excludes four APAP-ALF donors with fewer than 300 retained hepatocyte nuclei, leaving 6 APAP-ALF and 9 healthy donors. One-sided Mann--Whitney U tests evaluate APAP-ALF > healthy. AUROC uses APAP-ALF as the positive class and preserves the recorded score direction. The raw risk signature averages log-normalized expression of mapped risk genes; the net signature subtracts the recovery signature. No direction reversal was applied to improve signature AUROC.
+
+\Needspace{170pt}
+\par\medskip\noindent\textbf{Primary cohort}\par
+\begingroup\small\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.23}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.34\textwidth}*{4}{>{\raggedright\arraybackslash}X}}
+\toprule
+\textbf{Metric} & \textbf{TrajRisk \SelfOnly{}} & \textbf{TrajRisk Reference-KNN} & \textbf{Net orthologous gene signature} & \textbf{Raw risk gene signature} \\ \midrule
+APAP-ALF donors (n) & 10 & 10 & 10 & 10 \\
+Healthy donors (n) & 9 & 9 & 9 & 9 \\
+APAP-ALF donor mean & 0.2051 & 0.2144 & 0.1328 & 0.3585 \\
+Healthy donor mean & 0.1088 & 0.1224 & 0.0942 & 0.4380 \\
+One-sided Mann--Whitney p & 0.0064 & 0.0080 & 0.1352 & 0.9995 \\
+Donor-level AUROC & 0.8444 & 0.8333 & 0.6556 & 0.0556 \\
+\bottomrule
+\end{tabularx}
+\endgroup\par\medskip
+\Needspace{170pt}
+\par\medskip\noindent\textbf{Sensitivity cohort (\(\geq\)300 hepatocyte nuclei per ALF donor)}\par
+\begingroup\small\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.23}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.34\textwidth}*{4}{>{\raggedright\arraybackslash}X}}
+\toprule
+\textbf{Metric} & \textbf{TrajRisk \SelfOnly{}} & \textbf{TrajRisk Reference-KNN} & \textbf{Net orthologous gene signature} & \textbf{Raw risk gene signature} \\ \midrule
+APAP-ALF donors (n) & 6 & 6 & 6 & 6 \\
+Healthy donors (n) & 9 & 9 & 9 & 9 \\
+APAP-ALF donor mean & 0.1421 & 0.1494 & 0.0921 & 0.3641 \\
+Healthy donor mean & 0.1088 & 0.1224 & 0.0942 & 0.4380 \\
+One-sided Mann--Whitney p & 0.0248 & 0.0332 & 0.5227 & 0.9986 \\
+Donor-level AUROC & 0.8148 & 0.7963 & 0.5000 & 0.0741 \\
+\bottomrule
+\end{tabularx}
+\endgroup\par\medskip

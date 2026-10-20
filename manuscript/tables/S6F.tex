@@ -1,0 +1,18 @@
+\subsection*{Table S6F. Risk changes after Scale 3 source-quartile edge removal.}\phantomsection\label{tab:S6F}
+\noindent Quartiles group all 1,043 source cells at 24~h by normalized pseudotime. Cutoffs are the 25th, 50th, and 75th percentiles computed with linear interpolation at full precision: 0.016547829, 0.056113873, and 0.0923301125. The first three intervals include their lower boundary and exclude their upper boundary; the final interval includes 1.000. A source exactly at a cutoff enters the higher quartile. Displayed boundaries are rounded to three decimal places. Q1--Q4 contain 261, 260, 261, and 261 source cells, respectively; all Scale 3 edges originating from the selected quartile are removed. Total absolute delta summarizes model risk changes. Mean and maximum delta columns separately summarize all 910 cells at 48~h and all 809 cells at 96~h. All 96~h effects are recorded as zero.
+
+\Needspace{170pt}
+\begingroup\small\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.23}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.34\textwidth}*{4}{>{\raggedright\arraybackslash}X}}
+\toprule
+\textbf{Metric} & \textbf{Q1\_low\_pt} & \textbf{Q2\_mid\_lo\_pt} & \textbf{Q3\_mid\_hi\_pt} & \textbf{Q4\_high\_pt} \\ \midrule
+Displayed pseudotime range & 0.000--0.017 & 0.017--0.056 & 0.056--0.092 & 0.092--1.000 \\
+Edges removed (n) & 30,692 & 30,208 & 30,739 & 25,769 \\
+Total absolute risk change & 1.5386 & 1.4460 & 1.3786 & 1.6321 \\
+Mean absolute risk change, 48~h & 0.0017 & 0.0016 & 0.0015 & 0.0018 \\
+Mean absolute risk change, 96~h & 0 & 0 & 0 & 0 \\
+Maximum absolute risk change, 48~h & 0.0160 & 0.0212 & 0.0239 & 0.0979 \\
+Maximum absolute risk change, 96~h & 0 & 0 & 0 & 0 \\
+\bottomrule
+\end{tabularx}
+\endgroup\par\medskip

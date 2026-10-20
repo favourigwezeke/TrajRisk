@@ -1,0 +1,21 @@
+\subsection*{Table S3B. \textit{Cdkn1a} expression association in 5,306 Umbaugh 48/\allowbreak{}72~h hepatocytes.}\phantomsection\label{tab:S3B}
+\noindent The detection task compares cells with \textit{Cdkn1a} expression > 0 against those with zero expression; the positive-class prevalence is 0.3407. Spearman rho and its two-sided nominal p value use continuous \textit{Cdkn1a} expression across all 5,306 cells. Group means summarize model scores. One-sided Mann--Whitney U tests evaluate greater scores in \textit{Cdkn1a}-expressing cells. Detection of \textit{Cdkn1a} transcript is the operational label; it does not directly measure p21 protein.
+
+\Needspace{170pt}
+\begingroup\small\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.23}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.34\textwidth}*{4}{>{\raggedright\arraybackslash}X}}
+\toprule
+\textbf{Metric} & \textbf{TrajRisk Reference-KNN} & \textbf{TrajRisk \SelfOnly{}} & \textbf{Initial XGBoost seed} & \textbf{Expression-only XGBoost} \\ \midrule
+\textit{Cdkn1a} detection AUROC & 0.6922 & 0.7372 & 0.7608 & 0.7567 \\
+AUROC 95\% CI, lower & 0.6782 & 0.7240 & 0.7484 & 0.7441 \\
+AUROC 95\% CI, upper & 0.7075 & 0.7517 & 0.7742 & 0.7705 \\
+\textit{Cdkn1a} detection AUPRC & 0.4790 & 0.5127 & 0.5588 & 0.5841 \\
+Random AUPRC & 0.3407 & 0.3407 & 0.3407 & 0.3407 \\
+Continuous \textit{Cdkn1a} Spearman rho & 0.3134 & 0.3822 & 0.4179 & 0.4037 \\
+Spearman p & \(2.744\times10^{-121}\) & \(3.838\times10^{-184}\) & \(2.254\times10^{-223}\) & \(3.885\times10^{-207}\) \\
+Mean score, \textit{Cdkn1a}-expressing & 0.3036 & 0.3689 & 0.8973 & 0.5410 \\
+Mean score, \textit{Cdkn1a}-zero & 0.1686 & 0.1826 & 0.5359 & 0.3056 \\
+One-sided U-test p (expressed > zero) & \(3.701\times10^{-117}\) & \(2.621\times10^{-177}\) & \(9.135\times10^{-214}\) & \(3.223\times10^{-207}\) \\
+\bottomrule
+\end{tabularx}
+\endgroup\par\medskip

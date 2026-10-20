@@ -1,0 +1,86 @@
+% Portable Times-compatible body text; no licensed system fonts required.
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}
+\usepackage[scaled=0.93]{helvet}
+% Scalable Latin Modern typewriter for file names and inline code.
+\renewcommand{\ttdefault}{lmtt}
+\usepackage{amsmath,amssymb}
+\usepackage[letterpaper,left=0.65in,right=0.65in,top=0.68in,bottom=0.68in,headheight=12pt,headsep=10pt,footskip=22pt]{geometry}
+\setlength{\columnsep}{0.27in}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[font={small},labelfont=bf,labelsep=period,justification=justified,singlelinecheck=false]{caption}
+\captionsetup{font={stretch=1.04,small},skip=8pt}
+\usepackage[numbers,square,sort&compress]{natbib}
+\usepackage{microtype}
+\usepackage{titlesec}
+\titleformat{\section}{\sffamily\bfseries\large}{}{0pt}{}
+\titleformat{\subsection}{\sffamily\bfseries\normalsize}{}{0pt}{}
+\titleformat{\subsubsection}{\sffamily\bfseries\normalsize}{}{0pt}{}
+\titlespacing*{\section}{0pt}{15pt}{7pt}
+\titlespacing*{\subsection}{0pt}{11pt}{5pt}
+\titlespacing*{\subsubsection}{0pt}{10pt}{4pt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\sffamily TrajRisk}
+\fancyhead[R]{}
+\fancyfoot[C]{\footnotesize\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\footrulewidth}{0pt}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\urlstyle{same}
+\hypersetup{pdftitle={TrajRisk: Treatment-Aware Multi-Scale Graph Neural Networks}}
+\ifdefined\CombinedReview
+\hypersetup{pdfsubject={Canonical combined manuscript and Supplementary Information}}
+\else
+\hypersetup{pdfsubject={TrajRisk manuscript and supporting information}}
+\fi
+\setlength{\parindent}{1em}
+\setlength{\parskip}{0pt}
+\setlength{\textfloatsep}{14pt plus 2pt minus 3pt}
+\setlength{\dbltextfloatsep}{14pt plus 2pt minus 3pt}
+\renewcommand{\topfraction}{0.93}
+\renewcommand{\dbltopfraction}{0.93}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.72}
+\renewcommand{\dblfloatpagefraction}{0.72}
+\setcounter{topnumber}{2}
+\setcounter{dbltopnumber}{2}
+\setlength{\bibsep}{4pt plus 1pt}
+\renewcommand{\bibsection}{\section*{References}}
+\makeatletter
+\renewcommand{\@biblabel}[1]{#1.}
+\setlength{\@fptop}{0pt}
+\setlength{\@dblfptop}{0pt}
+\makeatother
+\emergencystretch=1.2em
+\raggedbottom
+\input{legends/figure_1}
+\input{legends/figure_2}
+\input{legends/figure_3}
+\input{legends/figure_4}
+\input{legends/figure_5}
+\input{legends/figure_6}
+\input{legends/figure_7}
+\input{legends/figure_S1}
+\input{legends/figure_S2}
+\input{legends/figure_S3}
+\input{legends/figure_S4}
+\input{legends/figure_S5}
+
+% Black internal links: complete figure/table callouts are clickable.
+\newcommand{\FigRef}[2]{\hyperref[fig:#1]{Figure~#1#2}}
+\newcommand{\FigRefs}[2]{\hyperref[fig:#1]{Figures~#1#2}}
+% Main-figure links resolve in the combined master; separated SI has no main figures.
+\newcommand{\MainFigRef}[2]{\ifdefined\CombinedReview\FigRef{#1}{#2}\else Figure~#1#2\fi}
+\newcommand{\TableRef}[1]{\hyperref[tab:#1]{Table~#1}}
+\newcommand{\TableRefs}[2]{Tables~\hyperref[tab:#1]{#1} and \hyperref[tab:#2]{#2}}
+\newcommand{\DataRef}[1]{\hyperref[data:#1]{Data~#1}}
+\newcommand{\SupportAnchor}[1]{\ifdefined\CombinedReview\else\phantomsection\label{#1}\fi}
+\usepackage{booktabs,tabularx,array,needspace}
+
+% Transfer configuration; matrix notation is unchanged.
+\newcommand{\SelfOnly}{\ensuremath{\mathbf W_{\mathrm{self}}}-only}

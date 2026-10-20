@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-20",
+  "publication_assets_compared": 101,
+  "unchanged": 100,
+  "changes": [
+    {
+      "path": "manuscript/tables/data/Table_S6F_scale3_quartile_perturbation_FINAL.csv",
+      "before_sha256": "8be9ba77c27e94002de5f61af5c4af705ec21602dc4f2d9fb4e26c700e76bd30",
+      "after_sha256": "2c675043265376690011624744d85d74e76efd927cf69f40d4693327cad3ebb1",
+      "change": "Q4 display endpoint 1.010 -> 1.000, matching the PDF and caption; all other CSV fields unchanged."
+    }
+  ],
+  "canonical_figure_pdfs_changed": false,
+  "original_uploaded_inputs_changed": false
+}
