@@ -1,58 +1,52 @@
 # TrajRisk
 
-**Treatment-aware, multi-scale graph neural networks for studying liver injury and recovery.**
+**Multi-scale graph neural networks for liver injury and recovery.**
 
-TrajRisk learns directed transition graphs from sampling times, treatment labels and single-cell transcriptomic features. Four graph branches represent acute stress, peak injury, fate decision and resolution. Their embeddings are combined to estimate normalized Monocle 3 pseudotime in the mouse injury–recovery reference. The resulting dimensionless trajectory-state score is the operational meaning of “risk” in TrajRisk; it is not a probability of an adverse clinical outcome.
+TrajRisk combines treatment-aware, directed transition graphs with single-cell expression features to study hepatocyte injury and recovery. Four graph branches represent acute stress, peak injury, fate decision and resolution. The TrajRisk score estimates normalized Monocle 3 pseudotime in a mouse injury–recovery reference; it is a dimensionless trajectory-state score rather than an adverse-outcome probability.
 
-The analysis includes mouse reference training, external mouse and human reference projection, expression-only comparators, and graph perturbations that nominate candidate recovery-associated transitions.
+This repository contains the implementation, preprocessing notebooks, model checkpoints, analysis scripts and supplementary data accompanying the TrajRisk study. Analyses include mouse reference training, external mouse and human projection, comparator and ablation experiments, and graph perturbations.
 
-## Get started
+## Installation
 
 ```bash
 git clone https://github.com/favourigwezeke/TrajRisk.git
 cd TrajRisk
-```
-
-For saved-model reproduction on Linux, use Python 3.12 and the tested environment:
-
-```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -r environments/frozen-linux-py312.lock.txt
 ```
 
-Download the versioned frozen inputs and reproduce the saved-model analyses and supplementary figures:
+These instructions install the Linux CPU environment for analyses using the supplied checkpoints. See [environments](environments/README.md) for training and R dependencies.
+
+## Reproduce the analyses
+
+Download the model inputs with [GitHub CLI](https://cli.github.com/), then run:
 
 ```bash
 gh release download v0.1.0-rc1 --repo favourigwezeke/TrajRisk \
-  --pattern TrajRisk_frozen_inputs.zip --pattern SHA256SUMS --dir build/downloads
+  --pattern TrajRisk_frozen_inputs.zip --dir build/downloads
 bash scripts/reproduce_saved.sh build/downloads/TrajRisk_frozen_inputs.zip
 ```
 
-The download command uses [GitHub CLI](https://cli.github.com/). Alternatively, download the ZIP from the [input release](https://github.com/favourigwezeke/TrajRisk/releases/tag/v0.1.0-rc1) and pass its local filename to the same reproduction command. Input checksums are verified before analysis.
+The ZIP is also available from the [model-input release](https://github.com/favourigwezeke/TrajRisk/releases/tag/v0.1.0-rc1). The command reproduces saved-model predictions, evaluation metrics and Figures S1–S5. Results are written to `build/frozen_replay/` and figures to `build/figures/supplementary/`.
 
-Generated predictions, metrics and the report are written to `build/frozen_replay/`; Figures S1–S5 are written to `build/figures/supplementary/`. See the [reproduction guide](docs/reproduction.md) for outputs, expected checks and supported scope.
+See the [reproduction guide](docs/reproduction.md) for expected outputs and figure/table coverage. For preprocessing and training, follow the [analysis workflow](docs/workflow.md) using the [study datasets](docs/datasets.md).
 
-## Analysis workflow
+## Repository contents
 
-To preprocess the study data, train the reference model or run the complete external-cohort analyses, follow the [analysis workflow](docs/workflow.md). It links each stage to its inputs, script and outputs. Full-expression analyses use the [study datasets](docs/datasets.md) and the [analysis environment](environments/README.md).
-
-| Component | Location |
+| Directory | Contents |
 | --- | --- |
-| Dataset preprocessing and trajectory inference | [notebooks/](notebooks/README.md) |
-| Transition graphs, model training and external validation | [scripts/](docs/workflow.md) |
-| Supplementary figure generation | [scripts/figures/](scripts/figures/README.md) |
-| Manuscript, canonical figures and supplementary data | [manuscript/](manuscript/) |
-| Environment specifications | [environments/](environments/README.md) |
-| Data definitions and reproduction instructions | [docs/](docs/reproduction.md) |
+| [notebooks/](notebooks/README.md) | Dataset preprocessing, integration and trajectory inference. |
+| [scripts/](docs/workflow.md) | Graph construction, training, evaluation and figure generation. |
+| [manuscript/](manuscript/) | LaTeX source, figures, supplementary tables and Data S1–S5. |
+| [environments/](environments/README.md) | Python and R environment information. |
+| [docs/](docs/reproduction.md) | Data descriptions and analysis instructions. |
 
-## Interpretation and supported use
+## Citation
 
-TrajRisk describes position in an injury–recovery reference. Reference-KNN projects query cells onto that reference; it does not infer a human temporal trajectory. External performance is cohort-dependent. Candidate bottlenecks and recovery gateways are model-derived hypotheses for experimental follow-up. The accompanying manuscript reports the comparator results and biological limitations.
+Please cite the accompanying TrajRisk manuscript and identify the code version used. The [input archive](docs/frozen_inputs.md) has a separate version and checksum.
 
-## Citation, license and support
+## License and support
 
-When using TrajRisk, cite the accompanying manuscript and identify the software commit or release used. Frozen input archives have their own version and checksum; the [input guide](docs/frozen_inputs.md) explains how they relate to the code version.
-
-See [LICENSE](LICENSE) for the code's licensing terms. Please report questions and reproducible problems through [GitHub Issues](https://github.com/favourigwezeke/TrajRisk/issues).
+See [LICENSE](LICENSE) for licensing terms. Questions and reproducible problems can be submitted through [GitHub Issues](https://github.com/favourigwezeke/TrajRisk/issues).

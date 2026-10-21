@@ -36,9 +36,9 @@ logging.basicConfig(
 log = logging.getLogger("TrajRisk-W9A")
 
 
-# =============================================================================
+
 # 0.  CONFIGURATION
-# =============================================================================
+
 
 BASE = Path(__file__).resolve().parents[1]
 DATA   = BASE / "Data" / "processed"
@@ -63,13 +63,13 @@ SCALE_NAMES = [
     "Scale4_Resolution",     # 48h → 96h  : resolution phase
 ]
 
-# GNN architecture — must match Week 7 training exactly
+# GNN architecture — must match reference model training exactly
 NODE_DIM   = 31
 HIDDEN_DIM = 64
 N_SCALES   = 4
 DROPOUT    = 0.3
 
-# B1 XGBoost best hyperparameters from Week 8 5-fold cross-validation
+# B1 XGBoost best hyperparameters from baseline and ablation analysis 5-fold cross-validation
 XGB_B1_PARAMS = dict(
     n_estimators=500, max_depth=6, learning_rate=0.05,
     subsample=0.8, colsample_bytree=0.8,
@@ -80,9 +80,9 @@ torch.manual_seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
-# =============================================================================
-# 1.  MODEL CLASSES  (exact copies from Week 7 — do not modify)
-# =============================================================================
+
+# 1.  MODEL CLASSES  (exact copies from reference model — do not modify)
+
 
 class TrajRiskConv(MessagePassing):
     """Directed edge-weighted graph convolution with residual self-loop."""
@@ -145,13 +145,13 @@ class TrajRiskGNN(nn.Module):
         return self.fusion_mlp(torch.cat(parts, dim=1)).squeeze(-1)
 
 
-# =============================================================================
+
 # 2.  LOAD AND VERIFY ALL DATA
-# =============================================================================
+
 
 def load_and_verify() -> Dict:
     log.info("=" * 72)
-    log.info("WEEK 9A — LOADING AND VERIFYING DATA")
+    log.info("mouse external validation — LOADING AND VERIFYING DATA")
     log.info("=" * 72)
 
     # Integrated AnnData (4 mouse datasets, 36,067 cells)
@@ -199,7 +199,7 @@ def load_and_verify() -> Dict:
         assert ei.max().item() <= 6581, \
             f"Scale {s+1} edge index out of Walesky range (max={ei.max().item()})"
 
-    # TrajRisk model checkpoint (Week 7 AUROC-best)
+    # TrajRisk model checkpoint (reference model AUROC-best)
     ckpt_path = MODELS / "week7_trajrisk_FINAL.pt"
     if not ckpt_path.exists():
         ckpt_path = MODELS / "week7_trajrisk_BEST_AUROC.pt"
@@ -210,11 +210,11 @@ def load_and_verify() -> Dict:
     model.load_state_dict(ckpt["model_state_dict"])
     model.eval()
 
-    # Week 6 seeder (XGBClassifier: 0h vs 6h)
+    # graph inputs seeder (XGBClassifier: 0h vs 6h)
     seeder          = joblib.load(MODELS / "week6_xgboost_model.pkl")
     seeder_walesky  = np.load(DATA / "week6_xgboost_risk.npy")
 
-    # Week 7 TrajRisk predictions for all Walesky cells
+    # reference model TrajRisk predictions for all Walesky cells
     preds_w7         = pd.read_csv(DATA / "week7_predictions.csv", index_col=0)
     trajrisk_walesky = preds_w7["risk_predicted"].values.astype(np.float32)
 
@@ -240,13 +240,13 @@ def load_and_verify() -> Dict:
     }
 
 
-# =============================================================================
-# 3.  FIT B1 XGBOOST  (expression-only baseline from Week 8)
-# =============================================================================
+
+# 3.  FIT B1 XGBOOST  (expression-only baseline from baseline and ablation analysis)
+
 
 def fit_b1_xgboost(data: Dict) -> Tuple[XGBRegressor, np.ndarray]:
     """
-    Week 8 expression-only baseline.
+    baseline and ablation analysis expression-only baseline.
     Input:  30D scVI latent features
     Target: pseudotime_norm (Walesky training set only)
     Returns the fitted model and its predictions on all 6,582 Walesky cells.
@@ -262,9 +262,9 @@ def fit_b1_xgboost(data: Dict) -> Tuple[XGBRegressor, np.ndarray]:
     return b1, b1_walesky
 
 
-# =============================================================================
+
 # 4.  REFERENCE ANCHOR ASSIGNMENT (biologically motivated, cell-specific)
-# =============================================================================
+
 
 def get_scale_and_anchors_for_cell(
     dataset:   str,
@@ -312,9 +312,9 @@ def get_scale_and_anchors_for_cell(
     return [], []
 
 
-# =============================================================================
+
 # 5.  BUILD CELL-SPECIFIC REFERENCE EDGES
-# =============================================================================
+
 
 def build_cell_specific_reference_edges(
     data:         Dict,
@@ -438,9 +438,9 @@ def build_cell_specific_reference_edges(
     return ref_edge_indices, ref_edge_weights
 
 
-# =============================================================================
+
 # 6.  SCORE COMPUTATION
-# =============================================================================
+
 
 def compute_wself_scores(
     data:  Dict,
@@ -538,9 +538,9 @@ def compute_knn_scores(
     }
 
 
-# =============================================================================
+
 # 7.  METRICS
-# =============================================================================
+
 
 def safe_auroc(y: np.ndarray, scores: np.ndarray) -> float:
     if y.sum() < MIN_POS or (1 - y).sum() < MIN_POS:
@@ -610,17 +610,17 @@ def report_metrics(
     return rows
 
 
-# =============================================================================
+
 # 8.  INDIVIDUAL TESTS
-# =============================================================================
+
 
 def run_t0_walesky_reference(data: Dict, b1_walesky: np.ndarray) -> List[Dict]:
     """
-    T0: Walesky held-out validation — reproduces Week 7/8 numbers.
+    T0: Walesky held-out validation — reproduces reference model/8 numbers.
     Uses pre-computed TrajRisk scores (full graph propagation).
     Included as an internal reference for direct comparison with T1-T3.
 
-    Key Week 8 result (reproduced here for context):
+    Key baseline and ablation analysis result (reproduced here for context):
       24h AUPRC: TrajRisk 0.4983 vs Seeder 0.3224 vs B1 XGBoost 0.3793
     """
     log.info("\n" + "=" * 72)
@@ -777,9 +777,9 @@ def run_t3_umbaugh_p21_mechanistic(
     return rows_t3a + rows_t3b, pd.DataFrame(p21_rows)
 
 
-# =============================================================================
+
 # 9.  SUMMARY TABLE
-# =============================================================================
+
 
 def build_summary_table(df: pd.DataFrame) -> pd.DataFrame:
     """Compute KNN vs W_self vs Seeder vs B1 XGBoost comparison per test."""
@@ -809,15 +809,15 @@ def build_summary_table(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-# =============================================================================
+
 # 10.  MAIN
-# =============================================================================
+
 
 def main() -> None:
     t_start = time.time()
 
     log.info("=" * 72)
-    log.info("TRAJRISK — WEEK 9A: MOUSE CROSS-DATASET VALIDATION")
+    log.info("TRAJRISK — mouse external validation: MOUSE CROSS-DATASET VALIDATION")
     log.info("Reference-KNN Trajectory Projection")
     log.info("=" * 72)
     log.info("What this tests: does multi-scale trajectory risk generalise to")
@@ -846,7 +846,7 @@ def main() -> None:
 
     # Print final summary
     log.info("\n" + "=" * 72)
-    log.info("WEEK 9A SUMMARY — Reference-KNN TrajRisk vs Baselines")
+    log.info("mouse external validation SUMMARY — Reference-KNN TrajRisk vs Baselines")
     log.info("=" * 72)
     log.info("\n" + summary_df.to_string(index=False))
 
@@ -856,7 +856,7 @@ def main() -> None:
     log.info("  Key result: T2 Umbaugh 2h (early detection) — TrajRisk wins both baselines")
 
     # Save all outputs
-    log.info("\nSaving Week 9A outputs ...")
+    log.info("\nSaving mouse external validation outputs ...")
 
     out_table   = RES / "week9a_mouse_validation_table.csv"
     out_p21     = RES / "week9a_mouse_p21_analysis.csv"
@@ -870,7 +870,7 @@ def main() -> None:
     with open(out_json, "w") as f:
         json.dump({
             "script":            "validate_mouse_transfer.py",
-            "description":       "Week 9A mouse cross-dataset validation — reference-KNN",
+            "description":       "External mouse evaluation with Reference-KNN",
             "knn_k":             KNN_K,
             "anchor_strategy":   "cell-specific, scale-specific, biologically motivated",
             "runtime_minutes":   round((time.time() - t_start) / 60, 2),
@@ -881,7 +881,7 @@ def main() -> None:
         log.info(f"  {out.name}")
 
     log.info(f"\nWeek 9A complete in {(time.time()-t_start)/60:.1f} minutes.")
-    log.info("Next: Week 9B — Human Cross-Species Validation")
+    log.info("Next: human cross-species analysis — Human Cross-Species Validation")
     log.info("  Script: validate_human_transfer.py")
 
 

@@ -39,10 +39,7 @@ logging.basicConfig(
 )
 log = logging.getLogger("TrajRisk-W6")
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 0: CONFIGURATION
-# ═════════════════════════════════════════════════════════════════════════════
+# CONFIGURATION
 
 BASE = Path(__file__).resolve().parents[1]
 DATA_DIR  = BASE / "Data"  / "processed"
@@ -56,14 +53,14 @@ for _d in [DATA_DIR, MODEL_DIR, FIG_DIR, RES_DIR]:
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Node feature dimensions
-SCVI_DIM     = 30   # scVI latent space (fixed, from Week 3)
+SCVI_DIM     = 30   # scVI latent space (fixed, from scVI integration)
 INIT_RISK_DIM = 1   # XGBoost initial risk score
 NODE_DIM     = SCVI_DIM + INIT_RISK_DIM  # 31D total
 
-# GNN hyperparameters (locked for Week 6 architecture; tuned in Week 7)
+# GNN hyperparameters (reported for graph inputs architecture; tuned in reference model)
 HIDDEN_DIM   = 64    # output dimension of each TrajRiskConv layer
 N_CONV_LAYERS = 2    # conv layers per scale
-N_SCALES     = 4     # temporal scales from Week 5
+N_SCALES     = 4     # temporal scales from transition graphs
 FUSION_DIM   = 256   # N_SCALES * HIDDEN_DIM (derived, do not change independently)
 DROPOUT      = 0.3
 
@@ -79,14 +76,14 @@ XGB_PARAMS: Dict[str, Any] = {
     "eval_metric":   "auc",
 }
 
-# Training (Week 6 = quick diagnostic; Week 7 = full)
+# Training (graph inputs = quick diagnostic; reference model = full)
 N_EPOCHS_TEST = 10        # quick test to verify pipeline
 LEARNING_RATE = 1e-3
 WEIGHT_DECAY  = 1e-5
 VAL_FRACTION  = 0.20      # 20% of each timepoint → validation
 RANDOM_SEED   = 42
 
-# Scale names matching Week 5 output keys
+# Scale names matching transition graphs output keys
 SCALE_NAMES: List[str] = [
     "Scale1_AcuteStress",
     "Scale2_PeakInjury",
@@ -97,28 +94,25 @@ SCALE_NAMES: List[str] = [
 torch.manual_seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
+# LOAD TRANSITION INPUTS
 
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 1: LOAD WEEK 5 OUTPUTS
-# ═════════════════════════════════════════════════════════════════════════════
-
-def load_week5_outputs() -> Tuple[Dict, pd.DataFrame, sc.AnnData]:
-    """
-    Load all outputs produced by Week 5 (transition matrices, cell index,
-    updated AnnData with pseudotime_norm).
+def load_transition_inputs() -> Tuple[Dict, pd.DataFrame, sc.AnnData]:
+    """Load directed transition graphs, reference cell order and Walesky expression.
 
     Returns
     -------
-    graphs     : dict — PyG graphs keyed by scale name
-    cell_index : DataFrame — global index mapping with pseudotime_norm
-    walesky    : AnnData — 6,582 Walesky cells with scVI latent
-    """
-    log.info("Loading Week 5 outputs...")
+    graphs : dict
+        PyTorch Geometric graphs keyed by temporal scale.
+    cell_index : pandas.DataFrame
+        Global cell indices and normalized pseudotime.
+    walesky : AnnData
+        The 6,582-cell reference with scVI coordinates."""
+    log.info("Loading transition matrices and reference inputs...")
 
     # PyTorch Geometric multi-scale graphs
     pyg_path = DATA_DIR / "multiscale_graphs.pt"
     if not pyg_path.exists():
-        raise FileNotFoundError(f"Week 5 output not found: {pyg_path}. Run week5 first.")
+        raise FileNotFoundError(f"Transition graph input not found: {pyg_path}. Run scripts/build_transition_graphs.py first.")
     graphs = torch.load(pyg_path, map_location="cpu")
     log.info(f"  Loaded {len(graphs)} scale graphs:")
     for sn, g in graphs.items():
@@ -144,10 +138,7 @@ def load_week5_outputs() -> Tuple[Dict, pd.DataFrame, sc.AnnData]:
 
     return graphs, cell_index, walesky
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 2: XGBOOST INITIAL RISK SCORER
-# ═════════════════════════════════════════════════════════════════════════════
+# XGBOOST INITIAL RISK SCORER
 
 def train_xgboost_risk(
     walesky_scvi: np.ndarray,
@@ -223,7 +214,7 @@ def train_xgboost_risk(
     log.info(f"  XGBoost validation AUROC (0h vs 6h): {val_auroc:.4f}")
 
     if val_auroc < 0.80:
-        log.warning("  ⚠ XGBoost AUROC < 0.80. scVI may not cleanly separate 0h from 6h.")
+        log.warning("   XGBoost AUROC < 0.80. scVI may not cleanly separate 0h from 6h.")
 
     # Score ALL 6,582 Walesky cells
     risk_scores = xgb.predict_proba(walesky_scvi)[:, 1].astype(np.float32)
@@ -238,10 +229,7 @@ def train_xgboost_risk(
 
     return xgb, risk_scores
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 3: NODE FEATURE ASSEMBLY
-# ═════════════════════════════════════════════════════════════════════════════
+# NODE FEATURE ASSEMBLY
 
 def assemble_node_features(
     walesky_scvi: np.ndarray,
@@ -251,7 +239,7 @@ def assemble_node_features(
     Assemble the 31-dimensional node feature matrix.
 
     Features (per cell, ordered):
-        Dims 0-29  : scVI latent representation (from Week 3 scVI model)
+        Dims 0-29  : scVI latent representation (from scVI integration scVI model)
         Dim  30    : XGBoost initial risk score (trained above)
 
     Note: pseudotime_norm is intentionally EXCLUDED from node features.
@@ -287,10 +275,7 @@ def assemble_node_features(
 
     return torch.tensor(x, dtype=torch.float32)
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 4: TRAINING / VALIDATION SPLIT
-# ═════════════════════════════════════════════════════════════════════════════
+# TRAINING / VALIDATION SPLIT
 
 def make_train_val_split(
     cell_index: pd.DataFrame,
@@ -351,10 +336,7 @@ def make_train_val_split(
         torch.tensor(val_y,     dtype=torch.float32),
     )
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 5: TRAJRISKCONV — CUSTOM MESSAGE PASSING LAYER
-# ═════════════════════════════════════════════════════════════════════════════
+# TRAJRISKCONV — CUSTOM MESSAGE PASSING LAYER
 
 class TrajRiskConv(MessagePassing):
     """
@@ -371,7 +353,7 @@ class TrajRiskConv(MessagePassing):
         the asymmetric risk propagation direction.
 
     (2) Our edge weights are row-stochastic transition probabilities
-        produced by the Week 5 Random Forest. They are already normalised
+        produced by the transition graphs Random Forest. They are already normalised
         such that sum_j T[i, j] = 1 for each source cell i. Applying
         GCN's additional degree normalisation would corrupt these weights.
 
@@ -381,7 +363,7 @@ class TrajRiskConv(MessagePassing):
         h_i^l  = ReLU( agg_i  +  W_self @ h_i )
 
     where T_s[j, i] is the transition probability from source cell j to
-    target cell i (pre-learned by the Week 5 RF), W_nbr and W_self are
+    target cell i (pre-learned by the transition graphs RF), W_nbr and W_self are
     learnable weight matrices, and h_j is the feature vector of cell j.
 
     The residual term W_self @ h_i prevents information loss for cells
@@ -456,10 +438,7 @@ class TrajRiskConv(MessagePassing):
         """
         return edge_weight.unsqueeze(-1) * x_j
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 6: TRAJRISKGNN — FULL ARCHITECTURE
-# ═════════════════════════════════════════════════════════════════════════════
+# TRAJRISKGNN — FULL ARCHITECTURE
 
 class TrajRiskGNN(nn.Module):
     """
@@ -602,7 +581,7 @@ class TrajRiskGNN(nn.Module):
     ) -> torch.Tensor:
         """
         Return per-scale embeddings before fusion (for interpretability analyses
-        and scale-importance assessment in Week 7/8 ablation studies).
+        and scale-importance assessment in reference model/8 ablation studies).
 
         Returns
         -------
@@ -627,10 +606,7 @@ class TrajRiskGNN(nn.Module):
     def count_parameters(self) -> int:
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 7: TRAINING UTILITIES
-# ═════════════════════════════════════════════════════════════════════════════
+# TRAINING UTILITIES
 
 def prepare_graph_tensors(
     graphs: Dict,
@@ -754,10 +730,7 @@ def evaluate(
 
     return val_loss, metrics
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 8: QUICK DIAGNOSTIC RUN (10 EPOCHS)
-# ═════════════════════════════════════════════════════════════════════════════
+# QUICK DIAGNOSTIC RUN (10 EPOCHS)
 
 def run_diagnostic_training(
     model:        TrajRiskGNN,
@@ -778,7 +751,7 @@ def run_diagnostic_training(
     (3) Predicted risks are non-degenerate (not all 0.5)
     (4) Spearman correlation improves above chance
 
-    Full training (200 epochs, early stopping) is done in Week 7.
+    Full training (200 epochs, early stopping) is done in reference model.
 
     Returns a history dictionary for logging and figure generation.
     """
@@ -831,16 +804,13 @@ def run_diagnostic_training(
 
     if not loss_decreased:
         log.warning(
-            "  ⚠ Loss did not decrease. Check learning rate, "
+            "   Loss did not decrease. Check learning rate, "
             "node features, and label scaling."
         )
 
     return history
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 9: VALIDATION FIGURES
-# ═════════════════════════════════════════════════════════════════════════════
+# VALIDATION FIGURES
 
 def make_diagnostic_figures(
     history:         Dict,
@@ -858,12 +828,12 @@ def make_diagnostic_figures(
     Panel C: XGBoost initial risk distribution by timepoint (baseline comparison)
     """
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-    fig.suptitle("TrajRisk Week 6 — Architecture Diagnostics (10-epoch test)", fontweight="bold")
+    fig.suptitle("TrajRisk graph inputs — Architecture Diagnostics (10-epoch test)", fontweight="bold")
 
     epochs = range(1, len(history["train_loss"]) + 1)
     colors_tp = {"0h": "#2ecc71", "6h": "#e74c3c", "24h": "#e67e22", "48h": "#9b59b6", "96h": "#3498db"}
 
-    # ── A: Loss curves ─────────────────────────────────────────────────────
+    # A: Loss curves
     ax = axes[0]
     ax.plot(epochs, history["train_loss"], label="Train MSE", color="#3498db", lw=2)
     ax.plot(epochs, history["val_loss"],   label="Val MSE",   color="#e74c3c", lw=2, linestyle="--")
@@ -871,7 +841,7 @@ def make_diagnostic_figures(
     ax.set_title("A  Training and Validation Loss")
     ax.legend(); ax.grid(alpha=0.3)
 
-    # ── B: Predicted risk vs pseudotime_norm ──────────────────────────────
+    # B: Predicted risk vs pseudotime_norm
     ax = axes[1]
     model.eval()
     with torch.no_grad():
@@ -894,7 +864,7 @@ def make_diagnostic_figures(
     rho, _ = spearmanr(risk_all, pt_norm)
     ax.text(0.05, 0.92, f"Spearman ρ = {rho:.3f}", transform=ax.transAxes, fontsize=9)
 
-    # ── C: XGBoost initial risk by timepoint ──────────────────────────────
+    # C: XGBoost initial risk by timepoint
     ax = axes[2]
     import seaborn as sns
     df_plot = cell_index.copy()
@@ -916,12 +886,9 @@ def make_diagnostic_figures(
     plt.close()
     log.info(f"  Figure saved: {out}")
 
+# SAVE ALL OUTPUTS
 
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 10: SAVE ALL OUTPUTS
-# ═════════════════════════════════════════════════════════════════════════════
-
-def save_week6_outputs(
+def save_graph_inputs(
     model:       TrajRiskGNN,
     xgb_model:   XGBClassifier,
     xgb_risk:    np.ndarray,
@@ -933,9 +900,9 @@ def save_week6_outputs(
     history:     Dict,
     metrics:     Dict,
 ) -> None:
-    """Save all Week 6 outputs needed for Week 7 (full training)."""
+    """Save all graph inputs outputs needed for reference model (full training)."""
 
-    # 1. Test model checkpoint (10-epoch; Week 7 will overwrite with final)
+    # 1. Test model checkpoint (10-epoch; reference model will overwrite with final)
     torch.save({
         "model_state_dict":  model.state_dict(),
         "architecture": {
@@ -954,7 +921,7 @@ def save_week6_outputs(
     joblib.dump(xgb_model, MODEL_DIR / "week6_xgboost_model.pkl")
     log.info("  Saved XGBoost model: week6_xgboost_model.pkl")
 
-    # 3. Node features (needed for Week 7 training without re-running everything)
+    # 3. Node features (needed for reference model training without re-running everything)
     torch.save(x, DATA_DIR / "week6_node_features.pt")
     log.info(f"  Saved node features: {tuple(x.shape)} → week6_node_features.pt")
 
@@ -962,7 +929,7 @@ def save_week6_outputs(
     np.save(DATA_DIR / "week6_xgboost_risk.npy", xgb_risk)
     log.info("  Saved XGBoost risk scores: week6_xgboost_risk.npy")
 
-    # 5. Training data (indices and labels for Week 7)
+    # 5. Training data (indices and labels for reference model)
     torch.save({
         "train_idx": train_idx,
         "val_idx":   val_idx,
@@ -1006,14 +973,11 @@ def save_week6_outputs(
         json.dump(summary, f, indent=2)
     log.info("  Saved diagnostics: week6_diagnostics.json")
 
-
-# ═════════════════════════════════════════════════════════════════════════════
 # MAIN EXECUTION
-# ═════════════════════════════════════════════════════════════════════════════
 
 def main() -> None:
     log.info("=" * 70)
-    log.info("TRAJRISK — WEEK 6: GNN ARCHITECTURE IMPLEMENTATION")
+    log.info("TRAJRISK — graph inputs: GNN ARCHITECTURE IMPLEMENTATION")
     log.info("=" * 70)
     log.info(f"Device: {DEVICE}")
     log.info(f"Node features: {NODE_DIM}D (scVI {SCVI_DIM}D + XGBoost {INIT_RISK_DIM}D)")
@@ -1021,31 +985,31 @@ def main() -> None:
     log.info(f"Training objective: MSE regression on pseudotime_norm")
     t_start = time.time()
 
-    # ── 1. Load Week 5 outputs ─────────────────────────────────────────────
-    log.info("\n[1/9] Loading Week 5 outputs...")
-    graphs, cell_index, walesky = load_week5_outputs()
+    # 1. Load transition graphs outputs
+    log.info("\n[1/9] Loading transition matrices and reference inputs...")
+    graphs, cell_index, walesky = load_transition_inputs()
     walesky_scvi = walesky.obsm["X_scvi"].astype(np.float32)
 
-    # ── 2. XGBoost initial risk ────────────────────────────────────────────
+    # 2. XGBoost initial risk
     log.info("\n[2/9] Training XGBoost initial risk scorer (0h vs 6h)...")
     xgb_model, xgb_risk = train_xgboost_risk(walesky_scvi, cell_index)
 
-    # ── 3. Node feature assembly ───────────────────────────────────────────
+    # 3. Node feature assembly
     log.info("\n[3/9] Assembling node features (31D per cell)...")
     x = assemble_node_features(walesky_scvi, xgb_risk).to(DEVICE)
 
-    # ── 4. Train/val split ─────────────────────────────────────────────────
+    # 4. Train/val split
     log.info("\n[4/9] Creating stratified train/validation split...")
     train_idx, val_idx, train_y, val_y = make_train_val_split(cell_index)
 
-    # ── 5. Prepare graph tensors ───────────────────────────────────────────
+    # 5. Prepare graph tensors
     log.info("\n[5/9] Preparing graph tensors on device...")
     edge_indices, edge_weights = prepare_graph_tensors(graphs)
 
     for s, sn in enumerate(SCALE_NAMES):
         log.info(f"  {sn}: {edge_indices[s].shape[1]:,} edges on {DEVICE}")
 
-    # ── 6. Instantiate model ───────────────────────────────────────────────
+    # 6. Instantiate model
     log.info("\n[6/9] Instantiating TrajRiskGNN...")
     model = TrajRiskGNN(
         node_dim=NODE_DIM, hidden_dim=HIDDEN_DIM,
@@ -1067,10 +1031,10 @@ def main() -> None:
     assert (test_out >= 0).all() and (test_out <= 1).all(), \
         "Output risk scores not in [0, 1]. Check Sigmoid activation."
 
-    log.info(f"  ✓ Forward pass successful: output shape {tuple(test_out.shape)}")
-    log.info(f"  ✓ Risk score range after random init: [{test_out.min():.4f}, {test_out.max():.4f}]")
+    log.info(f"   Forward pass successful: output shape {tuple(test_out.shape)}")
+    log.info(f"   Risk score range after random init: [{test_out.min():.4f}, {test_out.max():.4f}]")
 
-    # ── 7. Diagnostic training (10 epochs) ────────────────────────────────
+    # 7. Diagnostic training (10 epochs)
     log.info(f"\n[7/9] Running {N_EPOCHS_TEST}-epoch diagnostic training...")
     history = run_diagnostic_training(
         model, x, edge_indices, edge_weights,
@@ -1092,24 +1056,24 @@ def main() -> None:
     log.info(f"    Val AUROC:    {final_metrics['auroc']:.4f}")
     log.info(f"    High-risk cells (pt_norm > 0.10): {final_metrics['n_high_risk']:,}")
 
-    # ── 8. Figures ─────────────────────────────────────────────────────────
+    # 8. Figures
     log.info("\n[8/9] Generating diagnostic figures...")
     make_diagnostic_figures(
         history, model, x, edge_indices, edge_weights, cell_index, xgb_risk,
     )
 
-    # ── 9. Save all outputs ────────────────────────────────────────────────
+    # 9. Save all outputs
     log.info("\n[9/9] Saving outputs...")
-    save_week6_outputs(
+    save_graph_inputs(
         model, xgb_model, xgb_risk, x,
         train_idx, val_idx, train_y, val_y,
         history, final_metrics,
     )
 
-    # ── Final summary ──────────────────────────────────────────────────────
+    # Final summary
     elapsed = time.time() - t_start
     log.info("\n" + "=" * 70)
-    log.info("WEEK 6 COMPLETE")
+    log.info("graph inputs COMPLETE")
     log.info("=" * 70)
     log.info(f"Total runtime: {elapsed/60:.1f} minutes")
     log.info("")
@@ -1133,7 +1097,7 @@ def main() -> None:
     log.info(f"  {RES_DIR}/week6_diagnostics.json")
     log.info(f"  {FIG_DIR}/week6_architecture_diagnostics.png")
     log.info("")
-    log.info("→ Week 6 complete. Ready for Week 7: Full Model Training (200 epochs).")
+    log.info("Graph inputs and reference split saved.")
     log.info("  Load week6_node_features.pt, week6_training_data.pt, multiscale_graphs.pt")
 
 

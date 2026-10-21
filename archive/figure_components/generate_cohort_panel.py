@@ -1,23 +1,8 @@
 #!/usr/bin/env python3
-"""
-Figure 1B — Dataset summary bubble matrix
-==========================================
+"""Earlier TrajRisk analysis retained for source comparison.
 
-Confirmed audited cell counts only.
-
-Rows:
-    Training and validation datasets.
-
-Columns:
-    Mouse sampling timepoints and human clinical conditions.
-
-Visual encoding:
-    Bubble colour = dataset role.
-    Bubble area = compressed function of cell count.
-    Text inside bubble = observed cell count.
-
-Right-hand metadata columns:
-    Exact total cell count and sequencing platform.
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
 import numpy as np
@@ -30,17 +15,17 @@ import matplotlib.patches as mpatches
 from pathlib import Path
 
 
-# =============================================================================
+
 # PATHS
-# =============================================================================
+
 BASE = Path(__file__).resolve().parents[3]
 FIGS = BASE / "results" / "manuscript_figures"
 FIGS.mkdir(parents=True, exist_ok=True)
 
 
-# =============================================================================
+
 # STYLE
-# =============================================================================
+
 plt.rcParams.update({
     "font.family": "Arial",
     "font.size": 7,
@@ -68,9 +53,9 @@ plt.rcParams.update({
 })
 
 
-# =============================================================================
+
 # CONFIRMED CELL COUNTS
-# =============================================================================
+
 TIMEPOINTS = [
     "0 h",
     "2 h",
@@ -175,9 +160,9 @@ DATASET_ORDER = [
 ]
 
 
-# =============================================================================
+
 # COLOURS
-# =============================================================================
+
 ROLE_COL = {
     "training": "#D9A514",
     "mouse_val": "#2FB36A",
@@ -191,9 +176,9 @@ ROLE_LABEL = {
 }
 
 
-# =============================================================================
+
 # HELPERS
-# =============================================================================
+
 def bubble_size(n_cells: int, maximum: int) -> float:
     """
     Compress the wide cell-count range while preserving visible differences.
@@ -217,9 +202,9 @@ def format_cell_count(n_cells: int) -> str:
     return f"{n_cells:,}"
 
 
-# =============================================================================
+
 # BUILD FIGURE
-# =============================================================================
+
 fig, ax = plt.subplots(figsize=(7.2, 3.15))
 
 fig.subplots_adjust(
@@ -459,9 +444,9 @@ ax.text(
 )
 
 
-# =============================================================================
+
 # EXPORT
-# =============================================================================
+
 output_stem = FIGS / "figure_1b_dataset_summary"
 
 for extension in [".pdf", ".svg", ".png"]:

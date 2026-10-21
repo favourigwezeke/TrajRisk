@@ -1,22 +1,8 @@
 #!/usr/bin/env python3
-"""
-Manuscript figure generation — Cell Reports Methods
-=====================================================
-All statistics read from saved CSV/JSON files. Nothing hard-coded.
-Saves PDF, SVG, and PNG for every figure.
+"""Earlier TrajRisk analysis retained for source comparison.
 
-Figure 1  — Mouse external validation (Panels A, B, C)
-Figure 2  — Human cross-species validation (Panels A, B, C, D)
-Supp S1   — Full four-method AUROC summary
-Supp S2   — AUPRC summary
-Supp S3   — Walesky-neighbour composition by condition
-Supp S4   — Gene signature analysis
-Supp S5   — Cell-level human risk score distributions
-
-Usage:
-    conda activate trajrisk
-    cd /path/to/TrajRisk
-    python scripts/generate_figures.py
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
 import json, sys, warnings
@@ -32,17 +18,17 @@ from matplotlib.gridspec import GridSpec
 
 warnings.filterwarnings("ignore")
 
-# =============================================================================
+
 # PATHS
-# =============================================================================
+
 BASE = Path(__file__).resolve().parents[2]
 RES  = BASE / "results"
 FIGS = RES / "manuscript_figures"
 FIGS.mkdir(parents=True, exist_ok=True)
 
-# =============================================================================
+
 # STYLE
-# =============================================================================
+
 plt.rcParams.update({
     "font.family":        "Arial",
     "font.size":          8,
@@ -109,9 +95,9 @@ def save_fig(fig, stem):
     print(f"  Saved: {stem}.pdf / .svg / .png")
 
 
-# =============================================================================
+
 # FILE GUARD
-# =============================================================================
+
 REQUIRED = {
     "Mouse validation table":  RES / "week9a_mouse_validation_table.csv",
     "Mouse p21 analysis":      RES / "week9a_mouse_p21_analysis.csv",
@@ -130,9 +116,9 @@ if missing:
     sys.exit(1)
 print("All required files present.\n")
 
-# =============================================================================
+
 # LOAD DATA
-# =============================================================================
+
 val_tbl  = pd.read_csv(RES / "week9a_mouse_validation_table.csv")
 p21_tbl  = pd.read_csv(RES / "week9a_mouse_p21_analysis.csv")
 cell_df  = pd.read_csv(RES / "manuscript_mouse_cell_scores.csv")
@@ -162,9 +148,9 @@ bar_w         = 0.18     # kept for supplementary compatibility
 n_methods     = len(METHODS_ALL)
 
 
-# =============================================================================
+
 # FIGURE 1 — MOUSE EXTERNAL VALIDATION (3 panels)
-# =============================================================================
+
 print("Generating Figure 1 — Mouse external validation ...")
 
 fig1 = plt.figure(figsize=(7.5, 5.6))
@@ -177,7 +163,7 @@ ax1A = fig1.add_subplot(gs1[0, :])    # full-width top
 ax1B = fig1.add_subplot(gs1[1, 0])    # bottom-left
 ax1C = fig1.add_subplot(gs1[1, 1])    # bottom-right
 
-# ── Panel A: AUROC (3 methods, cleaner) ───────────────────────────────────────
+# Panel A: AUROC (3 methods, cleaner)
 n_main  = len(METHODS_MAIN)
 bar_w_m = 0.22
 for mi, method in enumerate(METHODS_MAIN):
@@ -210,7 +196,7 @@ ax1A.legend(loc="lower center", bbox_to_anchor=(0.5, 1.22), ncol=3,
             handletextpad=0.4, columnspacing=0.8)
 label_panel(ax1A, "A", x=-0.05, y=1.10)
 
-# ── Panel B: Umbaugh 2h score distributions ────────────────────────────────────
+# Panel B: Umbaugh 2h score distributions
 u2h = cell_df[cell_df["dataset"] == "Umbaugh_2h"].copy()
 for i, grp in enumerate(["Control", "APAP"]):
     scores = u2h.loc[u2h["treatment"] == grp, "trajrisk_knn"].values
@@ -245,7 +231,7 @@ ax1B.set_title("Early-injury score distribution", fontsize=8, pad=6)
 ax1B.set_xlim(-0.6, 1.6)
 label_panel(ax1B, "B")
 
-# ── Panel C: Cdkn1a vs TrajRisk ────────────────────────────────────────────────
+# Panel C: Cdkn1a vs TrajRisk
 u72 = cell_df[cell_df["dataset"] == "Umbaugh_48h72h"].copy()
 u72 = u72.dropna(subset=["cdkn1a_expression", "trajrisk_wself"])
 expr = u72["cdkn1a_expression"] > 0
@@ -277,9 +263,9 @@ save_fig(fig1, "figure_mouse_validation")
 plt.close(fig1)
 
 
-# =============================================================================
+
 # FIGURE 2 — HUMAN CROSS-SPECIES VALIDATION (2-row layout)
-# =============================================================================
+
 print("Generating Figure 2 — Human cross-species validation ...")
 
 fig2 = plt.figure(figsize=(7.5, 6.2))
@@ -293,7 +279,7 @@ ax2B = fig2.add_subplot(gs2[1, 0])    # Panel B
 ax2C = fig2.add_subplot(gs2[1, 1])    # Panel C
 ax2D = fig2.add_subplot(gs2[1, 2])    # Panel D
 
-# ── Panel A: horizontal workflow schematic ─────────────────────────────────────
+# Panel A: horizontal workflow schematic
 ax2A.set_xlim(0, 100)
 ax2A.set_ylim(0, 10)
 ax2A.axis("off")
@@ -328,7 +314,7 @@ for i in range(len(box_x) - 1):
 ax2A.set_title("Cross-species validation workflow", fontsize=8, pad=6)
 label_panel(ax2A, "A", x=-0.02, y=1.18)
 
-# ── Shared donor strip helper ──────────────────────────────────────────────────
+# Shared donor strip helper
 def donor_strip(ax, df, score_col, title, json_scope):
     for ci, cond in enumerate(["Healthy", "APAP_ALF"]):
         sub = df[df["condition"] == cond][score_col].values
@@ -358,11 +344,11 @@ def donor_strip(ax, df, score_col, title, json_scope):
     ax.set_title(title, fontsize=8, pad=6)
     ax.set_xlim(-0.55, 1.55)
 
-# ── Panel B: primary donor analysis ───────────────────────────────────────────
+# Panel B: primary donor analysis
 donor_strip(ax2B, don_pri, "risk_2a", "Primary analysis", "primary")
 label_panel(ax2B, "B")
 
-# ── Panel C: sensitivity analysis ─────────────────────────────────────────────
+# Panel C: sensitivity analysis
 donor_strip(ax2C, don_sen, "risk_2a", "Sensitivity analysis", "sensitivity")
 label_panel(ax2C, "C")
 
@@ -372,7 +358,7 @@ _yhi = max(ax2B.get_ylim()[1], ax2C.get_ylim()[1])
 ax2B.set_ylim(_ylo, _yhi)
 ax2C.set_ylim(_ylo, _yhi)
 
-# ── Panel D: convergence scatter ──────────────────────────────────────────────
+# Panel D: convergence scatter
 for cond in ["Healthy", "APAP_ALF"]:
     sub = don_pri[don_pri["condition"] == cond]
     ax2D.scatter(sub["sig_net"], sub["risk_2b"],
@@ -400,9 +386,9 @@ save_fig(fig2, "figure_human_validation")
 plt.close(fig2)
 
 
-# =============================================================================
+
 # SUPPLEMENTARY S1 — FULL FOUR-METHOD AUROC
-# =============================================================================
+
 print("Generating Supp S1 — Full four-method AUROC ...")
 
 fig_s1, ax_s1 = plt.subplots(figsize=(7.5, 3.8))
@@ -438,9 +424,9 @@ save_fig(fig_s1, "supp_figure_auroc_full")
 plt.close(fig_s1)
 
 
-# =============================================================================
+
 # SUPPLEMENTARY S2 — AUPRC SUMMARY
-# =============================================================================
+
 print("Generating Supp S2 — AUPRC ...")
 
 fig_s2, ax_s2 = plt.subplots(figsize=(7.5, 3.8))
@@ -473,9 +459,9 @@ save_fig(fig_s2, "supp_figure_auprc")
 plt.close(fig_s2)
 
 
-# =============================================================================
+
 # SUPPLEMENTARY S3 — NEIGHBOUR COMPOSITION
-# =============================================================================
+
 print("Generating Supp S3 — Neighbour composition ...")
 
 fig_s3, ax_s3 = plt.subplots(figsize=(4.0, 3.4))
@@ -512,9 +498,9 @@ save_fig(fig_s3, "supp_figure_composition")
 plt.close(fig_s3)
 
 
-# =============================================================================
+
 # SUPPLEMENTARY S4 — GENE SIGNATURE ANALYSIS
-# =============================================================================
+
 print("Generating Supp S4 — Gene signature analysis ...")
 
 fig_s4, axes_s4 = plt.subplots(1, 2, figsize=(8.2, 3.8),
@@ -571,9 +557,9 @@ save_fig(fig_s4, "supp_figure_signature")
 plt.close(fig_s4)
 
 
-# =============================================================================
+
 # SUPPLEMENTARY S5 — CELL-LEVEL HUMAN DISTRIBUTIONS
-# =============================================================================
+
 print("Generating Supp S5 — Cell-level distributions ...")
 
 fig_s5, axes_s5 = plt.subplots(1, 2, figsize=(5.5, 3.8),
@@ -618,9 +604,9 @@ save_fig(fig_s5, "supp_figure_celllevel")
 plt.close(fig_s5)
 
 
-# =============================================================================
+
 # DONE
-# =============================================================================
+
 print("\n" + "=" * 60)
 print("All figures saved to:")
 print(f"  {FIGS}")

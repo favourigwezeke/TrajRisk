@@ -1,66 +1,9 @@
 
 #!/usr/bin/env python3
-"""
-TrajRisk — Week 9 Script 2: Reference-KNN Cross-Dataset Validation
-===================================================================
-Project : TrajRisk — Trajectory-Informed Risk in APAP Hepatotoxicity
-Journal : Cell Reports Methods
+"""Earlier TrajRisk analysis retained for source comparison.
 
-WHY THIS SCRIPT EXISTS
-----------------------
-Script 1 (week9_mouse_cross_dataset.py) showed that W_self-only TrajRisk
-underperforms the Seeder on external datasets. The cause is exact and known:
-
-    External cells received NO incoming edges.
-    TrajRiskConv reduced to: h_i = W_self(x_i)
-    No trajectory information reached external cells.
-
-This script fixes that by connecting each external cell to biologically
-appropriate Walesky reference cells in the shared scVI space, giving it
-genuine graph-based trajectory context before risk scoring.
-
-REFERENCE-KNN PROJECTION DESIGN
---------------------------------
-For each external cell:
-  1. Find its k=15 nearest neighbors AMONG the biologically appropriate
-     Walesky anchor cells in 30D scVI space.
-  2. Add edges: Walesky anchor → external cell
-     (source_to_target, same convention as all existing edges)
-  3. Assign Gaussian similarity weights, row-normalised per external cell.
-  4. Run TrajRiskGNN — external cell now receives trajectory-informed
-     messages from its Walesky anchors in both conv layers.
-
-ANCHOR SELECTION (biologically motivated, not arbitrary)
----------------------------------------------------------
-  Umbaugh_2h     → Walesky 0h + 6h
-      Early injury dataset. Reference anchors are the baseline (0h) and
-      the peak acute injury state (6h) — the trajectory states that bound
-      the 2h early response.
-
-  Ben_Moshe      → Walesky 24h + 48h + 96h
-      APAP dataset at 48h/72h. Reference anchors are the recovery
-      trajectory states corresponding to the same phase of injury.
-
-  Umbaugh_48h72h → Walesky 24h + 48h + 96h
-      p21-sorted cells at 48h/72h. Same reasoning as Ben-Moshe.
-
-METHODS COMPARED
-----------------
-  W_self TrajRisk    — previous version, no graph context for external cells
-  KNN   TrajRisk     — this script, reference-projected version (THE FIX)
-  Seeder             — Week 6 XGBClassifier (0h vs 6h expression only)
-  B1 XGBoost         — Week 8 XGBRegressor (scVI → pseudotime_norm)
-
-SUCCESS CRITERIA
-----------------
-  Primary:   KNN TrajRisk > W_self TrajRisk on all external tests
-  Secondary: KNN TrajRisk >= Seeder on ≥1 biologically meaningful test
-  Most likely: T1 Ben-Moshe (best scVI alignment) and T3a Cdkn1a
-
-Usage:
-    conda activate trajrisk
-    cd /path/to/TrajRisk
-    python scripts/week9_mouse_reference_knn.py
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
 import json
@@ -96,9 +39,9 @@ logging.basicConfig(
 log = logging.getLogger("W9-KNN")
 
 
-# =============================================================================
+
 # 0.  CONFIGURATION
-# =============================================================================
+
 
 BASE = Path(__file__).resolve().parents[2]
 DATA   = BASE / "Data" / "processed"
@@ -146,9 +89,9 @@ torch.manual_seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
-# =============================================================================
-# 1.  MODEL CLASSES  (exact copies from Week 7 — do not modify)
-# =============================================================================
+
+# 1.  MODEL CLASSES  (exact copies from reference model — do not modify)
+
 
 class TrajRiskConv(MessagePassing):
     def __init__(self, in_channels: int, out_channels: int):
@@ -202,9 +145,9 @@ class TrajRiskGNN(nn.Module):
         return self.fusion_mlp(torch.cat(parts, dim=1)).squeeze(-1)
 
 
-# =============================================================================
+
 # 2.  LOAD AND VERIFY ALL DATA
-# =============================================================================
+
 
 def load_and_verify() -> Dict:
     log.info("=" * 68)
@@ -220,17 +163,17 @@ def load_and_verify() -> Dict:
     assert ds_counts["Umbaugh_2h"]     == 21_409
     assert ds_counts["Umbaugh_48h72h"] == 5_306
     assert ds_counts["Ben_Moshe"]      == 2_770
-    log.info(f"  adata: {adata.n_obs:,} cells  ✓")
+    log.info(f"  adata: {adata.n_obs:,} cells  ")
 
     cell_index = pd.read_csv(DATA / "walesky_cell_index.csv", index_col=0)
     assert len(cell_index) == 6_582
-    log.info(f"  walesky_cell_index: {len(cell_index):,} rows  ✓")
+    log.info(f"  walesky_cell_index: {len(cell_index):,} rows  ")
     log.info(f"  Walesky timepoints (hours): "
              f"{sorted(cell_index['hours'].unique().tolist())}")
 
     x_walesky = torch.load(DATA / "week6_node_features.pt", map_location="cpu")
     assert x_walesky.shape == (6_582, 31)
-    log.info(f"  x_walesky: {tuple(x_walesky.shape)}  ✓")
+    log.info(f"  x_walesky: {tuple(x_walesky.shape)}  ")
 
     graphs       = torch.load(DATA / "multiscale_graphs.pt", map_location="cpu")
     edge_indices = [graphs[sn]["edge_index"] for sn in SCALE_NAMES]
@@ -238,7 +181,7 @@ def load_and_verify() -> Dict:
     for s, ei in enumerate(edge_indices):
         assert ei.max().item() <= 6_581
     log.info(f"  Graphs: 4 scales, "
-             f"{sum(e.shape[1] for e in edge_indices):,} total edges  ✓")
+             f"{sum(e.shape[1] for e in edge_indices):,} total edges  ")
 
     ckpt_path = MODELS / "week7_trajrisk_FINAL.pt"
     if not ckpt_path.exists():
@@ -247,14 +190,14 @@ def load_and_verify() -> Dict:
     model = TrajRiskGNN().to(DEVICE)
     model.load_state_dict(ckpt["model_state_dict"])
     model.eval()
-    log.info(f"  TrajRisk model: {ckpt_path.name}  ✓")
+    log.info(f"  TrajRisk model: {ckpt_path.name}  ")
 
     seeder          = joblib.load(MODELS / "week6_xgboost_model.pkl")
     seeder_walesky  = np.load(DATA / "week6_xgboost_risk.npy")
     preds_w7        = pd.read_csv(DATA / "week7_predictions.csv", index_col=0)
     trajrisk_walesky = preds_w7["risk_predicted"].values.astype(np.float32)
     td              = torch.load(DATA / "week6_training_data.pt", map_location="cpu")
-    log.info("  All supporting files loaded  ✓\n")
+    log.info("  All supporting files loaded  \n")
 
     return {
         "adata":             adata,
@@ -273,9 +216,9 @@ def load_and_verify() -> Dict:
     }
 
 
-# =============================================================================
+
 # 3.  FIT B1 XGBOOST
-# =============================================================================
+
 
 def fit_b1_xgboost(data: Dict) -> Tuple[XGBRegressor, np.ndarray]:
     log.info("Fitting B1 XGBoost (scVI → pseudotime_norm) ...")
@@ -283,13 +226,13 @@ def fit_b1_xgboost(data: Dict) -> Tuple[XGBRegressor, np.ndarray]:
     b1 = XGBRegressor(**XGB_B1_PARAMS)
     b1.fit(x_scvi_wal[data["train_idx"]], data["train_y"])
     b1_wal = np.clip(b1.predict(x_scvi_wal).astype(float), 0.0, 1.0).astype(np.float32)
-    log.info(f"  B1 fitted  — range [{b1_wal.min():.3f}, {b1_wal.max():.3f}]  ✓\n")
+    log.info(f"  B1 fitted  — range [{b1_wal.min():.3f}, {b1_wal.max():.3f}]  \n")
     return b1, b1_wal
 
 
-# =============================================================================
+
 # 4.  ANCHOR CELL HELPERS
-# =============================================================================
+
 
 def get_anchor_cells(data: Dict, anchor_hours: List[float]
                      ) -> Tuple[np.ndarray, np.ndarray]:
@@ -341,25 +284,25 @@ def build_reference_knn_edges(
     if k_actual < k:
         log.warning(f"  Only {n_anchors} anchors available; using k={k_actual}")
 
-    # ── KNN in scVI space ─────────────────────────────────────────────────────
+    # KNN in scVI space
     knn = NearestNeighbors(n_neighbors=k_actual, metric="euclidean", n_jobs=-1)
     knn.fit(z_anchors)
     distances, local_indices = knn.kneighbors(z_ext)     # (n_ext, k_actual)
 
-    # ── Gaussian weights ──────────────────────────────────────────────────────
+    # Gaussian weights
     nonzero_d = distances[distances > 0]
     sigma     = float(np.median(nonzero_d)) if len(nonzero_d) > 0 else 1.0
     raw_w     = np.exp(-distances ** 2 / (2.0 * sigma ** 2))  # (n_ext, k_actual)
 
-    # ── Row-normalise per external cell ───────────────────────────────────────
+    # Row-normalise per external cell
     row_sums = raw_w.sum(axis=1, keepdims=True)
     row_sums = np.where(row_sums == 0, 1.0, row_sums)
     norm_w   = (raw_w / row_sums).astype(np.float32)           # (n_ext, k_actual)
 
-    # ── Convert local anchor indices → global Walesky positions ──────────────
+    # Convert local anchor indices → global Walesky positions
     global_src = anchor_idx[local_indices]          # (n_ext, k_actual)
 
-    # ── Build edge tensors ────────────────────────────────────────────────────
+    # Build edge tensors
     src = global_src.flatten().astype(np.int64)     # Walesky position
     tgt = (np.repeat(np.arange(n_ext), k_actual) + n_wal).astype(np.int64)
 
@@ -369,9 +312,9 @@ def build_reference_knn_edges(
     return ref_ei, ref_ew
 
 
-# =============================================================================
+
 # 5.  COMPUTE RISK SCORES — W_SELF VARIANT  (kept for direct comparison)
-# =============================================================================
+
 
 def compute_wself(data: Dict, b1_xgb: XGBRegressor,
                   z_val: np.ndarray, label: str) -> Dict[str, np.ndarray]:
@@ -397,9 +340,9 @@ def compute_wself(data: Dict, b1_xgb: XGBRegressor,
     }
 
 
-# =============================================================================
+
 # 6.  COMPUTE RISK SCORES — REFERENCE-KNN VARIANT  (THE FIX)
-# =============================================================================
+
 
 def compute_knn(data: Dict, b1_xgb: XGBRegressor,
                 z_val: np.ndarray,
@@ -472,8 +415,8 @@ def compute_all_scores(data: Dict, b1_xgb: XGBRegressor,
     Compute all four methods for a validation dataset:
         trajrisk_knn   — reference-KNN TrajRisk (the fix)
         trajrisk_wself — W_self-only TrajRisk (for comparison)
-        seeder         — Week 6 XGBClassifier
-        b1_xgb         — Week 8 expression-only XGBoost
+        seeder         — graph inputs XGBClassifier
+        b1_xgb         — baseline and ablation analysis expression-only XGBoost
 
     All scores are computed from the same z_val and the same model.
     """
@@ -499,9 +442,9 @@ def compute_all_scores(data: Dict, b1_xgb: XGBRegressor,
     }
 
 
-# =============================================================================
+
 # 7.  METRICS
-# =============================================================================
+
 
 def safe_auroc(y: np.ndarray, s: np.ndarray) -> float:
     if y.sum() < MIN_POS or (1 - y).sum() < MIN_POS:
@@ -568,12 +511,12 @@ def report_metrics(test_name: str, y: np.ndarray,
     return rows
 
 
-# =============================================================================
+
 # 8.  INDIVIDUAL TESTS
-# =============================================================================
+
 
 def run_t0_reference(data: Dict, b1_wal: np.ndarray) -> List[Dict]:
-    """T0: Walesky held-out val — uses full graph (Week 7/8 numbers reproduced)."""
+    """T0: Walesky held-out val — uses full graph (reference model/8 numbers reproduced)."""
     log.info("\n" + "=" * 68)
     log.info("T0: Walesky held-out val (internal reference — full graph)")
     log.info("=" * 68)
@@ -678,9 +621,9 @@ def run_t3_umbaugh_p21(data: Dict, b1_xgb: XGBRegressor
     return rows_t3a + rows_t3b, p21_df
 
 
-# =============================================================================
+
 # 9.  SUMMARY TABLE AND FIGURES
-# =============================================================================
+
 
 def print_summary(df: pd.DataFrame) -> List[Dict]:
     log.info("\n" + "=" * 68)
@@ -755,7 +698,7 @@ def make_comparison_figure(df: pd.DataFrame) -> None:
 
     fig, axes = plt.subplots(1, 2, figsize=(max(14, n_t * 3), 6))
     fig.suptitle(
-        "TrajRisk Week 9: W_self vs Reference-KNN vs Baselines\n"
+        "TrajRisk external validation: W_self vs Reference-KNN vs Baselines\n"
         "(hatching = previous W_self-only version;  solid green = fixed KNN version)",
         fontsize=11, fontweight="bold"
     )
@@ -851,14 +794,14 @@ def make_improvement_figure(summary_rows: List[Dict]) -> None:
     log.info(f"  Saved: {out.name}")
 
 
-# =============================================================================
+
 # 10.  MAIN
-# =============================================================================
+
 
 def main() -> None:
     t0 = time.time()
     log.info("=" * 68)
-    log.info("TRAJRISK — WEEK 9 SCRIPT 2: REFERENCE-KNN VALIDATION")
+    log.info("TRAJRISK — external validation SCRIPT 2: REFERENCE-KNN VALIDATION")
     log.info("=" * 68)
 
     data            = load_and_verify()

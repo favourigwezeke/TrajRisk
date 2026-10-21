@@ -38,9 +38,9 @@ logging.basicConfig(
 log = logging.getLogger("TrajRisk-W9B")
 
 
-# =============================================================================
+
 # 0.  CONFIGURATION
-# =============================================================================
+
 
 BASE = Path(__file__).resolve().parents[1]
 DATA   = BASE / "Data" / "processed"
@@ -54,7 +54,7 @@ N_SIG_GENES      = 50      # genes per signature direction
 KNN_K            = 15      # reference neighbours per human cell
 LOW_CELL_THRESH  = 300     # patients below this excluded in sensitivity
 
-# GNN — must match Week 7 architecture exactly
+# GNN — must match reference model architecture exactly
 NODE_DIM   = 31
 HIDDEN_DIM = 64
 N_SCALES   = 4
@@ -67,7 +67,7 @@ SCALE_NAMES = [
 ]
 
 # Cross-species TrajRisk training hyperparameters
-# (same as Week 7 best configuration: lr=0.001, wd=1e-4)
+# (same as reference model best configuration: lr=0.001, wd=1e-4)
 CS_LR          = 1e-3
 CS_WD          = 1e-4
 CS_MAX_EPOCHS  = 200
@@ -87,9 +87,9 @@ np.random.seed(RANDOM_SEED)
 scvi.settings.seed = RANDOM_SEED
 
 
-# =============================================================================
-# 1.  MODEL CLASSES  (exact copies from Week 7)
-# =============================================================================
+
+# 1.  MODEL CLASSES  (exact copies from reference model)
+
 
 class TrajRiskConv(MessagePassing):
     def __init__(self, in_ch: int, out_ch: int):
@@ -142,16 +142,16 @@ class TrajRiskGNN(nn.Module):
         return self.fusion_mlp(torch.cat(parts, dim=1)).squeeze(-1)
 
 
-# =============================================================================
+
 # 2.  LOAD ALL DATA
-# =============================================================================
+
 
 def load_all_data() -> Dict:
     log.info("=" * 68)
     log.info("LOADING AND VERIFYING ALL DATA")
     log.info("=" * 68)
 
-    # ── Human ─────────────────────────────────────────────────────────────────
+    # Human
     human = sc.read_h5ad(str(DATA / "matchett_human_hepatocytes.h5ad"))
     assert human.n_obs == 49_984
     assert {"condition", "sample"}.issubset(human.obs.columns)
@@ -177,7 +177,7 @@ def load_all_data() -> Dict:
     ].index.tolist()
     log.info(f"  Low-cell patients (< {LOW_CELL_THRESH} cells): {low_cell}")
 
-    # ── Walesky from integrated mouse adata ───────────────────────────────────
+    # Walesky from integrated mouse adata
     mouse_adata   = sc.read_h5ad(str(DATA / "adata_integrated_with_trajectory.h5ad"))
     adata_walesky = mouse_adata[mouse_adata.obs["dataset"] == "Walesky"].copy()
     assert adata_walesky.n_obs == 6_582
@@ -185,28 +185,28 @@ def load_all_data() -> Dict:
     adata_walesky.obs["patient_id"] = "walesky"
     log.info(f"  Walesky: {adata_walesky.n_obs:,} cells")
 
-    # ── Walesky cell index (timepoints for KNN scale assignment) ──────────────
+    # Walesky cell index (timepoints for KNN scale assignment)
     cell_index    = pd.read_csv(DATA / "walesky_cell_index.csv", index_col=0)
     walesky_hours = cell_index["hours"].values.astype(float)
     assert len(walesky_hours) == 6_582
 
-    # ── Transition graphs ─────────────────────────────────────────────────────
+    # Transition graphs
     graphs       = torch.load(DATA / "multiscale_graphs.pt", map_location="cpu")
     edge_indices = [graphs[sn]["edge_index"] for sn in SCALE_NAMES]
     edge_weights = [graphs[sn]["edge_weight"] for sn in SCALE_NAMES]
     for s, ei in enumerate(edge_indices):
         assert ei.max().item() <= 6_581
 
-    # ── Week 7 predictions (pseudotime_norm + risk for gene signature) ────────
+    # reference model predictions (pseudotime_norm + risk for gene signature)
     preds_w7 = pd.read_csv(DATA / "week7_predictions.csv", index_col=0)
     assert "pseudotime_norm" in preds_w7.columns
     assert set(adata_walesky.obs_names).issubset(set(preds_w7.index)), \
         "Walesky barcodes in adata not all present in week7_predictions.csv"
 
-    # ── Training split ────────────────────────────────────────────────────────
+    # Training split
     td = torch.load(DATA / "week6_training_data.pt", map_location="cpu")
 
-    # ── Ortholog table ────────────────────────────────────────────────────────
+    # Ortholog table
     orthologs = pd.read_csv(DATA / "mouse_human_orthologs_biomart.csv")
 
     log.info("  All data verified.\n")
@@ -229,9 +229,9 @@ def load_all_data() -> Dict:
     }
 
 
-# =============================================================================
+
 # 3.  ORTHOLOG GENE SPACE
-# =============================================================================
+
 
 def prepare_ortholog_gene_space(data: Dict) -> Dict:
     log.info("Preparing strict 1:1 ortholog gene space ...")
@@ -257,9 +257,9 @@ def prepare_ortholog_gene_space(data: Dict) -> Dict:
     }
 
 
-# =============================================================================
+
 # 4.  BUILD COMBINED AnnData
-# =============================================================================
+
 
 def _check_and_normalize(adata: sc.AnnData, label: str) -> sc.AnnData:
     """Check normalization state; apply normalize_total + log1p if needed."""
@@ -294,7 +294,7 @@ def build_combined_adata(data: Dict, gi: Dict) -> Tuple[sc.AnnData, int]:
     ah.obs["species"] = "human"
     ah = _check_and_normalize(ah, "Human")
 
-    # ── Fix 1: ensure shared metadata columns survive sc.concat ──────────────
+    # ensure shared metadata columns survive sc.concat
     # sc.concat may drop columns with Categorical dtype conflicts between adatas.
     # Force both columns to plain str before concatenation.
     if "treatment" in aw.obs.columns:
@@ -330,9 +330,9 @@ def build_combined_adata(data: Dict, gi: Dict) -> Tuple[sc.AnnData, int]:
     return combined, n_wal
 
 
-# =============================================================================
+
 # 5.  CROSS-SPECIES scVI
-# =============================================================================
+
 
 def train_cross_species_scvi(combined: sc.AnnData, n_wal: int) -> sc.AnnData:
     combined_path = DATA / "adata_cross_species_combined.h5ad"
@@ -410,9 +410,9 @@ def train_cross_species_scvi(combined: sc.AnnData, n_wal: int) -> sc.AnnData:
     return combined
 
 
-# =============================================================================
+
 # 6.  CROSS-SPECIES SEEDER  (new, applied to human cells only)
-# =============================================================================
+
 
 def train_cross_species_seeder(
     combined: sc.AnnData, data: Dict, n_wal: int
@@ -451,9 +451,9 @@ def train_cross_species_seeder(
     return clf
 
 
-# =============================================================================
+
 # 7.  RETRAIN TrajRisk IN CROSS-SPECIES COORDINATE SYSTEM
-# =============================================================================
+
 
 def retrain_trajrisk_cross_species(
     combined:      sc.AnnData,
@@ -461,25 +461,13 @@ def retrain_trajrisk_cross_species(
     cross_seeder:  XGBClassifier,
     n_wal:         int,
 ) -> TrajRiskGNN:
-    """
-    Retrain TrajRiskGNN using Walesky cells' CROSS-SPECIES scVI latent
-    coordinates.  This ensures coordinate-system coherence when the same
-    model is applied to human cells.
+    """Train the reference GNN using Walesky cells in cross-species scVI coordinates.
 
-    What stays the same as Week 7:
-      - Architecture (TrajRiskGNN, 87,233 parameters)
-      - Transition graphs (biological transitions are independent of latent space)
-      - Pseudotime_norm labels
-      - Train/val split (80/20 by timepoint)
-      - Hyperparameters (lr=0.001, wd=1e-4, patience=25)
-
-    What changes:
-      - Node features: x = [z_cross_species; r_cross_seeder(z_cross_species)]
-        instead of [z_original_mouse; r_original_seeder]
-
-    This new model is saved as week9b_trajrisk_cross_species.pt and is used
-    ONLY for Week 9B human validation.  The original Week 7 model is untouched.
-    """
+    The model retains the reference architecture, directed transition graphs,
+    normalized-pseudotime targets, 80/20 timepoint-stratified split and training
+    hyperparameters. Node inputs combine shared-space coordinates with the
+    cross-species XGBoost seed. Human nuclei do not provide supervised targets.
+    The cross-species checkpoint is saved separately from the mouse-cohort model."""
     ckpt_path = MODELS / "week9b_trajrisk_cross_species.pt"
 
     if ckpt_path.exists():
@@ -495,7 +483,7 @@ def retrain_trajrisk_cross_species(
     log.info("=" * 68)
     log.info("RETRAINING TrajRisk IN CROSS-SPECIES scVI COORDINATE SYSTEM")
     log.info("=" * 68)
-    log.info("  Architecture, graphs, labels, and split identical to Week 7.")
+    log.info("  Using the reference architecture, graphs, targets and split.")
     log.info("  Only the node features change (cross-species scVI coordinates).")
 
     # Build cross-species node features for all 6,582 Walesky cells
@@ -528,7 +516,7 @@ def retrain_trajrisk_cross_species(
     log.info(f"  Training up to {CS_MAX_EPOCHS} epochs (patience={CS_PATIENCE}) ...")
 
     for epoch in range(CS_MAX_EPOCHS):
-        # ── Train step ────────────────────────────────────────────────────────
+        # Train step
         model.train()
         optimizer.zero_grad()
         pred_all = model(x_cross, edge_indices, edge_weights)
@@ -537,7 +525,7 @@ def retrain_trajrisk_cross_species(
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         optimizer.step()
 
-        # ── Validation ────────────────────────────────────────────────────────
+        # Validation
         model.eval()
         with torch.no_grad():
             pred_all_val = model(x_cross, edge_indices, edge_weights)
@@ -569,7 +557,7 @@ def retrain_trajrisk_cross_species(
     model.load_state_dict(best_state)
     model.eval()
 
-    # Sanity check: val AUROC should be close to the Week 7 result (~0.90)
+    # Sanity check: val AUROC should be close to the reference model result (~0.90)
     log.info(f"\n  Cross-species TrajRisk best val AUROC: {best_val_auroc:.4f}")
     if best_val_auroc < 0.80:
         log.warning("  Val AUROC < 0.80 — cross-species scVI alignment may be poor.")
@@ -583,9 +571,9 @@ def retrain_trajrisk_cross_species(
     return model, best_val_auroc
 
 
-# =============================================================================
+
 # 8.  GENE SIGNATURE  (from ALL Walesky genes, then ortholog-mapped)
-# =============================================================================
+
 
 def build_gene_signatures(data: Dict, gi: Dict) -> Dict:
     log.info("Building gene signatures from ALL Walesky genes ...")
@@ -594,7 +582,7 @@ def build_gene_signatures(data: Dict, gi: Dict) -> Dict:
         data["mouse_adata"].obs["dataset"] == "Walesky"
     ]
 
-    # Barcode alignment check (Bug 5 fix)
+    # Barcode alignment check ()
     assert set(adata_wal_full.obs_names).issubset(set(data["preds_w7"].index)), \
         "Walesky barcodes not all present in week7_predictions.csv"
 
@@ -644,7 +632,7 @@ def build_gene_signatures(data: Dict, gi: Dict) -> Dict:
     log.info(f"  Recovery signature: {len(recovery_human)} human genes")
 
     # Score human cells using NORMALIZED expression
-    # Bug 3 fix: normalize if needed before scoring
+    # normalize if needed before scoring
     Xh = data["human"].X
     if hasattr(Xh, "toarray"):
         Xh = Xh.toarray()
@@ -672,7 +660,7 @@ def build_gene_signatures(data: Dict, gi: Dict) -> Dict:
     recovery_score = score(recovery_human)
     net_score      = risk_score - recovery_score
 
-    # Bug 4 fix: save the ACTUAL mapped genes used for scoring
+    # save the ACTUAL mapped genes used for scoring
     sig_df = pd.concat([
         pd.DataFrame({
             "mouse_gene": risk_mouse,
@@ -700,9 +688,9 @@ def build_gene_signatures(data: Dict, gi: Dict) -> Dict:
     }
 
 
-# =============================================================================
+
 # 9.  COMPUTE HUMAN RISK SCORES
-# =============================================================================
+
 
 def _gaussian_knn_edges(
     z_query: np.ndarray,    # (n_query, 30) human cells
@@ -796,7 +784,7 @@ def compute_human_risk_scores(
     x_hum = torch.tensor(np.hstack([z_hum, r_hum.reshape(-1,1)]), dtype=torch.float32)
     x_all = torch.cat([x_wal, x_hum], dim=0)   # (n_wal + n_human, 31)
 
-    # ── Layer 2A: W_self-only (PRIMARY) ───────────────────────────────────────
+    # Layer 2A: W_self-only (PRIMARY)
     log.info("  Layer 2A: W_self-only (PRIMARY) ...")
     with torch.no_grad():
         cs_trajrisk.eval()
@@ -804,7 +792,7 @@ def compute_human_risk_scores(
     risk_2a = risk_2a_all[n_wal:].astype(np.float32)
     log.info(f"    Range: [{risk_2a.min():.4f}, {risk_2a.max():.4f}]")
 
-    # ── KNN edges ─────────────────────────────────────────────────────────────
+    # KNN edges
     log.info(f"  Building KNN edges (k={KNN_K}, cross-species scVI space) ...")
     local_idx, ref_ei, ref_ew = _gaussian_knn_edges(z_hum, z_wal, n_wal, k=KNN_K)
 
@@ -820,7 +808,7 @@ def compute_human_risk_scores(
         log.info(f"    {key:10s}: ALF={vals[is_alf].mean():.3f}  "
                  f"Healthy={vals[~is_alf].mean():.3f}")
 
-    # ── Layer 2B: Scale-specific KNN (SENSITIVITY) ────────────────────────────
+    # Layer 2B: Scale-specific KNN (SENSITIVITY)
     log.info("  Layer 2B: scale-specific KNN (SENSITIVITY) ...")
     scale_src  = [[] for _ in range(N_SCALES)]
     scale_tgt  = [[] for _ in range(N_SCALES)]
@@ -865,9 +853,9 @@ def compute_human_risk_scores(
     }
 
 
-# =============================================================================
+
 # 10.  DONOR-LEVEL ANALYSIS (PRIMARY + SENSITIVITY)
-# =============================================================================
+
 
 def donor_analysis(
     human:    sc.AnnData,
@@ -933,14 +921,14 @@ def donor_analysis(
     return res, donor
 
 
-# =============================================================================
+
 # MAIN
-# =============================================================================
+
 
 def main() -> None:
     t0 = time.time()
     log.info("=" * 68)
-    log.info("TRAJRISK — WEEK 9B: HUMAN CROSS-SPECIES VALIDATION")
+    log.info("TRAJRISK — human cross-species analysis: HUMAN CROSS-SPECIES VALIDATION")
     log.info("=" * 68)
 
     data     = load_all_data()

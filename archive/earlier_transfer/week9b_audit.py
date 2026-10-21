@@ -1,24 +1,8 @@
 #!/usr/bin/env python3
-"""
-TrajRisk — Week 9B Audit
-=========================
-Three checks only. Nothing is modified. No retraining.
+"""Earlier TrajRisk analysis retained for source comparison.
 
-Audit 1: Donor-level aggregation
-    Confirm exactly 10 ALF and 9 Healthy donors entered Mann-Whitney.
-    Confirm each donor appears exactly once.
-    Confirm mean was used (not sum, not median).
-
-Audit 2: Ortholog mapping
-    Confirm 13,122 strict 1:1 pairs — no duplicates, no many-to-many.
-    Confirm risk and recovery signature genes are non-overlapping.
-    Confirm no case-mismatch issues.
-
-Audit 3: Risk signature direction
-    Print top 10 risk genes and top 10 recovery genes.
-    Check what biology they represent.
-    Check if the inversion is biological or a sign error.
-    Compute flipped AUROC to quantify the inversion.
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
 from pathlib import Path
@@ -32,14 +16,14 @@ RES  = BASE / "results"
 DATA = BASE / "Data" / "processed"
 
 print("=" * 68)
-print("WEEK 9B AUDIT")
+print("human cross-species analysis VALIDATION")
 print("=" * 68)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# AUDIT 1 — Donor-level aggregation
-# ─────────────────────────────────────────────────────────────────────────────
-print("\n── AUDIT 1: Donor-level aggregation ──────────────────────────────────")
+
+# VALIDATION 1 — Donor-level aggregation
+
+print("\n── VALIDATION 1: Donor-level aggregation ──────────────────────────────────")
 
 cell_df  = pd.read_csv(RES / "week9b_cell_risk_scores.csv", index_col=0)
 donor_df = pd.read_csv(RES / "week9b_donor_primary.csv")
@@ -53,12 +37,12 @@ n_healthy = (donor_df["condition"] == "Healthy").sum()
 print(f"\nDonors in Mann-Whitney: ALF={n_alf}  Healthy={n_healthy}")
 assert n_alf     == 10, f"Expected 10 ALF donors, got {n_alf}"
 assert n_healthy ==  9, f"Expected 9 Healthy donors, got {n_healthy}"
-print("  ✓ Exactly 10 ALF and 9 Healthy donors entered the test")
+print("   Exactly 10 ALF and 9 Healthy donors entered the test")
 
 # Confirm each donor appears exactly once
 assert donor_df["patient_id"].nunique() == 19
 assert donor_df["patient_id"].value_counts().max() == 1
-print("  ✓ Each donor appears exactly once")
+print("   Each donor appears exactly once")
 
 # Verify mean aggregation by recomputing manually from cell-level data
 donor_recomputed = (
@@ -70,7 +54,7 @@ merged = donor_df.merge(donor_recomputed, on="patient_id")
 max_diff = (merged["risk_2a"] - merged["risk_2a_recomputed"]).abs().max()
 print(f"  Max difference between saved and recomputed donor mean: {max_diff:.2e}")
 assert max_diff < 1e-4, "Donor means do not match — aggregation may be wrong"
-print("  ✓ Mean aggregation confirmed — values match cell-level computation")
+print("   Mean aggregation confirmed — values match cell-level computation")
 
 # Confirm cells per donor
 cells_per_donor = cell_df.groupby("patient_id").size()
@@ -89,13 +73,13 @@ auroc    = roc_auc_score([1]*len(alf_vals)+[0]*len(hlt_vals),
 print(f"\nRe-verified primary result (Layer 2A W_self):")
 print(f"  ALF mean={alf_vals.mean():.4f}  Healthy mean={hlt_vals.mean():.4f}")
 print(f"  Mann-Whitney p={pval:.4e}  AUROC={auroc:.3f}")
-print("  ✓ Matches logged output from main run")
+print("   Matches logged output from main run")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# AUDIT 2 — Ortholog mapping
-# ─────────────────────────────────────────────────────────────────────────────
-print("\n── AUDIT 2: Ortholog mapping ──────────────────────────────────────────")
+
+# VALIDATION 2 — Ortholog mapping
+
+print("\n── VALIDATION 2: Ortholog mapping ──────────────────────────────────────────")
 
 orthologs = pd.read_csv(DATA / "mouse_human_orthologs_biomart.csv")
 mc = orthologs["mouse_gene_name"].value_counts()
@@ -122,7 +106,7 @@ assert len(o1) == 13_122, f"Expected 13,122 usable pairs, got {len(o1)}"
 # No duplicate mouse or human genes in usable table
 assert o1["mouse_gene_name"].nunique() == len(o1)
 assert o1["human_gene_name"].nunique() == len(o1)
-print("  ✓ No duplicate mouse or human genes in the usable 1:1 table")
+print("   No duplicate mouse or human genes in the usable 1:1 table")
 
 # Load signature and verify
 sig_df = pd.read_csv(RES / "week9b_gene_signature.csv")
@@ -136,7 +120,7 @@ print(f"Recovery signature genes: {len(recovery_genes)}")
 overlap = set(risk_genes) & set(recovery_genes)
 print(f"Overlap between risk and recovery sets: {len(overlap)}")
 assert len(overlap) == 0, f"Risk and recovery gene sets overlap: {overlap}"
-print("  ✓ No overlap between risk and recovery gene sets")
+print("   No overlap between risk and recovery gene sets")
 
 # Check for case mismatches (should all be UPPERCASE human gene names)
 not_upper = [g for g in risk_genes + recovery_genes if g != g.upper()]
@@ -155,10 +139,10 @@ for _, row in recov_top.iterrows():
     print(f"  {row['mouse_gene']:12s} → {row['human_gene']:12s}  ρ={row['spearman_rho']:+.4f}")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# AUDIT 3 — Risk signature direction
-# ─────────────────────────────────────────────────────────────────────────────
-print("\n── AUDIT 3: Risk signature direction ─────────────────────────────────")
+
+# VALIDATION 3 — Risk signature direction
+
+print("\n── VALIDATION 3: Risk signature direction ─────────────────────────────────")
 
 # Reload cell-level signature scores
 # These are in cell_df as "sig_net"
@@ -211,17 +195,17 @@ print(f"  AUROC (ALF > Healthy): {net_auroc:.3f}")
 print(f"  Direction: {'ALF > Healthy (correct)' if alf_net.mean() > hlt_net.mean() else 'inverted'}")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# FINAL AUDIT SUMMARY
-# ─────────────────────────────────────────────────────────────────────────────
+
+# FINAL VALIDATION SUMMARY
+
 print("\n" + "=" * 68)
-print("AUDIT SUMMARY")
+print("VALIDATION SUMMARY")
 print("=" * 68)
-print("  Audit 1 — Donor aggregation: PASS")
+print("  validation 1 — Donor aggregation: PASS")
 print("    10 ALF, 9 Healthy, each once, mean confirmed.")
-print("  Audit 2 — Ortholog mapping: PASS")
+print("  validation 2 — Ortholog mapping: PASS")
 print("    13,122 strict 1:1 pairs, no duplicates, no overlap.")
-print("  Audit 3 — Signature direction: INVESTIGATED")
+print("  validation 3 — Signature direction: INVESTIGATED")
 print(f"    Risk sig inverted (AUROC={forward_auroc:.3f}). Biology, not a code error.")
 print(f"    Net sig direction: ALF {'>' if alf_net.mean()>hlt_net.mean() else '<'} Healthy (AUROC={net_auroc:.3f}).")
 print("\nPrimary result is FROZEN and VALID:")

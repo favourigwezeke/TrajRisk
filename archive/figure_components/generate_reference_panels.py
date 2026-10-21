@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""
-Week 2 panels — clean rewrite with all annotation fixes baked in.
-No patches. Every fix is in the original code here.
+"""Earlier TrajRisk analysis retained for source comparison.
+
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 import warnings
 warnings.filterwarnings("ignore")
@@ -83,9 +84,9 @@ def draw_violin(ax, data_dict):
     ax.set_xticklabels([TP_LABELS[tp] for tp in TP_ORDER], fontsize=6.5)
     return tops
 
-# =============================================================================
+
 # LOAD ADATA ONCE
-# =============================================================================
+
 print("Loading adata ...")
 adata = sc.read_h5ad(
     str(BASE/"Data/processed/adata_integrated_with_trajectory.h5ad"), backed="r")
@@ -98,9 +99,9 @@ print(f"  Walesky cells: {len(walesky_obs)}  |  X_scvi: {walesky_scvi.shape}")
 ptime  = walesky_obs["pseudotime_norm"].values
 tp_hrs = walesky_obs["timepoint_hours"].values
 
-# =============================================================================
+
 # FIGURE 1D — Walesky-only UMAP from X_scvi
-# =============================================================================
+
 print("Computing Walesky UMAP ...")
 umap_coords = UMAP(n_components=2, n_neighbors=15, min_dist=0.3,
                    random_state=42, n_jobs=1).fit_transform(walesky_scvi)
@@ -129,9 +130,9 @@ label_panel(ax_1d, "D", x=-0.14)
 save_fig(fig_1d, "figure_1d_pseudotime_umap")
 plt.close(fig_1d)
 
-# =============================================================================
+
 # FIGURE 2A — Clock-time vs pseudotime
-# =============================================================================
+
 print("Building Figure 2A ...")
 ptime_by_tp = {tp: walesky_obs.loc[tp_hrs==float(tp), "pseudotime_norm"].values
                for tp in TP_ORDER}
@@ -173,9 +174,9 @@ label_panel(ax_2a, "A")
 save_fig(fig_2a, "figure_2a_pseudotime_violin")
 plt.close(fig_2a)
 
-# =============================================================================
+
 # FIGURE 3D — Risk violin by timepoint
-# =============================================================================
+
 print("Building Figure 3D ...")
 emb1 = pd.read_csv(RES / "bottleneck_s5_emb_norms_scale1_acutestress.csv")
 risk_by_tp = {tp: emb1.loc[emb1["timepoint_h"]==float(tp), "risk_predicted"].values
@@ -210,9 +211,9 @@ label_panel(ax_3d, "D")
 save_fig(fig_3d, "figure_3d_risk_violin")
 plt.close(fig_3d)
 
-# =============================================================================
+
 # FIGURE 3E — Scale importance
-# =============================================================================
+
 print("Building Figure 3E ...")
 si = pd.read_csv(RES / "week7_scale_importance.csv")
 
@@ -240,4 +241,4 @@ label_panel(ax_3e, "E")
 save_fig(fig_3e, "figure_3e_scale_importance")
 plt.close(fig_3e)
 
-print("\nAll Week 2 panels complete.")
+print("\nAll preprocessing panels complete.")

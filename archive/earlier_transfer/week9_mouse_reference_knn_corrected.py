@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
-"""
-TrajRisk — Week 9: Corrected Reference-KNN Mouse Cross-Dataset Validation
-========================================================================
+"""Earlier TrajRisk analysis retained for source comparison.
 
-Corrected design:
-- External cells receive reference KNN messages only in biologically relevant
-  TrajRisk scale branches.
-- Anchor cells are chosen per external cell, not per dataset globally.
-- Control cells anchor to Walesky 0h controls.
-- APAP cells anchor to phase-appropriate Walesky reference states.
-- W_self-only, Seeder, and B1 XGBoost are retained for comparison.
-
-This is still a validation experiment, not retraining.
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
 import json
@@ -44,9 +35,9 @@ logging.basicConfig(
 log = logging.getLogger("W9-KNN-CORRECTED")
 
 
-# =============================================================================
+
 # 0. CONFIG
-# =============================================================================
+
 
 BASE = Path(__file__).resolve().parents[2]
 DATA = BASE / "Data" / "processed"
@@ -90,9 +81,9 @@ torch.manual_seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
-# =============================================================================
+
 # 1. MODEL CLASSES
-# =============================================================================
+
 
 class TrajRiskConv(MessagePassing):
     def __init__(self, in_channels: int, out_channels: int):
@@ -156,9 +147,9 @@ class TrajRiskGNN(nn.Module):
         return self.fusion_mlp(torch.cat(parts, dim=1)).squeeze(-1)
 
 
-# =============================================================================
+
 # 2. LOAD DATA
-# =============================================================================
+
 
 def load_and_verify() -> Dict:
     log.info("=" * 72)
@@ -207,7 +198,7 @@ def load_and_verify() -> Dict:
     ckpt_path = MODELS / "week7_trajrisk_FINAL.pt"
     if not ckpt_path.exists():
         ckpt_path = MODELS / "week7_trajrisk_BEST_AUROC.pt"
-    assert ckpt_path.exists(), "No Week 7 TrajRisk checkpoint found"
+    assert ckpt_path.exists(), "No reference TrajRisk checkpoint found"
 
     model = TrajRiskGNN().to(DEVICE)
     ckpt = torch.load(ckpt_path, map_location="cpu")
@@ -241,9 +232,9 @@ def load_and_verify() -> Dict:
     }
 
 
-# =============================================================================
+
 # 3. B1 XGBOOST
-# =============================================================================
+
 
 def fit_b1_xgboost(data: Dict) -> Tuple[XGBRegressor, np.ndarray]:
     log.info("Fitting B1 XGBoost...")
@@ -257,9 +248,9 @@ def fit_b1_xgboost(data: Dict) -> Tuple[XGBRegressor, np.ndarray]:
     return model, pred_wal
 
 
-# =============================================================================
+
 # 4. CELL-SPECIFIC ANCHOR ASSIGNMENT
-# =============================================================================
+
 
 def scale_and_anchor_hours_for_cell(dataset: str, treatment: str, hour: float) -> Tuple[List[int], List[float]]:
     """
@@ -406,9 +397,9 @@ def build_cell_specific_reference_edges(
     return ref_edge_indices, ref_edge_weights
 
 
-# =============================================================================
+
 # 5. SCORE COMPUTATION
-# =============================================================================
+
 
 def compute_wself_scores(data: Dict, b1: XGBRegressor, z_ext: np.ndarray) -> Dict[str, np.ndarray]:
     n_wal = data["x_walesky"].shape[0]
@@ -489,9 +480,9 @@ def compute_knn_scores(
     }
 
 
-# =============================================================================
+
 # 6. METRICS
-# =============================================================================
+
 
 def safe_auroc(y, s):
     if y.sum() < MIN_POS or (1 - y).sum() < MIN_POS:
@@ -551,9 +542,9 @@ def report_metrics(test_name: str, y: np.ndarray, scores: Dict[str, np.ndarray])
     return rows
 
 
-# =============================================================================
+
 # 7. TESTS
-# =============================================================================
+
 
 def run_t0(data: Dict, b1_wal: np.ndarray) -> List[Dict]:
     vi = data["val_idx"]
@@ -632,14 +623,14 @@ def run_p21_test(data: Dict, b1: XGBRegressor) -> Tuple[List[Dict], pd.DataFrame
     return rows, pd.DataFrame(p21_rows)
 
 
-# =============================================================================
+
 # 8. MAIN
-# =============================================================================
+
 
 def main():
     t0 = time.time()
     log.info("=" * 72)
-    log.info("TRAJRISK — WEEK 9 CORRECTED REFERENCE-KNN VALIDATION")
+    log.info("TRAJRISK — external validation  REFERENCE-KNN VALIDATION")
     log.info("=" * 72)
 
     data = load_and_verify()

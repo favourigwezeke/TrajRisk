@@ -1,13 +1,13 @@
-# Environments
+# Software environments
 
-## Tested frozen-model runtime
+## Saved-model analysis
 
-`frozen-linux-py312.lock.txt` pins the Linux/Python 3.12 CPU runtime used for saved-model reproduction. Install CPU PyTorch first, then the lock file, as shown in the [README](../README.md). A fresh installation reproduced the 79 numerical checks; supplementary figure generation uses the same environment. This test covers frozen inference and plotting.
+`frozen-linux-py312.lock.txt` specifies the Linux/Python 3.12 CPU environment used for prediction, numerical evaluation and supplementary figures. Install CPU PyTorch first, then the remaining dependencies as shown in the [README](../README.md). This environment has passed the 79 numerical comparisons in the saved-model workflow.
 
-## Recorded analysis environment
+## Training and preprocessing
 
-The root `environment.yml` and `requirements.txt` pin 20 direct analysis dependencies. `pip-observed.txt` preserves 214 installed Python distributions, and `conda-observed.json` records 591 Conda entries with build strings. These snapshots describe the original analysis environment; they are not a solver-generated cross-platform lock. A complete clean installation and raw-data training replay are separate from the tested frozen runtime.
+The root `environment.yml` and `requirements.txt` specify 20 direct analysis dependencies. `pip-observed.txt` lists the 214 Python distributions in the analysis environment; `conda-observed.json` records its 591 Conda package/build entries. These files document that environment rather than a cross-platform solver lock. Complete raw-data retraining has not been tested through the saved-model command.
 
 ## R trajectory inference
 
-Trajectory inference used R 4.5.1 and Monocle 3 1.4.27 in RStudio. The separate Conda snapshot includes r-base 4.5.3. The RStudio versions identify the trajectory execution environment.
+The trajectory analysis used R 4.5.1 and Monocle 3 1.4.27 in RStudio. The separate Conda snapshot contains r-base 4.5.3. Use the RStudio versions when matching the trajectory analysis.

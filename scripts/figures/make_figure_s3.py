@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
 from umap import UMAP
 
-# ============================================================
+
 # PATHS
-# ============================================================
+
 
 DATA = INPUT_ROOT / "Data" / "processed"
 RES = INPUT_ROOT / "results"
@@ -30,9 +30,9 @@ PDF_OUT = OUT / "Figure_S3_cross_species_diagnostics_FINAL.pdf"
 RANDOM_SEED = 42
 KNN_K = 15
 
-# ============================================================
+
 # COLORS
-# ============================================================
+
 
 SPECIES_COLORS = {
     "mouse": "#4C78A8",
@@ -59,9 +59,9 @@ HUMAN_CONDITION_COLORS = {
     "APAP-ALF": "#E15759",
 }
 
-# ============================================================
+
 # STYLE
-# ============================================================
+
 
 plt.rcParams.update({
     "font.family": "Arial",
@@ -78,11 +78,11 @@ plt.rcParams.update({
     "ps.fonttype": 42,
 })
 
-# ============================================================
-# FILE CHECKS
-# ============================================================
 
-print("===== FIGURE S3 INPUT AUDIT =====")
+# FILE CHECKS
+
+
+print("===== FIGURE S3 INPUT VALIDATION =====")
 
 for f in [
     COMBINED_FILE,
@@ -92,9 +92,9 @@ for f in [
     if not f.exists():
         raise FileNotFoundError(f)
 
-# ============================================================
+
 # LOAD FINAL CROSS-SPECIES LATENT SPACE
-# ============================================================
+
 
 adata = read_view(
     COMBINED_FILE,
@@ -129,9 +129,9 @@ print(
 # Close backed file after extracting what we need.
 adata.file.close()
 
-# ============================================================
+
 # EXPECTED STRUCTURE
-# ============================================================
+
 
 species = (
     obs["species"]
@@ -171,7 +171,7 @@ if z.shape != (56566, 30):
         f"(56566, 30); found {z.shape}"
     )
 
-# Week 9B deliberately placed Walesky first and human second.
+# human cross-species analysis deliberately placed Walesky first and human second.
 if not np.all(mouse_mask[:n_mouse]):
     raise ValueError(
         "Mouse cells are not the first 6,582 rows "
@@ -188,11 +188,11 @@ print(
     "Mouse-first / human-second ordering: PASS"
 )
 
-# ============================================================
-# NORMALIZE CONCATENATED CELL IDs
-# ============================================================
 
-# Week 9B used:
+# NORMALIZE CONCATENATED CELL IDs
+
+
+# human cross-species analysis used:
 #
 # sc.concat(
 #     [aw, ah],
@@ -207,8 +207,8 @@ print(
 #   "-walesky" to mouse IDs
 #   "-human"   to human IDs
 #
-# These suffixes were not present in the original Week 7 /
-# Week 9B source objects. Remove ONLY the final concat suffix.
+# These suffixes were not present in the original reference model /
+# human cross-species analysis source objects. Remove ONLY the final concat suffix.
 
 mouse_ids_combined = pd.Index(
     obs_names[mouse_mask].astype(str)
@@ -286,9 +286,9 @@ print(
     human_ids[0]
 )
 
-# ============================================================
-# LOAD / ALIGN FINAL WEEK 7 MOUSE METADATA
-# ============================================================
+
+# LOAD / ALIGN FINAL reference model MOUSE METADATA
+
 
 mouse_pred = pd.read_csv(
     MOUSE_PRED_FILE,
@@ -320,10 +320,10 @@ if mouse_pred_ids != cross_mouse_ids:
     )
 
     raise ValueError(
-        "Week 7 mouse prediction IDs still do not "
+        "reference model mouse prediction IDs still do not "
         "match cross-species mouse IDs after concat "
         "suffix normalization.\n"
-        f"Only Week 7: {len(only_pred)}\n"
+        f"Only reference model: {len(only_pred)}\n"
         f"Only cross-species: {len(only_cross)}"
     )
 
@@ -344,7 +344,7 @@ missing_mouse = [
 
 if missing_mouse:
     raise ValueError(
-        "Missing required Week 7 mouse columns: "
+        "Missing required reference model mouse columns: "
         f"{missing_mouse}"
     )
 
@@ -357,12 +357,12 @@ if mouse_meta[
     )
 
 print(
-    "Mouse Week 7 metadata alignment: PASS"
+    "Mouse reference model metadata alignment: PASS"
 )
 
-# ============================================================
-# LOAD / ALIGN FINAL WEEK 9B HUMAN RISK SCORES
-# ============================================================
+
+# LOAD / ALIGN FINAL human cross-species analysis HUMAN RISK SCORES
+
 
 human_risk = pd.read_csv(
     HUMAN_RISK_FILE,
@@ -394,7 +394,7 @@ if human_risk_ids != cross_human_ids:
     )
 
     raise ValueError(
-        "Human Week 9B risk-score IDs do not match "
+        "Human human cross-species analysis risk-score IDs do not match "
         "cross-species human IDs after concat suffix "
         "normalization.\n"
         f"Only risk CSV: {len(only_csv)}\n"
@@ -436,16 +436,16 @@ print(
     f"{risk_2a.max():.4f}]"
 )
 
-# ============================================================
+
 # BUILD SPECIES-AWARE BIOLOGICAL GROUP LABELS
-# ============================================================
+
 
 group = np.empty(
     len(obs),
     dtype=object
 )
 
-# Mouse labels come from final Week 7 metadata.
+# Mouse labels come from final reference model metadata.
 mouse_treatment = (
     mouse_meta["treatment_str"]
     .astype(str)
@@ -460,7 +460,7 @@ group[
     "Mouse APAP"
 )
 
-# Human labels come from final Week 9B metadata.
+# Human labels come from final human cross-species analysis metadata.
 human_condition = (
     obs.loc[
         human_mask,
@@ -493,9 +493,9 @@ for g in GROUP_COLORS:
         f"{np.sum(group == g):,}"
     )
 
-# ============================================================
+
 # REPRODUCIBLE UMAP FROM FINAL X_scvi_cross
-# ============================================================
+
 
 print(
     "\nComputing UMAP from final X_scvi_cross "
@@ -520,9 +520,9 @@ print(
     f"UMAP shape: {umap_2d.shape}"
 )
 
-# ============================================================
-# RECOMPUTE EXACT WEEK 9B REFERENCE-NEIGHBOUR COMPOSITION
-# ============================================================
+
+# RECOMPUTE EXACT human cross-species analysis REFERENCE-NEIGHBOUR COMPOSITION
+
 
 print(
     "\nRecomputing 15-nearest-Walesky-neighbour "
@@ -575,7 +575,7 @@ composition_df[
     "condition"
 ] = human_condition
 
-# Same descriptive averaging logic as Week 9B.
+# Same descriptive averaging logic as human cross-species analysis.
 comp_summary = (
     composition_df
     .groupby(
@@ -606,9 +606,9 @@ print(
     f"{source_out}"
 )
 
-# ============================================================
+
 # FIGURE
-# ============================================================
+
 
 fig, axes = plt.subplots(
     1,
@@ -631,9 +631,9 @@ ypad = (
     ymax - ymin
 ) * 0.03
 
-# ============================================================
+
 # PANEL A — SPECIES
-# ============================================================
+
 
 ax = axes[0]
 
@@ -689,9 +689,9 @@ ax.legend(
     loc="best"
 )
 
-# ============================================================
+
 # PANEL B — SPECIES-AWARE BIOLOGICAL CONDITION
-# ============================================================
+
 
 ax = axes[1]
 
@@ -732,9 +732,9 @@ ax.legend(
     loc="best"
 )
 
-# ============================================================
+
 # PANEL C — PRIMARY W_self HUMAN RISK
-# ============================================================
+
 
 ax = axes[2]
 
@@ -791,9 +791,9 @@ cbar.ax.tick_params(
     labelsize=7
 )
 
-# ============================================================
+
 # PANEL D — REFERENCE-KNN NEIGHBOUR COMPOSITION
-# ============================================================
+
 
 ax = axes[3]
 
@@ -875,9 +875,9 @@ ax.grid(
     linewidth=0.5
 )
 
-# ============================================================
+
 # IDENTICAL UMAP LIMITS FOR A–C
-# ============================================================
+
 
 for ax in axes[:3]:
     ax.set_xlim(
@@ -894,9 +894,9 @@ for ax in axes[:3]:
     ax.set_xticks([])
     ax.set_yticks([])
 
-# ============================================================
+
 # PANEL LETTERS
-# ============================================================
+
 
 for label, ax in zip(
     ["A", "B", "C", "D"],
@@ -913,9 +913,9 @@ for label, ax in zip(
         ha="left"
     )
 
-# ============================================================
+
 # FINISH
-# ============================================================
+
 
 fig.subplots_adjust(
     left=0.045,

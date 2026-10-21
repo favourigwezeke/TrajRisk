@@ -49,9 +49,9 @@ logging.basicConfig(
 log = logging.getLogger("TrajRisk-W8")
 
 
-# =============================================================================
-# SECTION 0: CONFIGURATION
-# =============================================================================
+
+# CONFIGURATION
+
 
 BASE = Path(__file__).resolve().parents[1]
 DATA_DIR  = BASE / "Data"  / "processed"
@@ -64,7 +64,7 @@ for _d in [MODEL_DIR, FIG_DIR, RES_DIR]:
 
 DEVICE = torch.device("cpu")
 
-# Architecture constants — must match Week 7 exactly
+# Architecture constants — must match reference model exactly
 NODE_DIM_FULL = 31    # scVI 30D + XGBoost initial risk 1D
 NODE_DIM_SCVI = 30    # scVI only (Ablation A4)
 HIDDEN_DIM    = 64
@@ -78,7 +78,7 @@ SCALE_NAMES: List[str] = [
     "Scale4_Resolution",
 ]
 
-# Temporal windows — must match Week 5 RF training windows exactly
+# Temporal windows — must match transition graphs RF training windows exactly
 SCALE_TEMPORAL_WINDOWS: List[Tuple[str, str]] = [
     ("0h",  "6h"),
     ("6h",  "24h"),
@@ -86,19 +86,19 @@ SCALE_TEMPORAL_WINDOWS: List[Tuple[str, str]] = [
     ("48h", "96h"),
 ]
 
-# GNN hyperparameters fixed from Week 7 Phase 1 search — never re-tuned here
+# GNN hyperparameters fixed from reference model Phase 1 search — never re-tuned here
 BEST_LR            = 0.001
 BEST_WD            = 0.0001
-MAX_EPOCHS_ABLATION = 200   # Week 7 converged at epoch 144; 200 is a safe ceiling
+MAX_EPOCHS_ABLATION = 200   # reference model converged at epoch 144; 200 is a safe ceiling
 PATIENCE           = 25
 LR_REDUCE_PATIENCE = 10
 LR_REDUCE_FACTOR   = 0.5
 GRADIENT_CLIP      = 1.0
 
-# Gaussian kernel parameters — match Week 5 RF sparsity
+# Gaussian kernel parameters — match transition graphs RF sparsity
 K_NEIGHBORS_GAUSSIAN = 15   # same as RF transition matrices (k=15 per source cell)
 
-# Binary label — fixed in Week 6 based on biology, never adjusted to maximise AUROC
+# Binary label — fixed in graph inputs based on biology, never adjusted to maximise AUROC
 HIGH_RISK_THRESHOLD = 0.10
 
 # Early stopping split
@@ -112,9 +112,9 @@ torch.manual_seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
-# =============================================================================
-# SECTION 1: MODEL CLASSES — exact copies from Week 7 (do not modify)
-# =============================================================================
+
+# MODEL CLASSES — exact copies from reference model (do not modify)
+
 
 class TrajRiskConv(MessagePassing):
     def __init__(self, in_channels: int, out_channels: int):
@@ -182,9 +182,9 @@ class TrajRiskGNN(nn.Module):
         return self.fusion_mlp(torch.cat(parts, dim=1)).squeeze(-1)
 
 
-# =============================================================================
-# SECTION 2: DATA LOADING
-# =============================================================================
+
+# DATA LOADING
+
 
 def create_dev_split(
     train_idx:  torch.Tensor,
@@ -194,7 +194,7 @@ def create_dev_split(
     """
     Split train_idx into train_inner and dev_inner.
     dev_inner is used ONLY for GNN early stopping.
-    val_idx (Week 6) is reserved for final AUROC reporting.
+    val_idx (graph inputs) is reserved for final AUROC reporting.
 
     Returns:
         train_inner_ids  — global cell IDs for gradient updates
@@ -234,7 +234,7 @@ def load_all_inputs() -> Dict:
 
     log.info(f"  Features: {tuple(x.shape)} | Train: {len(train_idx):,} | Val: {len(val_idx):,}")
 
-    # ── Dev split (RED FLAG 1 fix) ────────────────────────────────────────────
+    # Dev split (RED FLAG 1 fix)
     train_inner, dev_inner, train_inner_pos, dev_inner_pos = create_dev_split(train_idx)
     # Position-based indexing: train_y[i] corresponds to train_idx[i]
     train_inner_y = train_y[train_inner_pos]
@@ -249,13 +249,13 @@ def load_all_inputs() -> Dict:
     tp_col  = "timepoint_str" if "timepoint_str" in cell_index.columns else "timepoint"
     trt_col = "treatment_str" if "treatment_str" in cell_index.columns else "treatment"
 
-    # Load Week 7 TrajRisk predictions
+    # Load reference model TrajRisk predictions
     preds_w7 = pd.read_csv(DATA_DIR / "week7_predictions.csv", index_col=0)
     risk_trajrisk = preds_w7["risk_predicted"].values
 
     val_bin     = (val_y.numpy() > HIGH_RISK_THRESHOLD).astype(int)
     tr_val_auroc = roc_auc_score(val_bin, risk_trajrisk[val_idx.numpy()])
-    log.info(f"  TrajRisk val AUROC (from Week 7): {tr_val_auroc:.4f}")
+    log.info(f"  TrajRisk val AUROC (from reference model): {tr_val_auroc:.4f}")
     if not (0.89 <= tr_val_auroc <= 0.92):
         log.warning("  TrajRisk AUROC outside expected range [0.89, 0.92] — "
                     "verify week7_predictions.csv is from BEST_AUROC checkpoint")
@@ -273,9 +273,9 @@ def load_all_inputs() -> Dict:
     }
 
 
-# =============================================================================
-# SECTION 3: GAUSSIAN KERNEL COMPUTATION
-# =============================================================================
+
+# GAUSSIAN KERNEL COMPUTATION
+
 
 def compute_gaussian_transitions(
     x_scvi:     np.ndarray,
@@ -288,7 +288,7 @@ def compute_gaussian_transitions(
 
     Normalisation convention: row-stochastic over outgoing edges of each
     source node (sum_j w[i,j] = 1 for each i). This MATCHES the RF matrix
-    convention from Week 5, ensuring B2/A1 comparisons are apples-to-apples.
+    convention from transition graphs, ensuring B2/A1 comparisons are apples-to-apples.
 
     Bandwidth: median pairwise L2 distance across all (source, target) pairs
     within each temporal window (median heuristic — no tunable hyperparameter).
@@ -341,9 +341,9 @@ def compute_gaussian_transitions(
     return g_ei, g_ew
 
 
-# =============================================================================
-# SECTION 4: MATRIX PROPAGATION (B2 and A3)
-# =============================================================================
+
+# MATRIX PROPAGATION (B2 and A3)
+
 
 def pyg_to_scipy(edge_index, edge_weight, n_nodes) -> csr_matrix:
     """
@@ -392,9 +392,9 @@ def matrix_propagate(
     return (damping * initial_risk + (1.0 - damping) * mean_prop).clip(0.0, 1.0)
 
 
-# =============================================================================
-# SECTION 5: GNN ABLATION TRAINING (corrected early stopping)
-# =============================================================================
+
+# GNN ABLATION TRAINING (corrected early stopping)
+
 
 def train_gnn_ablation(
     node_dim:        int,
@@ -415,7 +415,7 @@ def train_gnn_ablation(
     Early stopping: monitors AUROC on dev_inner (a 20 % hold-out from train_idx
     that is NEVER included in final AUROC reporting). val_idx is never touched.
 
-    Hyperparameters: identical to Week 7 (lr=0.001, wd=0.0001, dropout=0.3,
+    Hyperparameters: identical to reference model (lr=0.001, wd=0.0001, dropout=0.3,
     grad_clip=1.0, ReduceLROnPlateau factor=0.5 patience=10). Only the model
     architecture (node_dim, n_scales) and edge sets vary across ablations.
     This ensures the comparison isolates the ablated component only.
@@ -498,9 +498,9 @@ def train_gnn_ablation(
     return all_preds, best_auroc
 
 
-# =============================================================================
-# SECTION 6: EVALUATION AND STATISTICS
-# =============================================================================
+
+# EVALUATION AND STATISTICS
+
 
 def evaluate_on_val(
     val_y_cont: np.ndarray,
@@ -588,11 +588,11 @@ def bootstrap_trajrisk_ci(
     return float(np.percentile(a, 2.5)), float(np.percentile(a, 97.5))
 
 
-# =============================================================================
-# SECTION 7: INDIVIDUAL METHOD RUNS
-# =============================================================================
 
-# ── Baseline 1: XGBoost with cross-validated hyperparameters (RF7 fix) ───────
+# INDIVIDUAL METHOD RUNS
+
+
+# Baseline 1: XGBoost with cross-validated hyperparameters (RF7 fix)
 
 def _xgb_auroc_scorer(y_true, y_pred):
     """AUROC scorer for GridSearchCV with continuous pseudotime labels."""
@@ -658,7 +658,7 @@ def run_baseline1_xgboost(data: Dict) -> np.ndarray:
     return risk_all
 
 
-# ── Baseline 2: Gaussian propagation ─────────────────────────────────────────
+# Baseline 2: Gaussian propagation
 
 def run_baseline2_gaussian_propagation(
     data: Dict,
@@ -673,7 +673,7 @@ def run_baseline2_gaussian_propagation(
     return risk
 
 
-# ── Baseline 3 / Ablation 2: Single-scale GNN — all four scales (RF4 fix) ───
+# Baseline 3 / Ablation 2: Single-scale GNN — all four scales (RF4 fix)
 
 def run_baseline3_single_scale_gnn(
     data:            Dict,
@@ -726,7 +726,7 @@ def run_baseline3_single_scale_gnn(
     return all_results[best_scale]["preds"], best_scale, all_results
 
 
-# ── Baseline 4: Expression distance ───────────────────────────────────────────
+# Baseline 4: Expression distance
 
 def run_baseline4_expression_distance(data: Dict) -> np.ndarray:
     """
@@ -754,7 +754,7 @@ def run_baseline4_expression_distance(data: Dict) -> np.ndarray:
     return risk
 
 
-# ── Ablation 1: Gaussian transitions + full GNN ───────────────────────────────
+# Ablation 1: Gaussian transitions + full GNN
 
 def run_ablation1_gaussian_gnn(
     data:            Dict,
@@ -781,7 +781,7 @@ def run_ablation1_gaussian_gnn(
     return preds
 
 
-# ── Ablation 3: RF transitions + matrix propagation ───────────────────────────
+# Ablation 3: RF transitions + matrix propagation
 
 def run_ablation3_rf_matrix_propagation(data: Dict) -> np.ndarray:
     log.info("A3: RF transitions + matrix propagation (no GNN)...")
@@ -794,7 +794,7 @@ def run_ablation3_rf_matrix_propagation(data: Dict) -> np.ndarray:
     return risk
 
 
-# ── Ablation 4: No XGBoost risk seed ─────────────────────────────────────────
+# Ablation 4: No XGBoost risk seed
 
 def run_ablation4_no_init_risk(
     data:            Dict,
@@ -820,9 +820,9 @@ def run_ablation4_no_init_risk(
     return preds
 
 
-# =============================================================================
-# SECTION 8: COMPARISON TABLE
-# =============================================================================
+
+# COMPARISON TABLE
+
 
 def build_comparison_table(
     all_preds: Dict[str, np.ndarray],
@@ -891,9 +891,9 @@ def build_comparison_table(
     return pd.DataFrame(rows)
 
 
-# =============================================================================
-# SECTION 9: FIGURES
-# =============================================================================
+
+# FIGURES
+
 
 def make_auroc_barplot(df: pd.DataFrame) -> None:
     type_colors = {
@@ -1020,22 +1020,22 @@ def make_ablation_waterfall(df: pd.DataFrame) -> None:
     log.info("  Saved: week8_ablation_waterfall.png")
 
 
-# =============================================================================
-# SECTION 10: MAIN
-# =============================================================================
+
+# MAIN
+
 
 def main() -> None:
     log.info("=" * 72)
-    log.info("TRAJRISK — WEEK 8: BASELINE COMPARISONS AND ABLATION STUDIES")
+    log.info("TRAJRISK — baseline and ablation analysis: BASELINE COMPARISONS AND ABLATION STUDIES")
     log.info("=" * 72)
     log.info(f"Threshold: pseudotime_norm > {HIGH_RISK_THRESHOLD}")
     log.info(f"Bootstrap: n={N_BOOTSTRAP}, paired bootstrap significance test (not DeLong)")
     log.info(f"GNN hyperparams: lr={BEST_LR}, wd={BEST_WD}, max_epochs={MAX_EPOCHS_ABLATION}")
     log.info(f"Dev split: {int(DEV_SPLIT_FRAC*100)}% of train_idx for GNN early stopping")
-    log.info(f"TrajRisk: loaded from Week 7 checkpoint (early stopping used val AUROC)")
+    log.info(f"TrajRisk: loaded from reference model checkpoint (early stopping used val AUROC)")
     t0 = time.time()
 
-    # ── Load ──────────────────────────────────────────────────────────────────
+    # Load
     log.info("\n[1] Loading inputs...")
     data = load_all_inputs()
 
@@ -1045,12 +1045,12 @@ def main() -> None:
     # train_inner_y and dev_y were computed in load_all_inputs() via position indexing
     train_inner_y   = data["train_inner_y"]
 
-    # ── Gaussian matrices (shared by B2 and A1) ───────────────────────────────
+    # Gaussian matrices (shared by B2 and A1)
     log.info("\n[2] Gaussian transition matrices...")
     x_scvi = data["x"][:, :NODE_DIM_SCVI].numpy()
     g_ei, g_ew = compute_gaussian_transitions(x_scvi, data["cell_index"], data["tp_col"])
 
-    # ── Run all methods ───────────────────────────────────────────────────────
+    # Run all methods
     log.info("\n[3] Running all baselines and ablations...")
     preds: Dict[str, np.ndarray] = {}
 
@@ -1074,7 +1074,7 @@ def main() -> None:
         data, train_inner_idx, dev_inner_idx, train_inner_y, dev_y
     )
 
-    # ── Table and statistics ──────────────────────────────────────────────────
+    # Table and statistics
     log.info("\n[4] Comparison table + bootstrap statistics...")
     df = build_comparison_table(preds, data)
 
@@ -1102,13 +1102,13 @@ def main() -> None:
         )
     log.info("  " + "─" * 108)
 
-    # ── Figures ───────────────────────────────────────────────────────────────
+    # Figures
     log.info("\n[5] Figures...")
     make_auroc_barplot(df)
     make_auprc_barplot(df)
     make_ablation_waterfall(df)
 
-    # ── Save ──────────────────────────────────────────────────────────────────
+    # Save
     log.info("\n[6] Saving results...")
     df.to_csv(RES_DIR / "week8_comparison_table.csv", index=False)
     log.info("  Saved: week8_comparison_table.csv")
@@ -1144,7 +1144,7 @@ def main() -> None:
         "trajrisk_auroc": round(tr_auroc, 4),
         "best_single_scale": best_scale,
         "early_stopping_note": (
-            "TrajRisk used val_idx AUROC for early stopping (Week 7). "
+            "TrajRisk used validation AUROC for early stopping. "
             "GNN ablations used dev_inner AUROC (20 % of train_idx). "
             "Comparison is conservative — TrajRisk has slight checkpoint advantage."
         ),
@@ -1155,10 +1155,10 @@ def main() -> None:
         json.dump(summary, f, indent=2, default=str)
     log.info("  Saved: week8_summary.json")
 
-    # ── Final summary ─────────────────────────────────────────────────────────
+    # Final summary
     elapsed = time.time() - t0
     log.info("\n" + "=" * 72)
-    log.info("WEEK 8 COMPLETE")
+    log.info("baseline and ablation analysis COMPLETE")
     log.info("=" * 72)
     log.info(f"Runtime: {elapsed/60:.1f} minutes")
     log.info(f"TrajRisk val AUROC: {tr_auroc:.4f}")
@@ -1184,7 +1184,7 @@ def main() -> None:
     ]
     log.info(f"Significant wins:  {len(sig)}/{len(df)-1} methods (paired bootstrap p<0.05)")
     log.info("")
-    log.info("→ Ready for Week 9: Cross-Dataset Validation.")
+    log.info("Baseline and ablation evaluation complete.")
 
 
 if __name__ == "__main__":

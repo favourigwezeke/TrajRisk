@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 
 from sklearn.decomposition import PCA
 
-# ============================================================
+
 # PATHS
-# ============================================================
+
 
 DATA = INPUT_ROOT / "Data" / "processed"
 OUT = REPO_ROOT / "build" / "figures" / "supplementary"
@@ -43,9 +43,9 @@ TIMEPOINT_COLORS = {
     "96h": "#4C8FC2",
 }
 
-# ============================================================
+
 # STYLE
-# ============================================================
+
 
 plt.rcParams.update({
     "font.family": "Arial",
@@ -62,11 +62,11 @@ plt.rcParams.update({
     "ps.fonttype": 42,
 })
 
-# ============================================================
-# LOAD
-# ============================================================
 
-print("===== FIGURE S2 INPUT AUDIT =====")
+# LOAD
+
+
+print("===== FIGURE S2 INPUT VALIDATION =====")
 
 for f in [
     ADATA_FILE,
@@ -110,9 +110,9 @@ print(
     f"{embeddings.shape}"
 )
 
-# ============================================================
+
 # BASIC INTEGRITY CHECKS
-# ============================================================
+
 
 if walesky.n_obs != 6582:
     raise ValueError(
@@ -145,9 +145,9 @@ if not walesky.obs_names.is_unique:
         "duplicate cell indices."
     )
 
-# ============================================================
+
 # BARCODE ALIGNMENT CHECK
-# ============================================================
+
 
 pred_ids = set(
     pred.index.astype(str)
@@ -173,9 +173,9 @@ print(
     "Cell-ID set alignment: PASS"
 )
 
-# ============================================================
+
 # REQUIRED PREDICTION COLUMNS
-# ============================================================
+
 
 required_pred_cols = [
     "timepoint_str",
@@ -193,9 +193,9 @@ if missing:
         f"{missing}"
     )
 
-# ============================================================
+
 # CHECK RISK SCORES AGAINST AnnData
-# ============================================================
+
 
 if "risk_predicted" not in walesky.obs.columns:
     raise ValueError(
@@ -247,9 +247,9 @@ print(
     "Prediction-to-AnnData alignment: PASS"
 )
 
-# ============================================================
+
 # RAW MONOCLE PSEUDOTIME CHECK
-# ============================================================
+
 
 if "pseudotime" not in walesky.obs.columns:
     raise ValueError(
@@ -274,9 +274,9 @@ if raw_pt.isna().any():
         "have missing raw pseudotime."
     )
 
-# ============================================================
+
 # TIMEPOINT COUNTS
-# ============================================================
+
 
 print("\nRaw pseudotime cohort:")
 
@@ -293,9 +293,9 @@ for tp in TIMEPOINT_ORDER:
         f"  {tp:>3}: {n:,}"
     )
 
-# ============================================================
+
 # PCA FROM SAVED FINAL EMBEDDINGS
-# ============================================================
+
 
 # (6582, 4, 64) -> (6582, 256)
 combined = embeddings.reshape(
@@ -334,14 +334,14 @@ print(
     f"  PC2: {pc2_var:.2f}%"
 )
 
-# Original Week 7 figure was approximately:
+# Original reference model figure was approximately:
 # PC1 = 17.9%, PC2 = 10.9%.
 # We reproduce these from the saved final embeddings
 # rather than hard-coding the values.
 
-# ============================================================
+
 # FIGURE
-# ============================================================
+
 
 fig, axes = plt.subplots(
     1,
@@ -349,9 +349,9 @@ fig, axes = plt.subplots(
     figsize=(15.5, 4.7)
 )
 
-# ============================================================
+
 # PANEL A — RAW MONOCLE PSEUDOTIME ECDF
-# ============================================================
+
 
 ax = axes[0]
 
@@ -420,9 +420,9 @@ ax.grid(
     linewidth=0.5
 )
 
-# ============================================================
+
 # PANEL B — EMBEDDING PCA BY TIMEPOINT
-# ============================================================
+
 
 ax = axes[1]
 
@@ -467,9 +467,9 @@ ax.legend(
     loc="upper right"
 )
 
-# ============================================================
+
 # PANEL C — SAME PCA, COLORED BY RISK
-# ============================================================
+
 
 ax = axes[2]
 
@@ -512,9 +512,9 @@ cbar.ax.tick_params(
     labelsize=7
 )
 
-# ============================================================
+
 # MATCH PCA AXES EXACTLY
-# ============================================================
+
 
 xmin = pca_2d[:, 0].min()
 xmax = pca_2d[:, 0].max()
@@ -541,9 +541,9 @@ for ax in axes[1:]:
         ymax + ypad
     )
 
-# ============================================================
+
 # PANEL LABELS
-# ============================================================
+
 
 for label, ax in zip(
     ["A", "B", "C"],
@@ -560,9 +560,9 @@ for label, ax in zip(
         ha="left"
     )
 
-# ============================================================
+
 # FINISH
-# ============================================================
+
 
 fig.subplots_adjust(
     left=0.06,

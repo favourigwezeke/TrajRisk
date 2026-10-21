@@ -1,76 +1,70 @@
 {
   "date": "2026-10-20",
-  "basis": "Current laptop source packet; all six hashes match the completed equation audit",
+  "basis": "Source checksums and executable-structure fingerprints.",
   "scripts": [
     {
       "path": "scripts/build_transition_graphs.py",
       "audited_original_sha256": "2be777dd0c2704f3f476b8f50fe3a63f79ff8f6a61eb07119d2edc3f2aa56329",
-      "portable_sha256": "d095ccfbbdad8d44c7771910fa52ae656bafc20c5bce9f03ffbdf84f1120f34f",
-      "change": "Project-root assignment and module-docstring cd example only",
+      "portable_sha256": "e4ea34e51a3514e105936976cc3db2b3e0af9c4f1c0999eb9f11d6ca4b9e07eb",
+      "change": "Portable project paths, analysis documentation and display messages.",
       "scientific_ast_unchanged": true,
       "execution_tested_after_port": false,
       "previous_repository_path": "scripts/week5_transition_matrices.py",
-      "previous_portable_sha256": "e24a14cf022bfa74b6e5bdfccf641b3c21a841a38ee73997b5d4b2270e7cde8d",
-      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
+      "previous_portable_sha256": "e24a14cf022bfa74b6e5bdfccf641b3c21a841a38ee73997b5d4b2270e7cde8d"
     },
     {
       "path": "scripts/prepare_graph_inputs.py",
       "audited_original_sha256": "c4e8dba6221ff80b3250d87baeb82769b338f6d5e92c2f04afaf3c2565ed319d",
-      "portable_sha256": "fa70020bda05ba3da44c12f07496614f033a7f356bef1ae9c64d7d974e0b82e4",
-      "change": "Project-root assignment and module-docstring cd example only",
+      "portable_sha256": "827795cdbf34de487ab28ca3331f0d0a78704577e4161cdd261a208cafd5e25a",
+      "change": "Portable project paths, analysis documentation and display messages.",
       "scientific_ast_unchanged": true,
       "execution_tested_after_port": false,
       "previous_repository_path": "scripts/week6_gnn_architecture.py",
-      "previous_portable_sha256": "95c08f4b578135499ddbbce206cbf049551638454f47769c1efb81492b1de48a",
-      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
+      "previous_portable_sha256": "95c08f4b578135499ddbbce206cbf049551638454f47769c1efb81492b1de48a"
     },
     {
       "path": "scripts/train_reference_model.py",
       "audited_original_sha256": "4ceba15a846619db37019532ad8c779bfb6339fa9488fdf03829bd541d7177f7",
-      "portable_sha256": "6803bdd2154ba8292156275e0d09dfaebe38b738a3a97de1f8606c309eaafa49",
-      "change": "Project-root assignment and module-docstring cd example only",
+      "portable_sha256": "5e8c7490becf1279581dd71d2fb7121b8d2ffef39d6529787398b4503d57833a",
+      "change": "Portable project paths, analysis documentation and display messages.",
       "scientific_ast_unchanged": true,
       "execution_tested_after_port": false,
       "previous_repository_path": "scripts/week7_full_training.py",
-      "previous_portable_sha256": "000a3cea01d9c12a5cf260cad07b57fbeebd0730ca8e39c87983b6d379739534",
-      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
+      "previous_portable_sha256": "000a3cea01d9c12a5cf260cad07b57fbeebd0730ca8e39c87983b6d379739534"
     },
     {
       "path": "scripts/evaluate_baselines.py",
       "audited_original_sha256": "bf0c4cefed0471fcc444fa1e75f0d7d124c8bbaf760bc6f3df1d2052c2e100f1",
-      "portable_sha256": "3564855ea04cee8954118c628f4d9b4a21838431bc3a6747c575f31e54b81d60",
-      "change": "Project-root assignment and module-docstring cd example only",
+      "portable_sha256": "721a25c668fc355ba0729d9519bcd97e1c4caa588a398779f5301532d66d3dc8",
+      "change": "Portable project paths, analysis documentation and display messages.",
       "scientific_ast_unchanged": true,
       "execution_tested_after_port": false,
       "previous_repository_path": "scripts/week8_baselines_ablations.py",
-      "previous_portable_sha256": "f89cfe96eb657daa11d86c6e3578aefebc186423547fbdcd63add98400649bce",
-      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
+      "previous_portable_sha256": "f89cfe96eb657daa11d86c6e3578aefebc186423547fbdcd63add98400649bce"
     },
     {
       "path": "scripts/validate_mouse_transfer.py",
       "audited_original_sha256": "7bbae518f6e464abd552b88473a44ca9ca17df78dec864e18911e66f68fe8922",
-      "portable_sha256": "2b6f367bc50432feb9a51f88291c85b99cdeba8896c527ba21d1d811737b6f8e",
-      "change": "Project-root assignment and module-docstring cd example only",
+      "portable_sha256": "63642bdc771dee1c8fd406953055cf1f8f4e7fda7acea212dc60b1c48f4ca869",
+      "change": "Portable project paths, analysis documentation and display messages.",
       "scientific_ast_unchanged": true,
       "execution_tested_after_port": false,
       "frozen_definitions_replayed": true,
       "full_training_script_executed": false,
       "previous_repository_path": "scripts/week9a_mouse_cross_dataset_final.py",
-      "previous_portable_sha256": "2307973787a4354ea9d99adc1d1c2216f67092a2b5fad6751af5456f98ae3bf5",
-      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
+      "previous_portable_sha256": "2307973787a4354ea9d99adc1d1c2216f67092a2b5fad6751af5456f98ae3bf5"
     },
     {
       "path": "scripts/validate_human_transfer.py",
       "audited_original_sha256": "34db603202f0892602a2faf026ca7d76cbd7d3a76a8b1983a2864cb9f2a014d3",
-      "portable_sha256": "675bc5338fcd3531a5ee6f66069dd8957c394f9155da0e584182dba8c94fc215",
-      "change": "Project-root assignment and module-docstring cd example only; scale-vote/tie docstring corrected to match the unchanged executable implementation",
+      "portable_sha256": "bd6146fabd3187d47ed24de011df7201824f26612e335c3d574b329de67467ee",
+      "change": "Portable project paths, analysis documentation and display messages.",
       "scientific_ast_unchanged": true,
       "execution_tested_after_port": false,
       "frozen_definitions_replayed": true,
       "full_training_script_executed": false,
       "previous_repository_path": "scripts/week9b_human_cross_species.py",
-      "previous_portable_sha256": "2fbfd7040fee5039c60d41c03d885ee9df5f7a6bf9b6164aa1452861d49d47c7",
-      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
+      "previous_portable_sha256": "2fbfd7040fee5039c60d41c03d885ee9df5f7a6bf9b6164aa1452861d49d47c7"
     }
   ]
 }

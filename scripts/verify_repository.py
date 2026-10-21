@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+from source_structure import science_hash
 
 ROOT = Path(__file__).resolve().parents[1]
 failures = []
@@ -64,6 +65,10 @@ def executable_hash(source):
 
 for row in changes["moves"]:
     path = ROOT / row["path"]
+    if row.get("archived_ref"):
+        if path.exists() or (ROOT / row["previous_path"]).exists():
+            failures.append("Archived preparation file remains in active tree: " + row["path"])
+        continue
     if not path.is_file() or sha(path) != row["sha256"]:
         failures.append("Source rename checksum: " + row["path"])
     elif row.get("executable_ast_sha256") and executable_hash(path.read_text()) != row["executable_ast_sha256"]:
@@ -91,6 +96,21 @@ for path in notebooks:
 if len(notebooks) != 10 or code_cells != 97:
     failures.append("Preprocessing notebook/cell inventory differs from 10/97")
 
+integrity = json.loads((ROOT / "metadata/source_integrity.json").read_text())
+if integrity.get("format") != "scientific-python-ast-v1":
+    failures.append("Unsupported scientific-source fingerprint format")
+for row in integrity["files"]:
+    path = ROOT / row["path"]
+    if not path.is_file() or sha(path) != row["sha256"]:
+        failures.append("Analysis source checksum mismatch: " + row["path"])
+    elif science_hash(path.read_text()) != row["scientific_ast_sha256"]:
+        failures.append("Scientific executable structure changed: " + row["path"])
+for row in integrity["notebooks"]:
+    notebook = json.loads((ROOT / row["path"]).read_text())
+    hashes = [science_hash("".join(cell.get("source", []))) for cell in notebook["cells"] if cell["cell_type"] == "code"]
+    if hashes != row["code_cell_hashes"]:
+        failures.append("Notebook scientific structure changed: " + row["path"])
+
 for path in (ROOT / "scripts").glob("*.py"):
     if re.search(r"week\d", path.name, re.I):
         failures.append("Development-stage active script name: " + path.name)
@@ -105,6 +125,6 @@ for folder in ["scripts", "notebooks", "docs"]:
 
 if failures:
     raise SystemExit("\n".join(failures))
-print("Public source names, original executable ASTs and source hashes: PASS")
+print("Analysis source checksums and executable structure: PASS")
 print("Preprocessing inventory: 10 notebooks / 97 cleared code cells")
 print("Active source/document personal-directory scan: PASS")

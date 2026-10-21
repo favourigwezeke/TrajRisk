@@ -27,19 +27,19 @@ logging.basicConfig(
 )
 log = logging.getLogger("TrajRisk-W8-Supp")
 
-# =============================================================================
+
 # CONFIGURATION
-# =============================================================================
+
 
 BASE = Path(__file__).resolve().parents[1]
 DATA_DIR = BASE / "Data" / "processed"
 RES_DIR  = BASE / "results"
 FIG_DIR  = BASE / "results" / "figures"
 
-HIGH_RISK_THRESHOLD = 0.10   # fixed in Week 6, never adjusted
+HIGH_RISK_THRESHOLD = 0.10   # fixed in graph inputs, never adjusted
 RANDOM_SEED         = 42
 
-# Best B1 XGBoost hyperparameters from Week 8 5-fold CV
+# Best B1 XGBoost hyperparameters from baseline and ablation analysis 5-fold CV
 # (logged as: "Best XGB params: n_estimators=500 max_depth=6 lr=0.05")
 XGB_BEST_PARAMS = dict(
     n_estimators=500, max_depth=6, learning_rate=0.05,
@@ -52,12 +52,12 @@ XGB_BEST_PARAMS = dict(
 MIN_POSITIVES = 5
 
 
-# =============================================================================
+
 # DATA LOADING
-# =============================================================================
+
 
 def load_inputs() -> Dict:
-    log.info("Loading Week 6-7 outputs...")
+    log.info("Loading graph inputs-7 outputs...")
 
     import torch
     td       = torch.load(DATA_DIR / "week6_training_data.pt", map_location="cpu")
@@ -98,17 +98,17 @@ def load_inputs() -> Dict:
     }
 
 
-# =============================================================================
+
 # B1 XGBOOST REFIT
-# =============================================================================
+
 
 def refit_b1_xgboost(data: Dict) -> np.ndarray:
     """
-    Refit the B1 XGBoost using the best hyperparameters from Week 8 CV.
-    Trains on the full train_idx (identical to Week 8 procedure).
+    Refit the B1 XGBoost using the best hyperparameters from baseline and ablation analysis CV.
+    Trains on the full train_idx (identical to baseline and ablation analysis procedure).
     Returns risk scores for all 6582 cells.
     """
-    log.info("Refitting B1 XGBoost (best Week 8 CV params, train on full train_idx)...")
+    log.info("Refitting B1 XGBoost (best baseline and ablation analysis CV params, train on full train_idx)...")
     X_all   = data["x"][:, :30]     # scVI 30D only (no XGBoost risk column)
     X_train = X_all[data["train_idx"]]
     y_train = data["train_y"]
@@ -123,9 +123,9 @@ def refit_b1_xgboost(data: Dict) -> np.ndarray:
     return scores
 
 
-# =============================================================================
+
 # METRIC COMPUTATION
-# =============================================================================
+
 
 def subset_metrics(
     y_cont:  np.ndarray,
@@ -172,9 +172,9 @@ def subset_metrics(
     }
 
 
-# =============================================================================
+
 # MAIN ANALYSIS
-# =============================================================================
+
 
 def run_analysis(data: Dict, b1_scores: np.ndarray) -> pd.DataFrame:
     vi  = data["val_idx"]
@@ -189,14 +189,14 @@ def run_analysis(data: Dict, b1_scores: np.ndarray) -> pd.DataFrame:
 
     rows: List[Dict] = []
 
-    # ── Global val (all timepoints) ───────────────────────────────────────────
+    # Global val (all timepoints)
     log.info("\n[A] Global val (all timepoints):")
     for mname, scores in methods.items():
         r = subset_metrics(val_y, scores, mname, "All val")
         rows.append(r)
         log.info(f"  {mname:<20} AUROC={r['auroc']:.4f}  AUPRC={r['auprc']:.4f}")
 
-    # ── Non-6h val (exclude 6h cells) ────────────────────────────────────────
+    # Non-6h val (exclude 6h cells)
     log.info("\n[B] Non-6h val (0h + 24h + 48h + 96h only):")
     mask_non6h = val_tp != "6h"
     y_non6h    = val_y[mask_non6h]
@@ -207,7 +207,7 @@ def run_analysis(data: Dict, b1_scores: np.ndarray) -> pd.DataFrame:
         rows.append(r)
         log.info(f"  {mname:<20} AUROC={r['auroc']:.4f}  AUPRC={r['auprc']:.4f}")
 
-    # ── Per-timepoint analysis ────────────────────────────────────────────────
+    # Per-timepoint analysis
     for tp in ["0h", "24h", "48h", "96h"]:
         mask   = val_tp == tp
         y_tp   = val_y[mask]
@@ -229,9 +229,9 @@ def run_analysis(data: Dict, b1_scores: np.ndarray) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-# =============================================================================
+
 # FIGURE
-# =============================================================================
+
 
 def make_within_timepoint_figure(df: pd.DataFrame) -> None:
     """
@@ -304,9 +304,9 @@ def make_within_timepoint_figure(df: pd.DataFrame) -> None:
     log.info(f"  Saved: {out.name}")
 
 
-# =============================================================================
+
 # PRINT SUMMARY TABLE
-# =============================================================================
+
 
 def print_summary_table(df: pd.DataFrame) -> None:
     log.info("\n" + "=" * 72)
@@ -350,13 +350,13 @@ def print_summary_table(df: pd.DataFrame) -> None:
                          f"TrajRisk fold over random: {fold:.1f}x")
 
 
-# =============================================================================
+
 # MAIN
-# =============================================================================
+
 
 def main() -> None:
     log.info("=" * 72)
-    log.info("TRAJRISK — WEEK 8 SUPPLEMENTARY ANALYSIS")
+    log.info("TRAJRISK — baseline and ablation analysis SUPPLEMENTARY ANALYSIS")
     log.info("=" * 72)
     log.info(f"Threshold: pseudotime_norm > {HIGH_RISK_THRESHOLD}")
     log.info(f"Min positives to report: {MIN_POSITIVES}")
@@ -378,7 +378,7 @@ def main() -> None:
     make_within_timepoint_figure(results)
 
     log.info("\n" + "=" * 72)
-    log.info("WEEK 8 SUPPLEMENTARY COMPLETE")
+    log.info("baseline and ablation analysis SUPPLEMENTARY COMPLETE")
     log.info("=" * 72)
     log.info("")
     log.info("Interpretation guide:")
@@ -389,9 +389,9 @@ def main() -> None:
     log.info("  If TrajRisk > Seeder on these metrics: graph propagation adds value")
     log.info("    beyond the initial expression-based risk seed.")
     log.info("  If XGBoost wins here too: the within-timepoint claim needs revision")
-    log.info("    and the paper argument shifts entirely to Week 9 generalization.")
+    log.info("    and the paper argument shifts entirely to external validation generalization.")
     log.info("")
-    log.info("→ Freeze Week 8. Move to Week 9: Cross-Dataset Validation.")
+    log.info("→ Freeze baseline and ablation analysis. Move to external validation: Cross-Dataset Validation.")
 
 
 if __name__ == "__main__":

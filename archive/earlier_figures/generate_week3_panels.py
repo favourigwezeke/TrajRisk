@@ -1,24 +1,8 @@
 #!/usr/bin/env python3
-"""
-Week 3 manuscript panels.
+"""Earlier TrajRisk analysis retained for source comparison.
 
-Generates:
-    figure_7_spatial.pdf / .svg / .png
-    figure_2bc_rf_performance.pdf / .svg / .png
-    supp_s14_conservation.pdf / .svg / .png
-
-Figure-only revisions:
-- Wider RF-performance figure and clean scale labels.
-- Spatial legends placed outside data regions.
-- Removed spot-level inferential annotation from Figure 7B.
-- Removed in-panel "Descriptive" annotation from Figure 7D.
-- S14A uses a neutral opacity legend.
-- S14B uses human APAP-ALF vs healthy log2 fold change directly.
-- S14B scale identities are shown with a separate legend rather than
-  overlapping gene rows.
-- S14B effect-size labels are removed because position already encodes effect.
-- S14B significance legend is placed outside the data region.
-- Mathematical labels use Matplotlib mathtext to prevent missing glyphs.
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
 import warnings
@@ -37,9 +21,9 @@ import numpy as np
 import pandas as pd
 
 
-# =============================================================================
+
 # PATHS
-# =============================================================================
+
 
 BASE = Path(__file__).resolve().parents[2]
 RES = BASE / "results"
@@ -47,9 +31,9 @@ FIGS = RES / "manuscript_figures"
 FIGS.mkdir(parents=True, exist_ok=True)
 
 
-# =============================================================================
+
 # STYLE
-# =============================================================================
+
 
 plt.rcParams.update({
     "font.family": "Arial",
@@ -148,9 +132,9 @@ def require_columns(
         )
 
 
-# =============================================================================
+
 # LOAD DATA
-# =============================================================================
+
 
 print("Loading data ...")
 
@@ -204,9 +188,9 @@ print(
 )
 
 
-# =============================================================================
+
 # FIGURE 7 — SPATIAL VALIDATION
-# =============================================================================
+
 
 print("Building Figure 7 ...")
 
@@ -541,9 +525,9 @@ save_fig(fig7, "figure_7_spatial")
 plt.close(fig7)
 
 
-# =============================================================================
+
 # FIGURE 2B–C — RF PERFORMANCE AND GAUSSIAN COMPARISON
-# =============================================================================
+
 
 print("Building Figure 2B+C ...")
 
@@ -743,9 +727,9 @@ save_fig(
 plt.close(fig_2bc)
 
 
-# =============================================================================
+
 # SUPPLEMENTARY S14 — CROSS-SPECIES CONSERVATION
-# =============================================================================
+
 
 print("Building Supplementary Figure S14 ...")
 
@@ -1241,5 +1225,5 @@ save_fig(
 plt.close(fig_s14)
 
 
-print("\nAll Week 3 panels complete.")
+print("\nAll scVI integration panels complete.")
 print(f"Output directory: {FIGS}")

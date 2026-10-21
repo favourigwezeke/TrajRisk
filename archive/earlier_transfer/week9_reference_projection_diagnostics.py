@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
-"""
-TrajRisk Week 9C — Reference Projection Diagnostics
-===================================================
+"""Earlier TrajRisk analysis retained for source comparison.
 
-Purpose:
-Diagnose whether external generalization failure is due to projection wiring,
-anchor choice, message strength, k-neighbors, or label definition.
-
-This is NOT for cherry-picking. It reports all tested settings.
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
 import json
@@ -434,7 +429,7 @@ def summarize(df):
 def main():
     t0 = time.time()
     log.info("=" * 72)
-    log.info("TRAJRISK WEEK 9C — REFERENCE PROJECTION DIAGNOSTICS")
+    log.info("TrajRisk reference projection diagnostics")
     log.info("=" * 72)
 
     data = load_data()

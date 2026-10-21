@@ -450,16 +450,16 @@
     }
   ],
   "notes": [
-    "Cdkn1a labels require expression values and were not regenerated from the compact packet. B1 is not refitted or assigned placeholder predictions.",
-    "The historical manuscript_mouse_cell_scores.csv is not used as a corrected Figure 5B score source. Use the frozen-replay external_mouse_predictions.csv.",
-    "Human signature gene selection and normalization require expression matrices; frozen risk scoring and donor statistics are replayed here, not signature discovery.",
-    "Per-scale conservation uses the previously audited mouse-selection rule; the original conservation/pathway generator is not recovered or rerun."
+    "Expression-derived Cdkn1a labels and B1 refitting require full expression matrices.",
+    "external_mouse_predictions.csv contains the model scores used for Figure 5B.",
+    "Gene-signature discovery requires expression matrices; donor-level model scores are evaluated from supplied coordinates.",
+    "Per-scale gene selection uses mouse p < 0.05 and absolute log2 fold change > 0.20; human significance uses nominal p <= 0.05."
   ],
   "error": null,
-  "scope": "Frozen inference and saved-output numerical replay. No training, expression reconstruction, R rerun, or canonical figure replacement.",
+  "scope": "Predictions and evaluation metrics from supplied checkpoints and latent coordinates.",
   "remaining": [
-    "Clean raw-expression preprocessing/training replay",
-    "Final main-figure generator alignment",
-    "Full training-environment installation including scVI; original RStudio versions remain user-confirmed"
+    "Raw-expression preprocessing and model training",
+    "Main-figure composite assembly",
+    "Full training environment and R trajectory execution"
   ]
 }

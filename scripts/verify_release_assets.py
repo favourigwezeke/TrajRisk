@@ -25,7 +25,7 @@ for p in active_tex:
     for group in re.findall(r'\\cite(?:\[[^\]]*\])?\{([^}]+)\}',p.read_text()):
         cited.update(k.strip() for k in group.split(','))
 if len(reference_keys)!=126 or len(reference_keys)!=len(set(reference_keys)) or set(reference_keys)!=cited:
-    failures.append('Reference matching differs from the 126-entry canonical bibliography')
+    failures.append('Reference matching differs from the 126-entry manuscript bibliography')
 methods=(paper/'sections/methods.tex').read_text()
 equations=len(re.findall(r'\\begin\{equation\}',methods))
 if equations!=26:

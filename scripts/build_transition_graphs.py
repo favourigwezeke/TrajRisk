@@ -5,7 +5,7 @@ Run from the project root with the processed Walesky reference in Data/processed
 Outputs include sparse transition matrices, graph tensors and reference cell order.
 """
 
-# ─── Standard library ────────────────────────────────────────────────────────
+# Standard library
 import os
 import json
 import time
@@ -14,27 +14,27 @@ import warnings
 from pathlib import Path
 from typing import Dict, List, Tuple, Any, Optional
 
-# ─── Scientific computing ─────────────────────────────────────────────────────
+# Scientific computing
 import numpy as np
 import pandas as pd
 from scipy import sparse
 from scipy.spatial.distance import cdist
 from scipy.stats import entropy as scipy_entropy, pearsonr
 
-# ─── Machine learning ─────────────────────────────────────────────────────────
+# Machine learning
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.metrics import roc_auc_score, average_precision_score
 from sklearn.neighbors import NearestNeighbors
 import joblib
 
-# ─── Single-cell analysis ─────────────────────────────────────────────────────
+# Single-cell analysis
 import scanpy as sc
 
-# ─── Deep learning graph format ───────────────────────────────────────────────
+# Deep learning graph format
 import torch
 
-# ─── Plotting ─────────────────────────────────────────────────────────────────
+# Plotting
 import matplotlib
 matplotlib.use("Agg")  # non-interactive backend (safe for scripts)
 import matplotlib.pyplot as plt
@@ -48,12 +48,9 @@ logging.basicConfig(
 )
 log = logging.getLogger("TrajRisk-W5")
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 0: CONFIGURATION
+# CONFIGURATION
 # All parameters are centralised here. If any biological assumption changes,
 # only this section needs to be updated.
-# ═════════════════════════════════════════════════════════════════════════════
 
 # Project root — adjust if directory structure differs
 BASE = Path(__file__).resolve().parents[1]
@@ -65,7 +62,7 @@ RES_DIR   = BASE / "results"
 for _d in [DATA_DIR, MODEL_DIR, FIG_DIR, RES_DIR]:
     _d.mkdir(parents=True, exist_ok=True)
 
-# ── Temporal scales ──────────────────────────────────────────────────────────
+# Temporal scales
 # Each tuple: (source_timepoint, target_timepoint, delta_hours, scale_name)
 # Calibrated to known APAP biology (Walesky et al. 2020, Umbaugh et al. 2022)
 SCALES: List[Tuple[str, str, int, str]] = [
@@ -80,14 +77,14 @@ TIMEPOINT_HOURS: Dict[str, int] = {
     "0h": 0, "6h": 6, "24h": 24, "48h": 48, "96h": 96,
 }
 
-# ── k-NN for positive transition labeling ────────────────────────────────────
-# k=15 matches the n_neighbors=15 used in Monocle3 (Week 4) and the
-# standard UMAP/Leiden graph construction in Scanpy (Week 2). Keeping this
+# k-NN for positive transition labeling
+# k=15 matches the n_neighbors=15 used in Monocle3 (trajectory inference) and the
+# standard UMAP/Leiden graph construction in Scanpy (preprocessing). Keeping this
 # consistent ensures that our transition labels are coherent with the
 # trajectory structure already inferred.
 K_NEIGHBORS: int = 15
 
-# ── Random Forest hyperparameters ─────────────────────────────────────────────
+# Random Forest hyperparameters
 # n_estimators=200: more trees give better probability calibration and
 #   more stable feature importances. 200 is sufficient for 66 features.
 # max_depth=15: deep enough to model complex interactions between scVI
@@ -109,7 +106,7 @@ RF_PARAMS: Dict[str, Any] = {
     "oob_score":        True,
 }
 
-# ── Transition matrix construction ───────────────────────────────────────────
+# Transition matrix construction
 # RAW_PROB_THRESHOLD is applied to the RF's raw predicted probabilities
 # BEFORE any row normalization. This is the critical order of operations.
 #
@@ -143,10 +140,7 @@ BATCH_SIZE_BUILD: int = 100
 RANDOM_SEED: int = 42
 np.random.seed(RANDOM_SEED)
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 1: LOAD AND EXTRACT WALESKY DATA
-# ═════════════════════════════════════════════════════════════════════════════
+# LOAD AND EXTRACT WALESKY DATA
 
 def detect_column(obs: pd.DataFrame, candidates: List[str], role: str) -> str:
     """
@@ -198,7 +192,7 @@ def load_walesky_data() -> Tuple[sc.AnnData, pd.DataFrame]:
 
     # Verify scVI latent space is present
     if "X_scvi" not in walesky.obsm:
-        raise ValueError("X_scvi not found in walesky.obsm. Run Week 3 first.")
+        raise ValueError("X_scvi not found in walesky.obsm. Run scVI integration first.")
     log.info(f"  scVI latent: {walesky.obsm['X_scvi'].shape}")
 
     # Verify pseudotime is present and fully populated
@@ -236,10 +230,7 @@ def load_walesky_data() -> Tuple[sc.AnnData, pd.DataFrame]:
 
     return walesky, cell_index
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 2: PSEUDOTIME NORMALISATION
-# ═════════════════════════════════════════════════════════════════════════════
+# PSEUDOTIME NORMALISATION
 
 def normalize_pseudotime(
     cell_index: pd.DataFrame,
@@ -257,7 +248,7 @@ def normalize_pseudotime(
     The normalised values are used as:
       (a) Node features 64-65 in the RF feature vector — encoding where
           each cell sits in the injury-compensation trajectory
-      (b) The GNN continuous risk label in Week 7 — pseudotime_norm × APAP
+      (b) The GNN continuous risk label in reference model — pseudotime_norm × APAP
           treatment indicator gives a smooth, biologically grounded risk
           target that the GNN is trained to predict and propagate
 
@@ -295,10 +286,7 @@ def normalize_pseudotime(
 
     return pt_norm
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 3: TRAINING DATA GENERATION
-# ═════════════════════════════════════════════════════════════════════════════
+# TRAINING DATA GENERATION
 
 def find_knn_positive_mask(
     scvi_source: np.ndarray,
@@ -315,7 +303,7 @@ def find_knn_positive_mask(
     plausible biological successors.
 
     We use k=15 to match the neighbour count used in Monocle3 graph
-    construction (Week 4), maintaining consistency across the pipeline.
+    construction (trajectory inference), maintaining consistency across the pipeline.
 
     Parameters
     ----------
@@ -523,10 +511,7 @@ def generate_scale_training_data(
 
     return X_train, y_train
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 4: RANDOM FOREST TRAINING
-# ═════════════════════════════════════════════════════════════════════════════
+# RANDOM FOREST TRAINING
 
 def train_rf_model(
     X_train: np.ndarray,
@@ -563,7 +548,7 @@ def train_rf_model(
     """
     log.info(f"  Training RF: {X_train.shape[0]:,} pairs × {X_train.shape[1]} features")
 
-    # ── Cross-validation (for reporting) ─────────────────────────────────
+    # Cross-validation (for reporting)
     cv = StratifiedKFold(n_splits=n_cv_folds, shuffle=True, random_state=RANDOM_SEED)
     rf_cv = RandomForestClassifier(**RF_PARAMS)
 
@@ -576,21 +561,21 @@ def train_rf_model(
 
     if cv_auroc.mean() < 0.70:
         log.warning(
-            f"  ⚠ CV AUROC < 0.70 for {scale_name}. "
+            f"   CV AUROC < 0.70 for {scale_name}. "
             "The RF may not have learned strong transition patterns. "
             "Check that scVI latent space separates timepoints."
         )
     elif cv_auroc.mean() >= 0.85:
-        log.info(f"  ✓ Strong RF transition learning for {scale_name}.")
+        log.info(f"   Strong RF transition learning for {scale_name}.")
 
-    # ── Final model trained on all data ──────────────────────────────────
+    # Final model trained on all data
     log.info("  Training final RF on all data...")
     t0 = time.time()
     rf = RandomForestClassifier(**RF_PARAMS)
     rf.fit(X_train, y_train)
     log.info(f"  Done in {time.time()-t0:.1f}s | OOB accuracy: {rf.oob_score_:.4f}")
 
-    # Feature importance summary (helps interpret the model in Week 8)
+    # Feature importance summary (helps interpret the model in baseline and ablation analysis)
     feature_names = (
         [f"scvi_src_{i}" for i in range(30)] +
         [f"scvi_tgt_{i}" for i in range(30)] +
@@ -607,10 +592,7 @@ def train_rf_model(
 
     return rf, cv_auroc
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 5: TRANSITION MATRIX CONSTRUCTION
-# ═════════════════════════════════════════════════════════════════════════════
+# TRANSITION MATRIX CONSTRUCTION
 
 def build_transition_matrix(
     source_tp: str,
@@ -634,7 +616,7 @@ def build_transition_matrix(
       ∑_j  T[i, j] = 1   for all source cells i
 
     The matrix uses GLOBAL Walesky cell indices (0..6581), directly
-    compatible with the PyTorch Geometric GNN in Week 6.
+    compatible with the PyTorch Geometric GNN in graph inputs.
 
     Memory management:
     We process source cells in batches of `batch_size` (default 100).
@@ -727,7 +709,7 @@ def build_transition_matrix(
         # Reshape to (n_b, n_tgt): one row per source cell in this batch.
         probs_raw = probs_b.reshape(n_b, n_tgt)   # raw RF probabilities, kept for fallback
 
-        # ── CRITICAL: threshold on RAW probabilities BEFORE normalization ──
+        # CRITICAL: threshold on RAW probabilities BEFORE normalization
         # Row-normalizing first is the wrong order. With n_tgt=419, even a
         # strong positive pair (RF prob ≈ 0.85) gets divided by ~25 after
         # normalization → becomes ~0.034, below any useful cutoff.
@@ -747,7 +729,7 @@ def build_transition_matrix(
                 top_idx = np.argpartition(probs_raw[local_i], -top_k_fallback)[-top_k_fallback:]
                 probs_2d[local_i, top_idx] = probs_raw[local_i, top_idx]
 
-        # ── Row-normalise AFTER thresholding ──────────────────────────────
+        # Row-normalise AFTER thresholding
         # Now the surviving entries are the biologically plausible transitions.
         # Normalizing makes each source cell's outgoing probabilities sum to 1,
         # which is required for a proper stochastic transition matrix.
@@ -758,7 +740,7 @@ def build_transition_matrix(
         # Final cleanup: drop any residual near-zero floating-point entries
         probs_2d[probs_2d < EDGE_PROB_THRESHOLD] = 0.0
 
-        # ── Accumulate non-zero entries in COO format ─────────────────────
+        # Accumulate non-zero entries in COO format
         for local_i in range(n_b):
             global_src_i  = b_global[local_i]
             row_probs     = probs_2d[local_i]      # (n_tgt,)
@@ -789,10 +771,7 @@ def build_transition_matrix(
 
     return T
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 6: VALIDATION
-# ═════════════════════════════════════════════════════════════════════════════
+# VALIDATION
 
 def validate_stochasticity(
     T: sparse.csr_matrix,
@@ -823,7 +802,7 @@ def validate_stochasticity(
 
     if pct_valid < 95.0:
         log.warning(
-            f"  ⚠ Only {pct_valid:.1f}% of rows are near-stochastic. "
+            f"   Only {pct_valid:.1f}% of rows are near-stochastic. "
             "Consider lowering EDGE_PROB_THRESHOLD."
         )
 
@@ -929,9 +908,9 @@ def compare_with_gaussian_baseline(
     1. Sparsity — learned transitions should be sparser (more selective)
     2. Row-wise Pearson correlation — low correlation means the RF
        learned DIFFERENT structure from a simple distance-based kernel,
-       which is the primary motivation for Week 8 Ablation 1.
+       which is the primary motivation for baseline and ablation analysis Ablation 1.
 
-    This foreshadows the Week 8 ablation study comparing TrajRisk (learned
+    This foreshadows the baseline and ablation analysis ablation study comparing TrajRisk (learned
     transitions) versus a Gaussian propagation baseline.
 
     Parameters
@@ -995,10 +974,7 @@ def compare_with_gaussian_baseline(
 
     return comparison
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 7: PYTORCH GEOMETRIC CONVERSION
-# ═════════════════════════════════════════════════════════════════════════════
+# PYTORCH GEOMETRIC CONVERSION
 
 def matrix_to_pyg_edges(
     T: sparse.csr_matrix,
@@ -1018,7 +994,7 @@ def matrix_to_pyg_edges(
     Only entries above EDGE_PROB_THRESHOLD are included (guaranteed by
     the matrix construction step, but we verify here for safety).
 
-    These tensors will be passed directly to the GNN in Week 6 as the
+    These tensors will be passed directly to the GNN in graph inputs as the
     multi-scale graph structure.
 
     Parameters
@@ -1050,7 +1026,7 @@ def matrix_to_pyg_edges(
 
     if n_edges == 0:
         log.warning(
-            f"  ⚠ PyG — {scale_name}: 0 edges. "
+            f"   PyG — {scale_name}: 0 edges. "
             "Transition matrix is empty. This should not happen after the "
             "raw-probability threshold fix. Check build_transition_matrix output."
         )
@@ -1062,10 +1038,7 @@ def matrix_to_pyg_edges(
 
     return edge_index, edge_weight
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 8: VALIDATION FIGURES
-# ═════════════════════════════════════════════════════════════════════════════
+# VALIDATION FIGURES
 
 def make_validation_figures(
     all_results: Dict,
@@ -1092,11 +1065,11 @@ def make_validation_figures(
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     fig.suptitle(
-        "TrajRisk Week 5 — Transition Matrix Validation",
+        "TrajRisk transition graphs — Transition Matrix Validation",
         fontsize=14, fontweight="bold", y=1.01
     )
 
-    # ── A: CV AUROC per scale ─────────────────────────────────────────────
+    # A: CV AUROC per scale
     ax = axes[0, 0]
     auroc_means = [all_results[sn]["cv_auroc_mean"] for sn in scale_names]
     auroc_stds  = [all_results[sn]["cv_auroc_std"]  for sn in scale_names]
@@ -1111,7 +1084,7 @@ def make_validation_figures(
     for i, (m, s) in enumerate(zip(auroc_means, auroc_stds)):
         ax.text(i, m + s + 0.01, f"{m:.3f}", ha="center", fontsize=8)
 
-    # ── B: Sparsity comparison ─────────────────────────────────────────────
+    # B: Sparsity comparison
     ax = axes[0, 1]
     learned_sp = [all_results[sn]["gaussian_comparison"]["learned_sparsity_pct"]
                   for sn in scale_names]
@@ -1125,7 +1098,7 @@ def make_validation_figures(
     ax.set_title("B  Learned vs Gaussian Sparsity")
     ax.legend(fontsize=9)
 
-    # ── C: Transition entropy by source timepoint ──────────────────────────
+    # C: Transition entropy by source timepoint
     ax = axes[1, 0]
     src_tps   = [s[0] for s in SCALES]           # source timepoints
     ent_means = [all_results[sn]["entropy"]["entropy_mean"] for sn in scale_names]
@@ -1138,7 +1111,7 @@ def make_validation_figures(
     ax.set_ylabel("Transition Entropy (nats)")
     ax.set_title("C  Transition Diversity by Source Timepoint")
 
-    # ── D: Pseudotime distribution by timepoint (violin) ──────────────────
+    # D: Pseudotime distribution by timepoint (violin)
     ax = axes[1, 1]
     plot_data = cell_index.copy()
     plot_data = plot_data[plot_data["timepoint_str"].isin(tp_order)]
@@ -1163,10 +1136,7 @@ def make_validation_figures(
     plt.close()
     log.info(f"  Figure saved: {out}")
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 9: SAVE ALL OUTPUTS
-# ═════════════════════════════════════════════════════════════════════════════
+# SAVE ALL OUTPUTS
 
 def save_all_outputs(
     walesky: sc.AnnData,
@@ -1178,7 +1148,7 @@ def save_all_outputs(
     all_results: Dict,
 ) -> None:
     """
-    Persist all Week 5 outputs to disk.
+    Persist all transition graphs outputs to disk.
 
     Output inventory:
     ├── models/
@@ -1210,7 +1180,7 @@ def save_all_outputs(
     torch.save(all_pyg_graphs, pyg_path)
     log.info(f"  Saved PyG graphs: {pyg_path.name}")
 
-    # 4. Cell index table (critical for Week 6 node feature assembly)
+    # 4. Cell index table (critical for graph inputs node feature assembly)
     idx_path = DATA_DIR / "walesky_cell_index.csv"
     cell_index.to_csv(idx_path, index=True)
     log.info(f"  Saved cell index: {idx_path.name}")
@@ -1255,14 +1225,11 @@ def save_all_outputs(
         json.dump(summary, f, indent=2, default=str)
     log.info(f"  Saved summary: {summary_path.name}")
 
-
-# ═════════════════════════════════════════════════════════════════════════════
 # MAIN EXECUTION
-# ═════════════════════════════════════════════════════════════════════════════
 
 def main() -> None:
     log.info("=" * 70)
-    log.info("TRAJRISK — WEEK 5: LEARNABLE TRANSITION MATRICES")
+    log.info("TRAJRISK — transition graphs: LEARNABLE TRANSITION MATRICES")
     log.info("=" * 70)
     log.info(f"Base directory : {BASE}")
     log.info(f"Temporal scales: {len(SCALES)}")
@@ -1270,12 +1237,12 @@ def main() -> None:
     log.info(f"Edge threshold : {EDGE_PROB_THRESHOLD}")
     t_global_start = time.time()
 
-    # ── Load data ─────────────────────────────────────────────────────────
+    # Load data
     log.info("\n[1/9] Loading Walesky data...")
     walesky, cell_index = load_walesky_data()
     walesky_scvi = walesky.obsm["X_scvi"].astype(np.float32)
 
-    # ── Normalise pseudotime ──────────────────────────────────────────────
+    # Normalise pseudotime
     log.info("\n[2/9] Normalising pseudotime to [0, 1]...")
     pt_norm = normalize_pseudotime(cell_index)
 
@@ -1285,7 +1252,7 @@ def main() -> None:
     all_pyg_graphs: Dict[str, Dict]                    = {}
     all_results:    Dict[str, Dict]                    = {}
 
-    # ── Process each temporal scale ───────────────────────────────────────
+    # Process each temporal scale
     for scale_idx, (source_tp, target_tp, delta_hours, scale_name) in enumerate(SCALES):
         log.info(f"\n{'─'*70}")
         log.info(f"[Scale {scale_idx+1}/4] {scale_name}: {source_tp} → {target_tp}  (Δt={delta_hours}h)")
@@ -1298,7 +1265,7 @@ def main() -> None:
             "delta_hours": delta_hours,
         }
 
-        # ── Step A: Generate training data ────────────────────────────────
+        # Step A: Generate training data
         log.info("[A] Generating training data...")
         X_train, y_train = generate_scale_training_data(
             source_tp=source_tp, target_tp=target_tp,
@@ -1308,7 +1275,7 @@ def main() -> None:
         scale_results["n_training_pairs"] = int(len(y_train))
         scale_results["positive_rate_pct"] = float(y_train.mean() * 100)
 
-        # ── Step B: Train Random Forest ───────────────────────────────────
+        # Step B: Train Random Forest
         log.info("[B] Training Random Forest...")
         rf, cv_auroc = train_rf_model(X_train, y_train, scale_name)
         scale_results["cv_auroc_mean"] = float(cv_auroc.mean())
@@ -1320,7 +1287,7 @@ def main() -> None:
         # Free training data — not needed after RF is trained
         del X_train, y_train
 
-        # ── Step C: Build transition matrix ──────────────────────────────
+        # Step C: Build transition matrix
         log.info("[C] Building transition matrix...")
         T = build_transition_matrix(
             source_tp=source_tp, target_tp=target_tp,
@@ -1331,7 +1298,7 @@ def main() -> None:
         all_matrices[scale_name] = T
         scale_results["nnz"] = int(T.nnz)
 
-        # ── Step D: Validate ──────────────────────────────────────────────
+        # Step D: Validate
         log.info("[D] Validating...")
         src_mask   = cell_index["timepoint_str"] == source_tp
         tgt_mask   = cell_index["timepoint_str"] == target_tp
@@ -1350,7 +1317,7 @@ def main() -> None:
         scale_results["entropy"]            = entropy_metrics
         scale_results["gaussian_comparison"] = gauss_compare
 
-        # ── Step E: Convert to PyG format ─────────────────────────────────
+        # Step E: Convert to PyG format
         log.info("[E] Converting to PyTorch Geometric format...")
         edge_index, edge_weight = matrix_to_pyg_edges(T, scale_name, walesky.n_obs)
 
@@ -1368,17 +1335,17 @@ def main() -> None:
 
         t_scale = time.time() - t_scale_start
         log.info(
-            f"  ✓ {scale_name} done in {t_scale/60:.1f}min | "
+            f"   {scale_name} done in {t_scale/60:.1f}min | "
             f"CV AUROC={cv_auroc.mean():.4f} | "
             f"NNZ={T.nnz:,} | "
             f"PyG edges={edge_index.shape[1]:,}"
         )
 
-    # ── Figures ───────────────────────────────────────────────────────────
+    # Figures
     log.info("\n[3/9] Generating validation figures...")
     make_validation_figures(all_results, cell_index, pt_norm)
 
-    # ── Save everything ───────────────────────────────────────────────────
+    # Save everything
     log.info("\n[4/9] Saving all outputs...")
     save_all_outputs(
         walesky=walesky, pt_norm=pt_norm,
@@ -1387,10 +1354,10 @@ def main() -> None:
         all_results=all_results,
     )
 
-    # ── Final summary ─────────────────────────────────────────────────────
+    # Final summary
     t_total = time.time() - t_global_start
     log.info("\n" + "=" * 70)
-    log.info("WEEK 5 COMPLETE")
+    log.info("transition graphs COMPLETE")
     log.info("=" * 70)
     log.info(f"Total runtime: {t_total/60:.1f} minutes")
     log.info("")
@@ -1421,8 +1388,8 @@ def main() -> None:
     log.info(f"  {RES_DIR}/week5_transition_summary.json")
     log.info(f"  {FIG_DIR}/week5_transition_validation.png")
     log.info("")
-    log.info("→ Week 5 outputs are the inputs to Week 6 (GNN Architecture).")
-    log.info("  Load multiscale_graphs.pt and walesky_cell_index.csv in Week 6.")
+    log.info("→ transition graphs outputs are the inputs to graph inputs (GNN Architecture).")
+    log.info("  Load multiscale_graphs.pt and walesky_cell_index.csv in graph inputs.")
 
 
 if __name__ == "__main__":

@@ -1,69 +1,11 @@
 #!/usr/bin/env python3
-"""
-TrajRisk — Week 9 Script 1: Mouse Cross-Dataset Validation
-===========================================================
-Project : TrajRisk — Trajectory-Informed Risk in APAP Hepatotoxicity
-Journal : Cell Reports Methods
+"""Earlier TrajRisk analysis retained for source comparison.
 
-What this script does
----------------------
-Applies the Walesky-trained TrajRisk model to three independent mouse datasets
-to test whether the learned risk representation generalises beyond the training
-data. No re-training occurs. No pseudotime inference is re-run.
-
-Validation tests
-----------------
-T0  Walesky held-out validation (Week 7/8 reference numbers, reproduced here
-    for direct comparison with T1-T3 in the same table)
-
-T1  Ben-Moshe (Zenodo 6035873) — different laboratory, 10x Chromium platform
-    Label: treatment == 'APAP' (771 cells at 48h/72h) vs
-           treatment == 'Control' (1,999 cells at 0h)
-    Question: does TrajRisk generalise across labs and sequencing platforms?
-
-T2  Umbaugh 2h (GSE200771) — timepoint never seen during training
-    Label: treatment == 'APAP' (13,502 cells at 2h) vs
-           treatment == 'Control' (7,907 cells at 0h)
-    Question: can TrajRisk detect early injury at 2h before peak activation?
-
-T3  Umbaugh 48h/72h (GSE255834) — p21-sorted hepatocytes (mechanistic)
-    Label A: Cdkn1a expression > median vs <= median (n=5,306 total)
-    Label B: treatment == 'APAP' (2,978) vs treatment == 'Control' (2,328)
-    Question: do p21/Cdkn1a-high cells receive elevated trajectory risk?
-
-All column names, treatment values, and dataset labels were confirmed by a
-pre-run diagnostic before writing this script:
-    treatment values : 'APAP', 'Control'  (exact strings, no variants)
-    dataset labels   : 'Ben_Moshe', 'Umbaugh_2h', 'Umbaugh_48h72h', 'Walesky'
-    cell_index cols  : 'treatment_str', 'timepoint_str', 'hours', 'global_idx'
-
-How non-Walesky cells are processed by TrajRiskGNN
----------------------------------------------------
-The Walesky transition graph connects cells at positions 0-6581 in the node
-tensor.  Validation cells are appended at positions 6582+.  Since no edge in
-any scale points TO a validation cell, TrajRiskConv reduces to:
-
-    agg_i = 0   (no incoming messages)
-    h_i    = W_nbr(0) + W_self(x_i)  =  W_self(x_i)   [W_nbr has bias=False]
-
-This is the W_self feature-to-risk pathway.  BatchNorm in eval() mode uses
-running statistics from Walesky training.  This is described in the Methods
-as "cross-dataset feature-space transfer", NOT "trajectory graph propagation".
-
-Methods compared
-----------------
-    TrajRisk   — AUROC-best Week 7 checkpoint (W_self path for external cells)
-    Seeder     — Week 6 XGBClassifier (0h vs 6h only), no graph, no trajectory
-    B1 XGBoost — Week 8 XGBRegressor (scVI → pseudotime_norm, expression-only)
-
-Usage
------
-    conda activate trajrisk
-    cd /path/to/TrajRisk
-    python scripts/week9_mouse_cross_dataset.py
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
-# ── Standard library ──────────────────────────────────────────────────────────
+# Standard library
 import json
 import logging
 import time
@@ -71,7 +13,7 @@ import warnings
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-# ── Third-party ───────────────────────────────────────────────────────────────
+# Third-party
 import joblib
 import numpy as np
 import pandas as pd
@@ -97,9 +39,9 @@ logging.basicConfig(
 log = logging.getLogger("W9-Mouse")
 
 
-# =============================================================================
+
 # 0.  PATHS AND CONSTANTS
-# =============================================================================
+
 
 BASE = Path(__file__).resolve().parents[2]
 DATA     = BASE / "Data" / "processed"
@@ -117,7 +59,7 @@ MIN_POS        = 5          # minimum positives required to report a metric
 HIGH_RISK_THR  = 0.10       # pseudotime_norm threshold for Walesky binary label
 CDKN1A_GENE    = "Cdkn1a"  # confirmed present in var_names by diagnostic
 
-# B1 XGBoost best params from Week 8 5-fold CV
+# B1 XGBoost best params from baseline and ablation analysis 5-fold CV
 XGB_B1_PARAMS = dict(
     n_estimators=500, max_depth=6, learning_rate=0.05,
     subsample=0.8, colsample_bytree=0.8,
@@ -132,7 +74,7 @@ SCALE_NAMES = [
     "Scale4_Resolution",
 ]
 
-# Architecture constants — must match Week 7 exactly
+# Architecture constants — must match reference model exactly
 NODE_DIM   = 31
 HIDDEN_DIM = 64
 N_SCALES   = 4
@@ -142,9 +84,9 @@ torch.manual_seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
-# =============================================================================
-# 1.  MODEL CLASSES  (exact copies from Week 7 — do not modify)
-# =============================================================================
+
+# 1.  MODEL CLASSES  (exact copies from reference model — do not modify)
+
 
 class TrajRiskConv(MessagePassing):
     """Directed, edge-weighted graph convolution with residual self-loop."""
@@ -202,9 +144,9 @@ class TrajRiskGNN(nn.Module):
         return self.fusion_mlp(torch.cat(parts, dim=1)).squeeze(-1)
 
 
-# =============================================================================
+
 # 2.  LOAD AND VERIFY ALL DATA
-# =============================================================================
+
 
 def load_and_verify() -> Dict:
     """
@@ -215,7 +157,7 @@ def load_and_verify() -> Dict:
     log.info("LOADING AND VERIFYING ALL DATA")
     log.info("=" * 68)
 
-    # ── Integrated AnnData ───────────────────────────────────────────────────
+    # Integrated AnnData
     h5ad = DATA / "adata_integrated_with_trajectory.h5ad"
     log.info(f"  Loading {h5ad.name} ...")
     adata = sc.read_h5ad(str(h5ad))
@@ -223,12 +165,12 @@ def load_and_verify() -> Dict:
     assert "X_scvi" in adata.obsm,   "X_scvi missing from adata.obsm"
     assert adata.obsm["X_scvi"].shape == (36_067, 30), \
         f"X_scvi shape mismatch: {adata.obsm['X_scvi'].shape}"
-    log.info(f"  adata: {adata.n_obs:,} cells × {adata.n_vars:,} genes  ✓")
-    log.info(f"  X_scvi: {adata.obsm['X_scvi'].shape}  ✓")
+    log.info(f"  adata: {adata.n_obs:,} cells × {adata.n_vars:,} genes  ")
+    log.info(f"  X_scvi: {adata.obsm['X_scvi'].shape}  ")
     assert CDKN1A_GENE in adata.var_names, f"{CDKN1A_GENE} not in var_names"
-    log.info(f"  {CDKN1A_GENE} in var_names  ✓")
+    log.info(f"  {CDKN1A_GENE} in var_names  ")
 
-    # ── Dataset counts (confirm match with diagnostic) ───────────────────────
+    # Dataset counts (confirm match with diagnostic)
     ds_counts = adata.obs["dataset"].value_counts()
     log.info(f"  Dataset counts:\n{ds_counts.to_string()}")
     assert ds_counts["Walesky"]        == 6_582
@@ -236,14 +178,14 @@ def load_and_verify() -> Dict:
     assert ds_counts["Umbaugh_48h72h"] == 5_306
     assert ds_counts["Ben_Moshe"]      == 2_770
 
-    # ── Treatment value cross-check per dataset ──────────────────────────────
+    # Treatment value cross-check per dataset
     for ds in ["Ben_Moshe", "Umbaugh_2h", "Umbaugh_48h72h"]:
         vals = set(adata.obs.loc[adata.obs["dataset"] == ds, "treatment"].unique())
         assert vals == {"APAP", "Control"}, \
             f"Unexpected treatment values in {ds}: {vals}"
-    log.info("  Treatment values {'APAP', 'Control'} confirmed for all validation datasets  ✓")
+    log.info("  Treatment values {'APAP', 'Control'} confirmed for all validation datasets  ")
 
-    # ── Walesky cell index ────────────────────────────────────────────────────
+    # Walesky cell index
     ci_path = DATA / "walesky_cell_index.csv"
     cell_index = pd.read_csv(ci_path, index_col=0)
     assert len(cell_index) == 6_582, \
@@ -251,15 +193,15 @@ def load_and_verify() -> Dict:
     required_cols = {"global_idx", "timepoint_str", "hours", "treatment_str"}
     missing = required_cols - set(cell_index.columns)
     assert not missing, f"cell_index missing columns: {missing}"
-    log.info(f"  walesky_cell_index.csv: {len(cell_index):,} rows  ✓")
+    log.info(f"  walesky_cell_index.csv: {len(cell_index):,} rows  ")
 
-    # ── Walesky node features ─────────────────────────────────────────────────
+    # Walesky node features
     x_walesky = torch.load(DATA / "week6_node_features.pt", map_location="cpu")
     assert x_walesky.shape == (6_582, 31), \
         f"x_walesky shape mismatch: {x_walesky.shape}"
-    log.info(f"  x_walesky: {tuple(x_walesky.shape)}  ✓")
+    log.info(f"  x_walesky: {tuple(x_walesky.shape)}  ")
 
-    # ── Alignment check: scVI in x_walesky vs adata.obsm['X_scvi'] ───────────
+    # Alignment check: scVI in x_walesky vs adata.obsm['X_scvi']
     # We verify the first 5 Walesky barcodes match between cell_index and adata
     adata_wal_mask = adata.obs["dataset"] == "Walesky"
     adata_wal_barcodes = set(adata.obs_names[adata_wal_mask])
@@ -267,9 +209,9 @@ def load_and_verify() -> Dict:
     overlap = ci_barcodes & adata_wal_barcodes
     assert len(overlap) >= 40, \
         f"cell_index barcodes not found in adata (only {len(overlap)}/50 match)"
-    log.info(f"  scVI barcode alignment: {len(overlap)}/50 cell_index barcodes in adata  ✓")
+    log.info(f"  scVI barcode alignment: {len(overlap)}/50 cell_index barcodes in adata  ")
 
-    # ── Transition graphs ─────────────────────────────────────────────────────
+    # Transition graphs
     graphs   = torch.load(DATA / "multiscale_graphs.pt", map_location="cpu")
     for sn in SCALE_NAMES:
         assert sn in graphs, f"Scale {sn} missing from multiscale_graphs.pt"
@@ -280,9 +222,9 @@ def load_and_verify() -> Dict:
         assert ei.max().item() <= 6_581, \
             f"Scale {s} edge_index out of range: max={ei.max().item()}"
     total_edges = sum(e.shape[1] for e in edge_indices)
-    log.info(f"  Transition graphs: 4 scales, {total_edges:,} total edges  ✓")
+    log.info(f"  Transition graphs: 4 scales, {total_edges:,} total edges  ")
 
-    # ── TrajRisk model checkpoint ─────────────────────────────────────────────
+    # TrajRisk model checkpoint
     ckpt_path = MODELS / "week7_trajrisk_FINAL.pt"
     if not ckpt_path.exists():
         ckpt_path = MODELS / "week7_trajrisk_BEST_AUROC.pt"
@@ -291,33 +233,33 @@ def load_and_verify() -> Dict:
     model = TrajRiskGNN().to(DEVICE)
     model.load_state_dict(ckpt["model_state_dict"])
     model.eval()
-    log.info(f"  TrajRisk model: {ckpt_path.name}  ✓")
+    log.info(f"  TrajRisk model: {ckpt_path.name}  ")
 
-    # ── Seeder (Week 6 XGBClassifier) ────────────────────────────────────────
+    # Seeder (graph inputs XGBClassifier)
     seeder = joblib.load(MODELS / "week6_xgboost_model.pkl")
-    log.info("  Seeder (Week 6 XGBClassifier)  ✓")
+    log.info("  Seeder (graph inputs XGBClassifier)  ")
 
-    # ── Seeder risk scores for Walesky cells ──────────────────────────────────
+    # Seeder risk scores for Walesky cells
     seeder_walesky = np.load(DATA / "week6_xgboost_risk.npy")
     assert seeder_walesky.shape == (6_582,), \
         f"seeder_walesky shape: {seeder_walesky.shape}"
-    log.info(f"  seeder_walesky: {seeder_walesky.shape}  ✓")
+    log.info(f"  seeder_walesky: {seeder_walesky.shape}  ")
 
-    # ── Week 7 TrajRisk predictions for Walesky cells ────────────────────────
+    # reference model TrajRisk predictions for Walesky cells
     preds_w7 = pd.read_csv(DATA / "week7_predictions.csv", index_col=0)
     assert len(preds_w7) == 6_582, \
         f"week7_predictions expected 6,582 rows, got {len(preds_w7)}"
     assert "risk_predicted" in preds_w7.columns
     trajrisk_walesky = preds_w7["risk_predicted"].values.astype(np.float32)
-    log.info(f"  week7_predictions: {len(preds_w7):,} rows  ✓")
+    log.info(f"  week7_predictions: {len(preds_w7):,} rows  ")
 
-    # ── Training split (for T0 reference and B1 XGBoost fitting) ─────────────
+    # Training split (for T0 reference and B1 XGBoost fitting)
     td = torch.load(DATA / "week6_training_data.pt", map_location="cpu")
     train_idx = td["train_idx"].numpy()
     val_idx   = td["val_idx"].numpy()
     train_y   = td["train_y"].numpy()
     val_y     = td["val_y"].numpy()
-    log.info(f"  Training split: {len(train_idx):,} train, {len(val_idx):,} val  ✓")
+    log.info(f"  Training split: {len(train_idx):,} train, {len(val_idx):,} val  ")
 
     log.info("  All files loaded and verified.\n")
 
@@ -338,13 +280,13 @@ def load_and_verify() -> Dict:
     }
 
 
-# =============================================================================
-# 3.  FIT B1 XGBOOST  (expression-only baseline from Week 8)
-# =============================================================================
+
+# 3.  FIT B1 XGBOOST  (expression-only baseline from baseline and ablation analysis)
+
 
 def fit_b1_xgboost(data: Dict) -> Tuple[XGBRegressor, np.ndarray]:
     """
-    Fit the Week 8 expression-only XGBoost on Walesky training data.
+    Fit the baseline and ablation analysis expression-only XGBoost on Walesky training data.
     Input:  30D scVI features
     Target: pseudotime_norm
     Returns the fitted model and its predictions on ALL 6,582 Walesky cells.
@@ -354,13 +296,13 @@ def fit_b1_xgboost(data: Dict) -> Tuple[XGBRegressor, np.ndarray]:
     b1 = XGBRegressor(**XGB_B1_PARAMS)
     b1.fit(x_scvi_wal[data["train_idx"]], data["train_y"])
     b1_walesky = np.clip(b1.predict(x_scvi_wal).astype(float), 0.0, 1.0).astype(np.float32)
-    log.info(f"  B1 XGBoost fitted  — Walesky range [{b1_walesky.min():.3f}, {b1_walesky.max():.3f}]  ✓\n")
+    log.info(f"  B1 XGBoost fitted  — Walesky range [{b1_walesky.min():.3f}, {b1_walesky.max():.3f}]  \n")
     return b1, b1_walesky
 
 
-# =============================================================================
+
 # 4.  COMPUTE RISK SCORES FOR VALIDATION CELLS
-# =============================================================================
+
 
 def compute_scores(data: Dict, b1_xgb: XGBRegressor,
                    z_val: np.ndarray, label: str) -> Dict[str, np.ndarray]:
@@ -388,13 +330,13 @@ def compute_scores(data: Dict, b1_xgb: XGBRegressor,
     n_wal = data["x_walesky"].shape[0]   # 6582
     log.info(f"  [{label}] n={n_val:,} cells — computing risk scores ...")
 
-    # ── Seeder: XGBClassifier predict_proba → P(APAP/6h-like) ───────────────
+    # Seeder: XGBClassifier predict_proba → P(APAP/6h-like)
     seeder_val = data["seeder"].predict_proba(z_val)[:, 1].astype(np.float32)
 
-    # ── B1 XGBoost: predict pseudotime_norm from scVI ────────────────────────
+    # B1 XGBoost: predict pseudotime_norm from scVI
     b1_val = np.clip(b1_xgb.predict(z_val).astype(float), 0.0, 1.0).astype(np.float32)
 
-    # ── TrajRisk: append validation cells to Walesky tensor ──────────────────
+    # TrajRisk: append validation cells to Walesky tensor
     # Column 30 of x_val = seeder initial risk (r_i)
     r_val  = seeder_val.reshape(-1, 1)                       # (n_val, 1)
     x_val  = np.hstack([z_val, r_val]).astype(np.float32)    # (n_val, 31)
@@ -421,9 +363,9 @@ def compute_scores(data: Dict, b1_xgb: XGBRegressor,
     return {"trajrisk": trajrisk_val, "seeder": seeder_val, "b1_xgb": b1_val}
 
 
-# =============================================================================
+
 # 5.  METRICS
-# =============================================================================
+
 
 def safe_auroc(y: np.ndarray, scores: np.ndarray) -> float:
     if y.sum() < MIN_POS or (1 - y).sum() < MIN_POS:
@@ -496,17 +438,17 @@ def report_metrics(test_name: str, y: np.ndarray,
     return rows
 
 
-# =============================================================================
+
 # 6.  T0 — WALESKY HELD-OUT VALIDATION (reference)
-# =============================================================================
+
 
 def run_t0_walesky(data: Dict, b1_walesky: np.ndarray) -> List[Dict]:
     """
-    Reproduce the Week 7/8 Walesky validation AUROC using pre-computed scores.
+    Reproduce the reference model/8 Walesky validation AUROC using pre-computed scores.
     This row is the internal reference for comparing T1-T3.
     """
     log.info("\n" + "=" * 68)
-    log.info("T0: Walesky held-out validation (Week 7/8 reference)")
+    log.info("T0: Walesky held-out validation (reference model/8 reference)")
     log.info("=" * 68)
 
     val_idx = data["val_idx"]
@@ -522,9 +464,9 @@ def run_t0_walesky(data: Dict, b1_walesky: np.ndarray) -> List[Dict]:
     return rows
 
 
-# =============================================================================
+
 # 7.  T1 — BEN-MOSHE  (cross-dataset, different lab / platform)
-# =============================================================================
+
 
 def run_t1_benmoshe(data: Dict, b1_xgb: XGBRegressor) -> List[Dict]:
     """
@@ -551,9 +493,9 @@ def run_t1_benmoshe(data: Dict, b1_xgb: XGBRegressor) -> List[Dict]:
     return rows
 
 
-# =============================================================================
+
 # 8.  T2 — UMBAUGH 2h  (early detection, novel timepoint)
-# =============================================================================
+
 
 def run_t2_umbaugh2h(data: Dict, b1_xgb: XGBRegressor) -> List[Dict]:
     """
@@ -586,9 +528,9 @@ def run_t2_umbaugh2h(data: Dict, b1_xgb: XGBRegressor) -> List[Dict]:
     return rows
 
 
-# =============================================================================
+
 # 9.  T3 — UMBAUGH 48h/72h  (p21/Cdkn1a mechanistic validation)
-# =============================================================================
+
 
 def run_t3_umbaugh_p21(data: Dict, b1_xgb: XGBRegressor
                         ) -> Tuple[List[Dict], pd.DataFrame]:
@@ -617,7 +559,7 @@ def run_t3_umbaugh_p21(data: Dict, b1_xgb: XGBRegressor
     log.info(f"  APAP: {(adata_u48.obs['treatment']=='APAP').sum():,} | "
              f"Control: {(adata_u48.obs['treatment']=='Control').sum():,}")
 
-    # ── Extract Cdkn1a expression ─────────────────────────────────────────────
+    # Extract Cdkn1a expression
     cdkn1a_col = list(adata_u48.var_names).index(CDKN1A_GENE)
     X = adata_u48.X
     if hasattr(X, "toarray"):
@@ -630,10 +572,10 @@ def run_t3_umbaugh_p21(data: Dict, b1_xgb: XGBRegressor
              f"max={cdkn1a_expr.max():.4f}  "
              f"% expressed={100*(cdkn1a_expr>0).mean():.1f}%")
 
-    # ── Compute risk scores for all Umbaugh 48h/72h cells ────────────────────
+    # Compute risk scores for all Umbaugh 48h/72h cells
     scores = compute_scores(data, b1_xgb, z_u48, "Umbaugh_48h72h")
 
-    # ── T3a: Cdkn1a median split ──────────────────────────────────────────────
+    # T3a: Cdkn1a median split
     median_cdkn1a = np.median(cdkn1a_expr)
     y_cdkn1a      = (cdkn1a_expr > median_cdkn1a).astype(int)
     n_high        = int(y_cdkn1a.sum())
@@ -644,7 +586,7 @@ def run_t3_umbaugh_p21(data: Dict, b1_xgb: XGBRegressor
         "T3a: Umbaugh 48h/72h (Cdkn1a-high vs -low)", y_cdkn1a, scores
     )
 
-    # ── Spearman correlation: Cdkn1a vs risk ──────────────────────────────────
+    # Spearman correlation: Cdkn1a vs risk
     log.info("\n  T3a — Spearman ρ (Cdkn1a expression vs risk score):")
     spearman_rows = []
     for mname, sc in scores.items():
@@ -681,7 +623,7 @@ def run_t3_umbaugh_p21(data: Dict, b1_xgb: XGBRegressor
         on="method"
     )
 
-    # ── T3b: APAP vs Control ──────────────────────────────────────────────────
+    # T3b: APAP vs Control
     y_apap = (adata_u48.obs["treatment"] == "APAP").values.astype(int)
     log.info(f"\n  T3b — APAP vs Control:  APAP={y_apap.sum():,}  Control={(1-y_apap).sum():,}")
     rows_t3b = report_metrics(
@@ -691,9 +633,9 @@ def run_t3_umbaugh_p21(data: Dict, b1_xgb: XGBRegressor
     return rows_t3a + rows_t3b, p21_df
 
 
-# =============================================================================
+
 # 10.  FIGURES
-# =============================================================================
+
 
 def make_figures(df: pd.DataFrame) -> None:
     """
@@ -705,7 +647,7 @@ def make_figures(df: pd.DataFrame) -> None:
                "b1_xgb": "B1 XGBoost"}
     colors  = {"trajrisk": "#27ae60", "seeder": "#e67e22", "b1_xgb": "#2980b9"}
 
-    # ── Figure A: AUROC ───────────────────────────────────────────────────────
+    # Figure A: AUROC
     tests  = df["test"].unique()
     n_t    = len(tests)
     x      = np.arange(n_t)
@@ -755,7 +697,7 @@ def make_figures(df: pd.DataFrame) -> None:
     plt.close()
     log.info(f"  Saved: {out.name}")
 
-    # ── Figure B: AUPRC (validation tests only) ───────────────────────────────
+    # Figure B: AUPRC (validation tests only)
     val_tests = [t for t in tests if "T0" not in t]
     if not val_tests:
         return
@@ -799,24 +741,24 @@ def make_figures(df: pd.DataFrame) -> None:
     log.info(f"  Saved: {out.name}")
 
 
-# =============================================================================
+
 # 11.  MAIN
-# =============================================================================
+
 
 def main() -> None:
     t_start = time.time()
     log.info("=" * 68)
-    log.info("TRAJRISK — WEEK 9 SCRIPT 1: MOUSE CROSS-DATASET VALIDATION")
+    log.info("TRAJRISK — external validation SCRIPT 1: MOUSE CROSS-DATASET VALIDATION")
     log.info("=" * 68)
 
-    # ── Load and verify ───────────────────────────────────────────────────────
+    # Load and verify
     data = load_and_verify()
 
-    # ── Fit B1 XGBoost ────────────────────────────────────────────────────────
+    # Fit B1 XGBoost
     b1_xgb, b1_walesky = fit_b1_xgboost(data)
     data["b1_walesky"] = b1_walesky
 
-    # ── Run all tests ─────────────────────────────────────────────────────────
+    # Run all tests
     all_rows: List[Dict] = []
 
     rows_t0            = run_t0_walesky(data, b1_walesky)
@@ -829,10 +771,10 @@ def main() -> None:
     all_rows.extend(rows_t2)
     all_rows.extend(rows_t3)
 
-    # ── Build results dataframe ───────────────────────────────────────────────
+    # Build results dataframe
     df = pd.DataFrame(all_rows)
 
-    # ── Summary table ─────────────────────────────────────────────────────────
+    # Summary table
     log.info("\n" + "=" * 68)
     log.info("FINAL SUMMARY — TrajRisk vs Seeder vs B1 XGBoost")
     log.info("=" * 68)
@@ -873,7 +815,7 @@ def main() -> None:
     log.info("    ΔTR-B1  improves (less negative) T1-T3 vs T0")
     log.info("    → circularity broke on independent data → generalisation claim holds")
 
-    # ── Save all outputs ──────────────────────────────────────────────────────
+    # Save all outputs
     log.info("\nSaving outputs ...")
     out_table = RESULTS / "week9_validation_table.csv"
     df.to_csv(out_table, index=False, float_format="%.6f")
@@ -889,7 +831,7 @@ def main() -> None:
                    "tests": summary_rows}, f, indent=2, default=str)
     log.info(f"  {out_sum.name}")
 
-    # ── Figures ───────────────────────────────────────────────────────────────
+    # Figures
     log.info("\nGenerating figures ...")
     make_figures(df)
 

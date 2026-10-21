@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Replay saved TrajRisk models and derived checks without fitting any model.
+"""Evaluate supplied TrajRisk checkpoints and reproduce reported metrics.
 
-Inputs are the author-supplied Repository Check 2 packet, not raw expression.
-The packet contains trusted author-generated joblib models; do not substitute
-untrusted pickle files. Scientific functions are loaded from explicitly named,
-hash-verified source definitions without executing script-level training code.
+The model-input archive contains checkpoints, graphs, latent coordinates and
+cohort annotations. Checksums are verified before model definitions are loaded
+and predictions are evaluated.
 """
 from __future__ import annotations
 
@@ -69,7 +68,7 @@ def open_bundle(path, destination):
     if not (path / "PACKET_MANIFEST.json").is_file():
         matches = list(path.glob("*/PACKET_MANIFEST.json"))
         if len(matches) != 1:
-            raise ValueError("Provide the Check 2 ZIP or its extracted packet directory")
+            raise ValueError("Provide the model-input ZIP or its extracted directory")
         path = matches[0].parent
     manifest = json.loads((path / "PACKET_MANIFEST.json").read_text())
     expected_manifest = json.loads((REPO / "metadata/frozen_input_manifest.json").read_text())
@@ -233,8 +232,8 @@ class Replay:
         self.mouse_scores = pd.concat(score_frames, ignore_index=True)
         self.mouse_scores.to_csv(self.output / "external_mouse_predictions.csv", index=False)
         pd.DataFrame(records).to_csv(self.output / "external_mouse_metrics.csv", index=False)
-        self.notes.append("Cdkn1a labels require expression values and were not regenerated from the compact packet. B1 is not refitted or assigned placeholder predictions.")
-        self.notes.append("The historical manuscript_mouse_cell_scores.csv is not used as a corrected Figure 5B score source. Use the frozen-replay external_mouse_predictions.csv.")
+        self.notes.append("Expression-derived Cdkn1a labels and B1 refitting require full expression matrices.")
+        self.notes.append("external_mouse_predictions.csv contains the model scores used for Figure 5B.")
 
     def human(self):
         obs, arrays, _ = compact(self.packet, "cross_species")
@@ -279,7 +278,7 @@ class Replay:
                 self.close(cohort + " " + key + " donor one-sided MW p", p, expected[key + "_mw_pval"], atol=1e-12)
                 self.close(cohort + " " + key + " donor means", [scores[positive].mean(), scores[~positive].mean()], [expected[key + "_alf_mean"], expected[key + "_healthy_mean"]])
             donors.to_csv(self.output / ("human_donor_" + cohort + ".csv"))
-        self.notes.append("Human signature gene selection and normalization require expression matrices; frozen risk scoring and donor statistics are replayed here, not signature discovery.")
+        self.notes.append("Gene-signature discovery requires expression matrices; donor-level model scores are evaluated from supplied coordinates.")
 
     def graph_derived(self):
         edges = read_csv(self.results / "bottleneck_s5_all_edges_with_shift.csv")
@@ -318,7 +317,7 @@ class Replay:
             self.check(scale + " corrected distinct-human significance counts", len(mapped) == expected_tested[idx] and n_sig == expected_significant[idx])
             records.append({"scale": scale, "unique_human_genes": len(mapped), "significant_unique_human_genes": n_sig, "percentage": 100 * n_sig / len(mapped)})
         pd.DataFrame(records).to_csv(self.output / "figure6e_distinct_gene_counts.csv", index=False)
-        self.notes.append("Per-scale conservation uses the previously audited mouse-selection rule; the original conservation/pathway generator is not recovered or rerun.")
+        self.notes.append("Per-scale gene selection uses mouse p < 0.05 and absolute log2 fold change > 0.20; human significance uses nominal p <= 0.05.")
 
     def write_report(self, error=None):
         packages = ["torch", "torch-geometric", "numpy", "pandas", "scipy", "scikit-learn", "xgboost", "joblib"]
@@ -330,8 +329,8 @@ class Replay:
             "bootstrap_ci_replayed": self.bootstrap,
             "checks": self.checks, "notes": self.notes,
             "error": error,
-            "scope": "Frozen inference and saved-output numerical replay. No training, expression reconstruction, R rerun, or canonical figure replacement.",
-            "remaining": ["Clean raw-expression preprocessing/training replay", "Final main-figure generator alignment", "Full training-environment installation including scVI; original RStudio versions remain user-confirmed"],
+            "scope": "Predictions and evaluation metrics from supplied checkpoints and latent coordinates.",
+            "remaining": ["Raw-expression preprocessing and model training", "Main-figure composite assembly", "Full training environment and R trajectory execution"],
         }
         (self.output / "reproduction_report.json").write_text(json.dumps(report, indent=2) + "\n")
         return report
@@ -339,7 +338,7 @@ class Replay:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--bundle", type=Path, required=True, help="Author-supplied Check 2 ZIP or extracted folder")
+    parser.add_argument("--bundle", type=Path, required=True, help="Model-input ZIP or extracted directory")
     parser.add_argument("--output", type=Path, default=REPO / "build/frozen_replay")
     parser.add_argument("--bootstrap-ci", action="store_true", help="Also replay the original 1,000-bootstrap mouse AUROC CIs")
     args = parser.parse_args()

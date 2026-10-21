@@ -40,10 +40,7 @@ logging.basicConfig(
 )
 log = logging.getLogger("TrajRisk-W7")
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 0: CONFIGURATION
-# ═════════════════════════════════════════════════════════════════════════════
+# CONFIGURATION
 
 BASE = Path(__file__).resolve().parents[1]
 DATA_DIR  = BASE / "Data"  / "processed"
@@ -56,7 +53,7 @@ for _d in [DATA_DIR, MODEL_DIR, FIG_DIR, RES_DIR]:
 
 DEVICE = torch.device("cpu")
 
-# Architecture constants — must match Week 6 exactly
+# Architecture constants — must match graph inputs exactly
 NODE_DIM    = 31
 HIDDEN_DIM  = 64
 N_SCALES    = 4
@@ -93,11 +90,8 @@ RANDOM_SEED = 42
 torch.manual_seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 1: TrajRiskConv and TrajRiskGNN
-# Exact copies from Week 6 — any change here breaks the saved checkpoint.
-# ═════════════════════════════════════════════════════════════════════════════
+# TrajRiskConv and TrajRiskGNN
+# Exact copies from graph inputs — any change here breaks the saved checkpoint.
 
 class TrajRiskConv(MessagePassing):
     """
@@ -220,17 +214,14 @@ class TrajRiskGNN(nn.Module):
     def n_parameters(self) -> int:
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 2: DATA LOADING
-# ═════════════════════════════════════════════════════════════════════════════
+# DATA LOADING
 
 def load_all_inputs() -> Tuple:
     """
     Load everything produced by Weeks 5 and 6.
     Returns all tensors needed for training and evaluation.
     """
-    log.info("Loading Week 5-6 outputs...")
+    log.info("Loading transition graphs-6 outputs...")
 
     # Multi-scale graphs
     graphs = torch.load(DATA_DIR / "multiscale_graphs.pt", map_location="cpu")
@@ -260,10 +251,7 @@ def load_all_inputs() -> Tuple:
 
     return x, edge_indices, edge_weights, train_idx, val_idx, train_y, val_y, cell_index
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 3: TRAINING UTILITIES
-# ═════════════════════════════════════════════════════════════════════════════
+# TRAINING UTILITIES
 
 def build_model(lr: float, weight_decay: float) -> Tuple:
     """Construct model, criterion, optimiser, and scheduler."""
@@ -344,10 +332,7 @@ def evaluate_epoch(
         "auprc":   auprc,
     }
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 4: PHASE 1 — HYPERPARAMETER GRID SEARCH
-# ═════════════════════════════════════════════════════════════════════════════
+# PHASE 1 — HYPERPARAMETER GRID SEARCH
 
 def run_hyperparameter_search(
     x:            torch.Tensor,
@@ -446,10 +431,7 @@ def run_hyperparameter_search(
 
     return best
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 5: PHASE 2 — FULL TRAINING WITH BEST HYPERPARAMETERS
-# ═════════════════════════════════════════════════════════════════════════════
+# PHASE 2 — FULL TRAINING WITH BEST HYPERPARAMETERS
 
 def run_full_training(
     best_config:  Dict[str, Any],
@@ -597,10 +579,7 @@ def run_full_training(
 
     return model, history
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 6: PHASE 3A — FULL EVALUATION
-# ═════════════════════════════════════════════════════════════════════════════
+# PHASE 3A — FULL EVALUATION
 
 @torch.no_grad()
 def full_evaluation(
@@ -708,10 +687,7 @@ def full_evaluation(
     }
     return risk_all, metrics
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 7: PHASE 3B — MODEL INTERPRETATION
-# ═════════════════════════════════════════════════════════════════════════════
+# PHASE 3B — MODEL INTERPRETATION
 
 @torch.no_grad()
 def compute_scale_embeddings(
@@ -764,17 +740,14 @@ def compute_scale_importance(
         log.info(f"    {row['scale']:<30} ρ = {row['spearman_vs_risk']:.4f}")
     return df
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 8: FIGURES
-# ═════════════════════════════════════════════════════════════════════════════
+# FIGURES
 
 def make_training_curves(history: Dict) -> None:
     """Training and validation loss + AUROC over epochs."""
     epochs = range(1, len(history["train_loss"]) + 1)
 
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-    fig.suptitle("TrajRisk Week 7 — Full Training", fontweight="bold")
+    fig.suptitle("TrajRisk reference model — Full Training", fontweight="bold")
 
     # Loss
     ax = axes[0]
@@ -823,7 +796,7 @@ def make_risk_distributions(
     ci["risk_predicted"] = risk_all
 
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-    fig.suptitle("TrajRisk Week 7 — Predicted Risk Distributions", fontweight="bold")
+    fig.suptitle("TrajRisk reference model — Predicted Risk Distributions", fontweight="bold")
 
     # Panel A: violin by timepoint
     ax = axes[0]
@@ -895,7 +868,7 @@ def make_embedding_figures(
     pca_2d   = pca.fit_transform(combined)
 
     fig, axes = plt.subplots(1, 4, figsize=(20, 5))
-    fig.suptitle("TrajRisk Week 7 — Multi-Scale Embedding PCA (256D → 2D)", fontweight="bold")
+    fig.suptitle("TrajRisk reference model — Multi-Scale Embedding PCA (256D → 2D)", fontweight="bold")
 
     # Panel A: coloured by timepoint
     ax = axes[0]
@@ -990,10 +963,7 @@ def make_prediction_scatter(
     plt.close()
     log.info("  Saved: week7_predictions_scatter.png")
 
-
-# ═════════════════════════════════════════════════════════════════════════════
-# SECTION 9: SAVE OUTPUTS
-# ═════════════════════════════════════════════════════════════════════════════
+# SAVE OUTPUTS
 
 def save_all_outputs(
     risk_all:    np.ndarray,
@@ -1005,8 +975,8 @@ def save_all_outputs(
     scale_imp:   pd.DataFrame,
 ) -> None:
     """
-    Persist all Week 7 outputs and write risk scores back into the AnnData
-    so that spatial validation (Week 10) can load them directly.
+    Persist all reference model outputs and write risk scores back into the AnnData
+    so that spatial validation (trajectory analysis) can load them directly.
     """
     log.info("Saving outputs...")
 
@@ -1027,7 +997,7 @@ def save_all_outputs(
     scale_imp.to_csv(si_path, index=False)
     log.info(f"  Scale importance: {si_path.name}")
 
-    # 4. Write risk scores into the AnnData (needed for Week 10 spatial validation)
+    # 4. Write risk scores into the AnnData (needed for trajectory analysis spatial validation)
     h5ad_path = DATA_DIR / "adata_integrated_with_trajectory.h5ad"
     adata      = sc.read_h5ad(h5ad_path)
     walesky_mask = adata.obs["dataset"] == "Walesky"
@@ -1071,69 +1041,66 @@ def save_all_outputs(
         json.dump(summary, f, indent=2, default=str)
     log.info("  Summary: week7_training_summary.json")
 
-
-# ═════════════════════════════════════════════════════════════════════════════
 # MAIN
-# ═════════════════════════════════════════════════════════════════════════════
 
 def main() -> None:
     log.info("=" * 70)
-    log.info("TRAJRISK — WEEK 7: FULL MODEL TRAINING")
+    log.info("TRAJRISK — reference model: FULL MODEL TRAINING")
     log.info("=" * 70)
     log.info(f"Device: {DEVICE}")
     log.info(f"Search grid: {len(HP_SEARCH_LRS) * len(HP_SEARCH_WEIGHT_DECAYS)} configs")
     log.info(f"Full training: up to {FULL_MAX_EPOCHS} epochs, patience={FULL_PATIENCE}")
     t_global = time.time()
 
-    # ── Load ─────────────────────────────────────────────────────────────────
+    # Load
     log.info("\n[1] Loading inputs...")
     x, edge_indices, edge_weights, train_idx, val_idx, train_y, val_y, cell_index = (
         load_all_inputs()
     )
 
-    # ── Phase 1: Hyperparameter search ───────────────────────────────────────
+    # Phase 1: Hyperparameter search
     log.info("\n[2] Phase 1 — Hyperparameter grid search...")
     best_config = run_hyperparameter_search(
         x, edge_indices, edge_weights, train_idx, val_idx, train_y, val_y
     )
 
-    # ── Phase 2: Full training ────────────────────────────────────────────────
+    # Phase 2: Full training
     log.info("\n[3] Phase 2 — Full training with best hyperparameters...")
     model, history = run_full_training(
         best_config, x, edge_indices, edge_weights,
         train_idx, val_idx, train_y, val_y
     )
 
-    # ── Phase 3A: Full evaluation ─────────────────────────────────────────────
+    # Phase 3A: Full evaluation
     log.info("\n[4] Phase 3 — Evaluation and interpretation...")
     risk_all, metrics = full_evaluation(
         model, x, edge_indices, edge_weights,
         val_idx, val_y, train_idx, train_y, cell_index
     )
 
-    # ── Phase 3B: Model interpretation ───────────────────────────────────────
+    # Phase 3B: Model interpretation
     log.info("\n[5] Extracting per-scale embeddings...")
     embeddings = compute_scale_embeddings(model, x, edge_indices, edge_weights)
     scale_imp  = compute_scale_importance(embeddings, risk_all)
 
-    # ── Figures ───────────────────────────────────────────────────────────────
+    # Figures
     log.info("\n[6] Generating figures...")
     make_training_curves(history)
     make_risk_distributions(risk_all, cell_index)
     make_embedding_figures(embeddings, risk_all, cell_index, scale_imp)
     make_prediction_scatter(risk_all, cell_index, val_idx, val_y)
 
-    # ── Save ──────────────────────────────────────────────────────────────────
+    # Save
     log.info("\n[7] Saving all outputs...")
     save_all_outputs(
         risk_all, embeddings, cell_index,
         best_config, history, metrics, scale_imp
     )
 
-    # ── Final summary ─────────────────────────────────────────────────────────
+    # Final summary
     elapsed = time.time() - t_global
     log.info("\n" + "=" * 70)
-    log.info("WEEK 7 COMPLETE")
+    log.info("reference model COMPLETE")
     log.info("=" * 70)
     log.info(f"Total runtime: {elapsed/60:.1f} minutes")
     log.info("")
@@ -1165,7 +1132,7 @@ def main() -> None:
     log.info(f"  {FIG_DIR}/week7_scale_embeddings_pca.png")
     log.info(f"  {FIG_DIR}/week7_predictions_scatter.png")
     log.info("")
-    log.info("→ Ready for Week 8: Baseline Comparisons and Ablation Studies.")
+    log.info("Reference-model training and evaluation complete.")
 
 
 if __name__ == "__main__":

@@ -1,23 +1,8 @@
 #!/usr/bin/env python3
-"""
-TrajRisk — Missing Figure Asset Extraction
-==========================================
-Creates two files required for manuscript figures but absent from saved outputs.
-NO models are retrained. ALL values computed from saved checkpoints only.
+"""Earlier TrajRisk analysis retained for source comparison.
 
-Output files:
-  results/manuscript_mouse_cell_scores.csv
-    cell_id, dataset, treatment, timepoint_hours,
-    trajrisk_knn, trajrisk_wself, seeder, cdkn1a_expression
-
-  results/manuscript_human_composition.csv
-    patient_id, condition, n_cells,
-    pct_0h, pct_6h, pct_24h, pct_48h, pct_96h
-
-Usage:
-    conda activate trajrisk
-    cd /path/to/TrajRisk
-    python scripts/extract_figure_data.py
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
 import logging
@@ -54,9 +39,9 @@ SCALE_NAMES = [
 ]
 KNN_K = 15
 
-# =============================================================================
+
 # 0. FILE EXISTENCE CHECKS — stop immediately if anything is missing
-# =============================================================================
+
 log.info("=" * 68)
 log.info("STEP 0: File existence checks")
 log.info("=" * 68)
@@ -121,9 +106,9 @@ if not all_ok:
 log.info("  All required files present.\n")
 
 
-# =============================================================================
+
 # 1. MODEL CLASSES — exact copies from week9a / week7
-# =============================================================================
+
 class TrajRiskConv(MessagePassing):
     def __init__(self, in_ch, out_ch):
         super().__init__(aggr="add", flow="source_to_target")
@@ -170,9 +155,9 @@ class TrajRiskGNN(nn.Module):
         return self.fusion_mlp(torch.cat(parts, dim=1)).squeeze(-1)
 
 
-# =============================================================================
+
 # 2. LOAD COMMON RESOURCES
-# =============================================================================
+
 log.info("=" * 68)
 log.info("STEP 1: Loading common resources")
 log.info("=" * 68)
@@ -209,9 +194,9 @@ if b1_model:
 log.info("")
 
 
-# =============================================================================
+
 # 3. HELPER: score external cells
-# =============================================================================
+
 
 def score_external_cells(z_ext, n_wal, edge_indices, edge_weights,
                           walesky_hours_arr, cell_timepoints_arr,
@@ -244,12 +229,12 @@ def score_external_cells(z_ext, n_wal, edge_indices, edge_weights,
         np.vstack([x_walesky.numpy(), x_ext]), dtype=torch.float32
     )   # (6582 + n_ext, 31)
 
-    # ── W_self (no reference edges) ──────────────────────────────────────────
+    # W_self (no reference edges)
     with torch.no_grad():
         risk_wself_all = trajrisk_model(x_all, edge_indices, edge_weights).numpy()
     risk_wself = risk_wself_all[n_wal:].astype(np.float32)
 
-    # ── Reference-KNN edges (cell-specific, scale-specific) ──────────────────
+    # Reference-KNN edges (cell-specific, scale-specific)
     # Build per-scale source/target/weight lists
     scale_src = [[] for _ in range(4)]
     scale_tgt = [[] for _ in range(4)]
@@ -317,9 +302,9 @@ def score_external_cells(z_ext, n_wal, edge_indices, edge_weights,
     return risk_wself, risk_knn, r_ext
 
 
-# =============================================================================
+
 # 4. EXTRACT UMBAUGH 2H CELL-LEVEL SCORES
-# =============================================================================
+
 log.info("=" * 68)
 log.info("STEP 2: Umbaugh 2h cell-level scores")
 log.info("=" * 68)
@@ -369,9 +354,9 @@ else:
 log.info(f"  Umbaugh 2h records: {len(df_u2h):,}")
 
 
-# =============================================================================
+
 # 5. EXTRACT UMBAUGH 48H/72H CELL-LEVEL SCORES + CDKN1A
-# =============================================================================
+
 log.info("\n" + "=" * 68)
 log.info("STEP 3: Umbaugh 48h/72h cell-level scores + Cdkn1a expression")
 log.info("=" * 68)
@@ -446,9 +431,9 @@ else:
 log.info(f"  Umbaugh 48h/72h records: {len(df_u72):,}")
 
 
-# =============================================================================
+
 # 6. SAVE MOUSE CELL SCORES CSV
-# =============================================================================
+
 log.info("\n" + "=" * 68)
 log.info("STEP 4: Saving mouse cell scores")
 log.info("=" * 68)
@@ -477,9 +462,9 @@ log.info(f"    KNN:   {auroc_check_knn:.4f}  (expected 0.6524 from week9a run)")
 log.info(f"    W_self:{auroc_check_wself:.4f}  (expected 0.6087 from week9a run)")
 
 
-# =============================================================================
+
 # 7. EXTRACT HUMAN NEIGHBOUR COMPOSITION
-# =============================================================================
+
 log.info("\n" + "=" * 68)
 log.info("STEP 5: Human neighbour composition")
 log.info("=" * 68)
@@ -556,9 +541,9 @@ donor_comp = (
 log.info(f"\n  Donor-level composition: {len(donor_comp)} rows")
 
 
-# =============================================================================
+
 # 8. SAVE HUMAN COMPOSITION CSV
-# =============================================================================
+
 log.info("\n" + "=" * 68)
 log.info("STEP 6: Saving human composition CSV")
 log.info("=" * 68)
@@ -569,9 +554,9 @@ log.info(f"  Saved: {out_comp.name}")
 log.info(f"  Rows: {len(donor_comp)}  |  Columns: {donor_comp.columns.tolist()}")
 
 
-# =============================================================================
+
 # 9. FINAL SUMMARY
-# =============================================================================
+
 log.info("\n" + "=" * 68)
 log.info("EXTRACTION COMPLETE")
 log.info("=" * 68)

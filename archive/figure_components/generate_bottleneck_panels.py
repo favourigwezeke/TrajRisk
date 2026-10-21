@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
-"""
-Bottleneck Analysis — Figure Generation (v3)
-Panel B now uses GridSpecFromSubplotSpec — properly rendered ridge plot.
+"""Earlier TrajRisk analysis retained for source comparison.
 
-Usage:
-  conda activate trajrisk
-  cd /path/to/TrajRisk
-  python scripts/generate_bottleneck_figures.py
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
 import warnings
@@ -76,7 +72,7 @@ def save_fig(fig, stem):
         fig.savefig(str(FIGS / (stem + ext)))
     print(f"  Saved: {stem}.pdf / .svg / .png")
 
-# ── Load ──────────────────────────────────────────────────────────────────────
+# Load
 print("Loading data ...")
 edges    = pd.read_csv(RES / "bottleneck_s1_all_edges.csv")
 ablation = pd.read_csv(RES / "bottleneck_s2_scale_ablation.csv")
@@ -92,7 +88,7 @@ risk      = walesky_obs["risk_predicted"].values.astype(np.float32)
 timepoint = walesky_obs["timepoint_hours"].values.astype(np.float32)
 print(f"  Edges: {len(edges):,}")
 
-# ── Figure layout ─────────────────────────────────────────────────────────────
+# Figure layout
 print("Building figure ...")
 fig = plt.figure(figsize=(7.2, 7.8))
 
@@ -117,7 +113,7 @@ ax_D = fig.add_subplot(outer[1, 1])
 ax_E = fig.add_subplot(outer[2, 0])
 ax_F = fig.add_subplot(outer[2, 1])
 
-# ── A: Risk flux histogram ────────────────────────────────────────────────────
+# A: Risk flux histogram
 for s_name in SCALE_NAMES:
     vals = edges[edges["scale"] == s_name]["flux"].values
     vals = vals[vals > 0]
@@ -132,7 +128,7 @@ ax_A.set_ylabel("Density")
 ax_A.set_title("Risk flux distribution", fontsize=8, pad=5)
 label_panel(ax_A, "A")
 
-# ── B: Ridge plot — 4 proper axes ────────────────────────────────────────────
+# B: Ridge plot — 4 proper axes
 BW = 0.30
 pt_grid = np.linspace(-0.02, 1.02, 400)
 
@@ -176,7 +172,7 @@ label_panel(r_ax[0], "B", x=-0.08, y=1.14)
 r_ax[0].set_title("Pseudotime of top-1% flux source cells",
                    fontsize=8, pad=4)
 
-# ── C: Fate commitment test ────────────────────────────────────────────────────
+# C: Fate commitment test
 sub3 = edges[edges["scale"] == "Scale3_FateDecision"]
 top3 = sub3[sub3["flux_pct_rank"] >= 99.0]
 src3 = top3["source_node"].unique().astype(int)
@@ -228,7 +224,7 @@ ax_C.annotate("depleted", xy=(2, pct_tgt + 1),
 ax_C.set_title("Scale 3 fate commitment", fontsize=8, pad=5)
 label_panel(ax_C, "C")
 
-# ── D: Scale ablation + inset ─────────────────────────────────────────────────
+# D: Scale ablation + inset
 bio_order = ["Scale1_AcuteStress","Scale2_PeakInjury",
              "Scale3_FateDecision","Scale4_Resolution"]
 abl_bio   = ablation.set_index("ablated_scale").reindex(bio_order).reset_index()
@@ -267,7 +263,7 @@ for sp in ax_ins.spines.values():
 ax_ins.tick_params(width=0.4, length=1.5)
 label_panel(ax_D, "D")
 
-# ── E: Embedding shift ────────────────────────────────────────────────────────
+# E: Embedding shift
 x_pos     = 0.0
 xtick_pos = []
 xtick_lab = []
@@ -322,7 +318,7 @@ ax_E.text(s4_x, y_sig, "n.s.", ha="center", va="bottom", fontsize=7,
           color=SCALE_COL["Scale4_Resolution"])
 label_panel(ax_E, "E")
 
-# ── F: Pathway enrichment dotplot ─────────────────────────────────────────────
+# F: Pathway enrichment dotplot
 EXCLUDE = [
     "Parkinson","Alzheimer","Huntington","Prion","trypanosomiasis",
     "Malaria","Kaposi","sarcoma","Influenza","Epstein","Hepatitis",
@@ -419,7 +415,7 @@ label_panel(ax_F, "F", x=-0.10)
 save_fig(fig, "figure_bottleneck")
 plt.close(fig)
 
-# ── Supplementary ────────────────────────────────────────────────────────────
+# Supplementary
 print("Generating supplementary figure ...")
 fig_s, ax_s = plt.subplots(figsize=(3.5, 3.0))
 fig_s.subplots_adjust(left=0.18, right=0.92, top=0.92, bottom=0.22)

@@ -7,9 +7,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# ============================================================
+
 # PATHS
-# ============================================================
+
 
 RES = INPUT_ROOT / "results"
 SUPP = REPO_ROOT / "manuscript"
@@ -51,9 +51,9 @@ PDF_OUT = (
     / "Figure_S5_bottleneck_sensitivity_FINAL.pdf"
 )
 
-# ============================================================
+
 # COLORS
-# ============================================================
+
 
 THRESHOLD_COLOR = "#7A5195"
 BACKGROUND_COLOR = "#7F7F7F"
@@ -61,9 +61,9 @@ BACKGROUND_COLOR = "#7F7F7F"
 MEAN_COLOR = "#4C78A8"
 MAX_COLOR = "#D95F59"
 
-# ============================================================
+
 # STYLE
-# ============================================================
+
 
 plt.rcParams.update({
     "font.family": "Arial",
@@ -80,9 +80,9 @@ plt.rcParams.update({
     "ps.fonttype": 42,
 })
 
-# ============================================================
+
 # HELPERS
-# ============================================================
+
 
 def require_file(path):
 
@@ -151,12 +151,12 @@ def add_panel_label(
     )
 
 
-# ============================================================
+
 # LOAD
-# ============================================================
+
 
 print(
-    "===== FIGURE S5 INPUT AUDIT ====="
+    "===== FIGURE S5 INPUT VALIDATION ====="
 )
 
 for path in [
@@ -190,9 +190,9 @@ raw_q = pd.read_csv(
 q4_padding = raw_q["quartile"].eq("Q4_high_pt") & raw_q["pt_range"].eq("0.092–1.010")
 raw_q.loc[q4_padding, "pt_range"] = "0.092–1.000"
 
-# ============================================================
+
 # REQUIRED COLUMNS
-# ============================================================
+
 
 require_columns(
     s6e,
@@ -224,12 +224,12 @@ require_columns(
     "S6F",
 )
 
-# ============================================================
-# AUDIT 1 — THRESHOLD SENSITIVITY STRUCTURE
-# ============================================================
+
+# VALIDATION 1 — THRESHOLD SENSITIVITY STRUCTURE
+
 
 print(
-    "\n===== S6E THRESHOLD-SENSITIVITY AUDIT ====="
+    "\n===== S6E THRESHOLD-SENSITIVITY VALIDATION ====="
 )
 
 expected_thresholds = np.array(
@@ -326,9 +326,9 @@ print(
     "All threshold Fisher p-values < 0.05: PASS"
 )
 
-# ============================================================
-# AUDIT 2 — 1% THRESHOLD MUST MATCH LOCKED S6D
-# ============================================================
+
+# VALIDATION 2 — 1% THRESHOLD MUST MATCH reported S6D
+
 
 print(
     "\n===== S6D ↔ S6E 1% CROSS-CHECK ====="
@@ -439,15 +439,15 @@ assert_close(
 )
 
 print(
-    "1% threshold reproduces locked S6D: PASS"
+    "1% threshold reproduces reported S6D: PASS"
 )
 
-# ============================================================
-# AUDIT 3 — RAW QUARTILE FILE VS LOCKED S6F
-# ============================================================
+
+# VALIDATION 3 — RAW QUARTILE FILE VS reported S6F
+
 
 print(
-    "\n===== RAW QUARTILE ↔ LOCKED S6F AUDIT ====="
+    "\n===== RAW QUARTILE ↔ reported S6F VALIDATION ====="
 )
 
 if list(
@@ -456,7 +456,7 @@ if list(
     s6f.columns
 ):
     raise ValueError(
-        "Raw quartile and locked S6F columns differ."
+        "Raw quartile and reported S6F columns differ."
     )
 
 if len(
@@ -465,7 +465,7 @@ if len(
     s6f
 ):
     raise ValueError(
-        "Raw quartile and locked S6F row counts differ."
+        "Raw quartile and reported S6F row counts differ."
     )
 
 for col in s6f.columns:
@@ -493,7 +493,7 @@ for col in s6f.columns:
         ):
             raise ValueError(
                 f"Raw quartile differs from "
-                f"locked S6F in numeric column: {col}"
+                f"reported S6F in numeric column: {col}"
             )
 
     else:
@@ -508,19 +508,19 @@ for col in s6f.columns:
         ):
             raise ValueError(
                 f"Raw quartile differs from "
-                f"locked S6F in text column: {col}"
+                f"reported S6F in text column: {col}"
             )
 
 print(
-    "Raw quartile file exactly matches locked S6F: PASS"
+    "Raw quartile file exactly matches reported S6F: PASS"
 )
 
-# ============================================================
-# AUDIT 4 — QUARTILE INTERPRETATION
-# ============================================================
+
+# VALIDATION 4 — QUARTILE INTERPRETATION
+
 
 print(
-    "\n===== S6F PERTURBATION AUDIT ====="
+    "\n===== S6F PERTURBATION VALIDATION ====="
 )
 
 expected_quartiles = [
@@ -654,12 +654,12 @@ print(
 )
 
 print(
-    "\nALL FIGURE S5 AUDITS PASSED."
+    "\nALL FIGURE S5 VALIDATIONS PASSED."
 )
 
-# ============================================================
+
 # FIGURE
-# ============================================================
+
 
 fig, axes = plt.subplots(
     1,
@@ -678,9 +678,9 @@ fig.subplots_adjust(
     wspace=0.34,
 )
 
-# ============================================================
+
 # PANEL A — THRESHOLD SENSITIVITY
-# ============================================================
+
 
 ax = axes[0]
 
@@ -801,9 +801,9 @@ add_panel_label(
     "A",
 )
 
-# ============================================================
+
 # PANEL B — QUARTILE PERTURBATION
-# ============================================================
+
 
 ax = axes[1]
 
@@ -938,9 +938,9 @@ add_panel_label(
     "B",
 )
 
-# ============================================================
+
 # SAVE
-# ============================================================
+
 
 fig.savefig(
     PNG_OUT,

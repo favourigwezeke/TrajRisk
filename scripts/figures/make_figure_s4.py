@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 from scipy.stats import mannwhitneyu
 from matplotlib.lines import Line2D
 
-# ============================================================
+
 # PATHS
-# ============================================================
+
 
 RES = INPUT_ROOT / "results"
 SUPP = REPO_ROOT / "manuscript"
@@ -35,9 +35,9 @@ DATA_S5_FILE = DATA / "Data_S5_human_spatial_section_zone_means.csv"
 PNG_OUT = OUT / "Figure_S4_spatial_validation_FINAL.png"
 PDF_OUT = OUT / "Figure_S4_spatial_validation_FINAL.pdf"
 
-# ============================================================
+
 # CONSTANTS
-# ============================================================
+
 
 N_RECOVERY_ORIGINAL = 50
 N_RECOVERY_CORRECTED = 49
@@ -63,9 +63,9 @@ PP_COLOR = "#4F9D69"
 APAP_COLOR = "#D95F59"
 HEALTHY_COLOR = "#4C78A8"
 
-# ============================================================
+
 # STYLE
-# ============================================================
+
 
 plt.rcParams.update({
     "font.family": "Arial",
@@ -82,9 +82,9 @@ plt.rcParams.update({
     "ps.fonttype": 42,
 })
 
-# ============================================================
+
 # HELPERS
-# ============================================================
+
 
 def require_file(path):
     if not path.exists():
@@ -263,7 +263,7 @@ def assert_statistical_consistency(
     if observed_p <= 0:
         raise ValueError(
             f"{label}: observed p-value <= 0 "
-            "while locked p-value is non-zero."
+            "while reported p-value is non-zero."
         )
 
     log10_diff = abs(
@@ -375,12 +375,12 @@ def add_panel_label(
     )
 
 
-# ============================================================
+
 # LOAD
-# ============================================================
+
 
 print(
-    "===== FIGURE S4 INPUT AUDIT ====="
+    "===== FIGURE S4 INPUT VALIDATION ====="
 )
 
 for path in [
@@ -444,9 +444,9 @@ print(
     f"{len(mh):,}"
 )
 
-# ============================================================
+
 # REQUIRED COLUMNS
-# ============================================================
+
 
 require_columns(
     bm,
@@ -498,9 +498,9 @@ require_columns(
     "Data S5",
 )
 
-# ============================================================
+
 # CORRECT THE MATCHETT RECOVERY SIGNATURE EXACTLY
-# ============================================================
+
 
 mm["sig_recovery_corrected"] = (
     N_RECOVERY_ORIGINAL
@@ -529,12 +529,12 @@ print(
     "signatures reconstructed."
 )
 
-# ============================================================
-# AUDIT 1 — BEN-MOSHE AGAINST LOCKED S5A
-# ============================================================
+
+# VALIDATION 1 — BEN-MOSHE AGAINST reported S5A
+
 
 print(
-    "\n===== BEN-MOSHE LOCKED-TABLE AUDIT ====="
+    "\n===== BEN-MOSHE reported-TABLE VALIDATION ====="
 )
 
 bm_expected_map = {
@@ -671,12 +671,12 @@ for label, tp in bm_expected_map.items():
         f"{bm_res.pvalue:.3e}"
     )
 
-# ============================================================
-# AUDIT 2 — MATCHETT MOUSE AGAINST LOCKED S5B
-# ============================================================
+
+# VALIDATION 2 — MATCHETT MOUSE AGAINST reported S5B
+
 
 print(
-    "\n===== MATCHETT MOUSE LOCKED-TABLE AUDIT ====="
+    "\n===== MATCHETT MOUSE reported-TABLE VALIDATION ====="
 )
 
 mm_pc = mm[
@@ -888,7 +888,7 @@ print(
     f"PC={mm_risk_pc:.3f}, "
     f"PP={mm_risk_pp:.3f} | "
     f"current p={mm_risk_res.pvalue:.8g} | "
-    f"locked p="
+    f"reported p="
     f"{float(mouse_risk_row['P_value']):.8g}"
 )
 
@@ -897,16 +897,16 @@ print(
     f"PC={mm_rec_pc:.3f}, "
     f"PP={mm_rec_pp:.3f} | "
     f"current p={mm_rec_res.pvalue:.3e} | "
-    f"locked p="
+    f"reported p="
     f"{float(mouse_rec_row['P_value']):.3e}"
 )
 
-# ============================================================
-# AUDIT 3 — MATCHETT HUMAN AGAINST LOCKED S5C
-# ============================================================
+
+# VALIDATION 3 — MATCHETT HUMAN AGAINST reported S5C
+
 
 print(
-    "\n===== MATCHETT HUMAN LOCKED-TABLE AUDIT ====="
+    "\n===== MATCHETT HUMAN reported-TABLE VALIDATION ====="
 )
 
 mh_pc = mh[
@@ -1118,7 +1118,7 @@ print(
     f"PC={mh_risk_pc:.3f}, "
     f"PP={mh_risk_pp:.3f} | "
     f"current p={mh_risk_res.pvalue:.8g} | "
-    f"locked p="
+    f"reported p="
     f"{float(human_risk_row['P_value']):.8g}"
 )
 
@@ -1127,16 +1127,16 @@ print(
     f"PC={mh_rec_pc:.3f}, "
     f"PP={mh_rec_pp:.3f} | "
     f"current p={mh_rec_res.pvalue:.3e} | "
-    f"locked p="
+    f"reported p="
     f"{float(human_rec_row['P_value']):.3e}"
 )
 
-# ============================================================
-# AUDIT 4 — DATA S5 AGAINST LOCKED S5D
-# ============================================================
+
+# VALIDATION 4 — DATA S5 AGAINST reported S5D
+
 
 print(
-    "\n===== HUMAN SECTION-LEVEL DESCRIPTIVE AUDIT ====="
+    "\n===== HUMAN SECTION-LEVEL DESCRIPTIVE VALIDATION ====="
 )
 
 section_summary = (
@@ -1244,12 +1244,12 @@ print(
 )
 
 print(
-    "\nALL FIGURE S4 AUDITS PASSED."
+    "\nALL FIGURE S4 VALIDATIONS PASSED."
 )
 
-# ============================================================
+
 # FIGURE
-# ============================================================
+
 
 fig = plt.figure(
     figsize=(15.2, 8.2)
@@ -1290,9 +1290,9 @@ axF = fig.add_subplot(
     gs[1, 2]
 )
 
-# ============================================================
+
 # PANEL A — BEN-MOSHE FIBROGENIC ENRICHMENT
-# ============================================================
+
 
 panel_a_groups = [
     (
@@ -1482,9 +1482,9 @@ for x, (_, _, locked_label) in zip(
         fontsize=6.5,
     )
 
-# ============================================================
+
 # PANEL B — MATCHETT MOUSE RISK ZONATION
-# ============================================================
+
 
 style_boxplot(
     axB,
@@ -1543,9 +1543,9 @@ axB.text(
     fontsize=7.5,
 )
 
-# ============================================================
-# PANEL C — MATCHETT MOUSE CORRECTED RECOVERY
-# ============================================================
+
+# PANEL C — MATCHETT MOUSE  RECOVERY
+
 
 style_boxplot(
     axC,
@@ -1604,9 +1604,9 @@ axC.text(
     fontsize=7.5,
 )
 
-# ============================================================
+
 # PANEL D — MATCHETT HUMAN RISK ZONATION
-# ============================================================
+
 
 style_boxplot(
     axD,
@@ -1665,9 +1665,9 @@ axD.text(
     fontsize=7.5,
 )
 
-# ============================================================
-# PANEL E — MATCHETT HUMAN CORRECTED RECOVERY
-# ============================================================
+
+# PANEL E — MATCHETT HUMAN  RECOVERY
+
 
 style_boxplot(
     axE,
@@ -1726,9 +1726,9 @@ axE.text(
     fontsize=7.5,
 )
 
-# ============================================================
+
 # PANEL F — HUMAN SECTION-LEVEL DESCRIPTIVE RISK
-# ============================================================
+
 
 x_zone = np.arange(
     len(
@@ -1848,9 +1848,9 @@ axF.text(
     fontsize=6.5,
 )
 
-# ============================================================
+
 # PANEL LABELS
-# ============================================================
+
 
 for label, ax in zip(
     [
@@ -1875,9 +1875,9 @@ for label, ax in zip(
         label,
     )
 
-# ============================================================
+
 # LIGHT GRID
-# ============================================================
+
 
 for ax in [
     axA,
@@ -1893,9 +1893,9 @@ for ax in [
         linewidth=0.5,
     )
 
-# ============================================================
+
 # SAVE
-# ============================================================
+
 
 fig.savefig(
     PNG_OUT,

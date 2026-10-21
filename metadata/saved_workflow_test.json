@@ -1,6 +1,6 @@
 {
   "date": "2026-10-20",
-  "command": "bash scripts/reproduce_saved.sh <matching frozen input ZIP>",
+  "command": "bash scripts/reproduce_saved.sh <model-input ZIP>",
   "exit_code": 0,
   "fresh_environment": true,
   "environment": "Linux / CPython 3.12.14 / CPU PyTorch 2.10.0",
@@ -66,5 +66,5 @@
   ],
   "canonical_figure_pdfs_replaced": false,
   "path_or_credential_scan_findings": [],
-  "limitations": "Frozen inference and saved-output reproduction; raw-data retraining and all main-figure assembly remain pending."
+  "limitations": "Evaluates supplied model checkpoints and latent coordinates; complete raw-data training and main-figure assembly are separate analyses."
 }

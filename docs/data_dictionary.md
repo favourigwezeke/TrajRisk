@@ -50,8 +50,6 @@ Human donor-level scores after excluding low-nucleus-count APAP-ALF donors.
 
 The file is a subset of Data S3 containing 15 donors: 6 APAP-ALF and 9 healthy, representing 49,181 retained hepatocyte nuclei. Four APAP-ALF donors with fewer than 300 retained nuclei are excluded: apap02 (94), apap05 (284), apap09 (291), and apap10 (134). All healthy donors are retained. The sensitivity analysis changes cohort membership; scores for retained donors are identical to Data S3.
 
-
-
 Columns and units are identical to Data S3: patient_id, condition, n_cells, risk_2a (primary W_self-only), risk_2b (Reference-KNN), sig_net, and sig_risk. Scores remain unweighted donor means. One-sided Mann-Whitney U tests compare APAP-ALF > healthy; AUROC uses that direction. Reference-KNN/net-signature concordance uses two-sided Spearman testing across the 15 donors. The file underlies the sensitivity rows in Tables S4B and S4C and the primary-score sensitivity panel in Figure 6C.
 
 ## Data S5
@@ -73,4 +71,4 @@ The file underlies the section-level trajectories in Figure S4F and the unweight
 
 ## File conventions
 
-CSV files use UTF-8 text, a single header row, and decimal points. All five supplied Data files have complete records with no blank or NaN cells. Numeric zero remains a measured or calculated zero. Legacy field names are retained and explained above. Table-component CSVs retain their original missing-value conventions; those are not rewritten during packaging.
+CSV files use UTF-8 text, a single header row, and decimal points. All five supplied Data files have complete records with no blank or NaN cells. Numeric zero remains a measured or calculated zero. Legacy field names are retained and explained above. Table CSVs use the missing-value conventions described in their captions.

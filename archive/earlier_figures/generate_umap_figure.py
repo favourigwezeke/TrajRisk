@@ -1,22 +1,8 @@
 #!/usr/bin/env python3
-"""
-Supplementary Figure S_ — Species Integration UMAP
-====================================================
-Diagnostic figure demonstrating cross-species scVI integration quality.
-Panels:
-  A — UMAP coloured by species (mouse / human)
-  B — UMAP coloured by condition (APAP/Control/APAP-ALF/Healthy)
-  C — UMAP coloured by W_self TrajRisk score
+"""Earlier TrajRisk analysis retained for source comparison.
 
-Checks for an existing X_umap embedding first.
-If absent, computes neighbours (using X_scvi_cross) then UMAP.
-The combined adata is NOT modified; embeddings are computed in memory only.
-Subsamples to 20,000 cells for plotting speed without losing structure.
-
-Usage:
-    conda activate trajrisk
-    cd /path/to/TrajRisk
-    python scripts/generate_umap_figure.py
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
 import sys
@@ -35,18 +21,18 @@ import scanpy as sc
 
 warnings.filterwarnings("ignore")
 
-# =============================================================================
+
 # PATHS
-# =============================================================================
+
 BASE = Path(__file__).resolve().parents[2]
 DATA = BASE / "Data" / "processed"
 RES  = BASE / "results"
 FIGS = RES / "manuscript_figures"
 FIGS.mkdir(parents=True, exist_ok=True)
 
-# =============================================================================
+
 # STYLE
-# =============================================================================
+
 plt.rcParams.update({
     "font.family":        "Arial",
     "font.size":          8,
@@ -73,9 +59,9 @@ plt.rcParams.update({
 SUBSAMPLE_N = 20_000   # cells to plot
 RANDOM_SEED = 42
 
-# =============================================================================
+
 # STEP 0 — File checks
-# =============================================================================
+
 combined_path = DATA / "adata_cross_species_combined.h5ad"
 cell_scores    = RES  / "week9b_cell_risk_scores.csv"
 
@@ -86,9 +72,9 @@ for label, path in [("Combined adata", combined_path),
         sys.exit(1)
     print(f"OK:  {path.name}  ({path.stat().st_size // (1024**2)} MB)")
 
-# =============================================================================
+
 # STEP 1 — Load combined adata
-# =============================================================================
+
 print("\nLoading combined adata (this may take a minute) ...")
 adata = sc.read_h5ad(str(combined_path))
 print(f"  {adata.n_obs:,} cells × {adata.n_vars:,} genes")
@@ -98,9 +84,9 @@ print(f"  obs columns: {list(adata.obs.columns)}")
 assert "X_scvi_cross" in adata.obsm, \
     "X_scvi_cross not found — was week9b run to completion?"
 
-# =============================================================================
+
 # STEP 2 — Compute UMAP if not already present
-# =============================================================================
+
 if "X_umap" in adata.obsm:
     print("\nX_umap already present — skipping computation.")
 else:
@@ -113,9 +99,9 @@ else:
 
 umap_coords = adata.obsm["X_umap"]
 
-# =============================================================================
+
 # STEP 3 — Attach TrajRisk W_self scores to human cells
-# =============================================================================
+
 cell_df = pd.read_csv(str(cell_scores), index_col=0)
 
 # Human cells are positions n_wal onward in the combined adata
@@ -128,9 +114,9 @@ risk_scores_full[n_wal:] = cell_df["risk_2a"].values
 adata.obs["risk_2a"] = risk_scores_full
 print(f"\nWalesky cells: {n_wal:,}   Human cells: {n_hum:,}")
 
-# =============================================================================
+
 # STEP 4 — Subsample for plotting
-# =============================================================================
+
 rng = np.random.default_rng(RANDOM_SEED)
 idx = rng.choice(adata.n_obs, size=min(SUBSAMPLE_N, adata.n_obs), replace=False)
 idx_sorted = np.sort(idx)
@@ -147,9 +133,9 @@ risk_sub      = adata.obs["risk_2a"].values[idx_sorted]
 
 print(f"\nPlotting {len(idx_sorted):,} cells (subsampled from {adata.n_obs:,})")
 
-# =============================================================================
+
 # STEP 5 — Build figure
-# =============================================================================
+
 print("Generating supplementary UMAP figure ...")
 
 fig, axes = plt.subplots(1, 3, figsize=(9.0, 3.4),
@@ -159,7 +145,7 @@ fig.subplots_adjust(left=0.06, right=0.93, top=0.88, bottom=0.12)
 dot_s = 1.2
 alpha = 0.30
 
-# ── Panel A: species ──────────────────────────────────────────────────────────
+# Panel A: species
 ax = axes[0]
 species_colours = {"human": "#1A6EAF", "mouse": "#E07B39"}
 for sp, col in species_colours.items():
@@ -186,7 +172,7 @@ if asw is not None:
 ax.text(-0.06, 1.08, "A", transform=ax.transAxes,
         fontsize=11, fontweight="bold", va="top")
 
-# ── Panel B: condition ────────────────────────────────────────────────────────
+# Panel B: condition
 ax = axes[1]
 cond_colours = {
     "APAP":     "#C0392B",
@@ -223,7 +209,7 @@ ax.legend(handles=handles_cond, loc="lower left", fontsize=7,
 ax.text(-0.06, 1.08, "B", transform=ax.transAxes,
         fontsize=11, fontweight="bold", va="top")
 
-# ── Panel C: TrajRisk score (human only, W_self) ──────────────────────────────
+# Panel C: TrajRisk score (human only, W_self)
 ax = axes[2]
 # Background: all cells grey
 ax.scatter(umap_sub[:, 0], umap_sub[:, 1],
@@ -246,9 +232,9 @@ ax.set_xticks([]); ax.set_yticks([])
 ax.text(-0.06, 1.08, "C", transform=ax.transAxes,
         fontsize=11, fontweight="bold", va="top")
 
-# =============================================================================
+
 # STEP 6 — Save
-# =============================================================================
+
 for ext in [".pdf", ".svg", ".png"]:
     fig.savefig(str(FIGS / ("supp_figure_umap" + ext)))
 plt.close(fig)

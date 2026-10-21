@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
-"""
-Week 13 panels — fixed all visual issues.
+"""Earlier TrajRisk analysis retained for source comparison.
 
-Fixes applied:
-- All panel letters: identical font, size (11pt bold), position
-- Figure 4: baselines (A) and ablations (B) are separate panels with no floating labels
-- Figure 4: TrajRisk reference line thicker and clearly labelled
-- Figure 4: B1 circularity note below panel, never overlapping bars
-- Figure 6E: 40.9% label moved outside bar area, no collision
-- Figure 6E: annotation arrow repositioned cleanly
-- Figure 6E: n= labels bold
-- Identical hex colour codes across all three figures
-- Consistent font, margins, and spacing throughout
+See docs/workflow.md for the study workflow and docs/reproduction.md for
+the commands used to reproduce the reported analyses.
 """
 
 import json
@@ -29,7 +20,7 @@ RES  = BASE / "results"
 FIGS = RES / "manuscript_figures"
 FIGS.mkdir(parents=True, exist_ok=True)
 
-# ── Shared style ───────────────────────────────────────────────────────────────
+# Shared style
 plt.rcParams.update({
     "font.family":        "Arial",
     "font.size":          8,
@@ -56,7 +47,7 @@ plt.rcParams.update({
     "legend.frameon":     False,
 })
 
-# ── Shared colour palette — identical hex codes used everywhere ────────────────
+# Shared colour palette — identical hex codes used everywhere
 COL = {
     "s1":      "#C0392B",   # Scale 1
     "s2":      "#E67E22",   # Scale 2
@@ -94,9 +85,9 @@ def save_fig(fig, stem):
         fig.savefig(str(FIGS / (stem + ext)))
     print(f"  Saved: {stem}.pdf / .svg / .png")
 
-# =============================================================================
+
 # LOAD DATA
-# =============================================================================
+
 with open(RES / "week8_summary.json") as f:
     w8 = json.load(f)
 all_methods = pd.DataFrame(w8["results"])
@@ -162,9 +153,9 @@ def draw_horizontal_bars(ax, method_names, y_labels, bar_col,
     label_panel(ax, panel_letter)
 
 
-# =============================================================================
+
 # FIGURE 4 — Three panels: A (baselines), B (ablations), C (within-TP AUPRC)
-# =============================================================================
+
 print("Building Figure 4 ...")
 
 BASELINE_METHODS = [
@@ -286,9 +277,9 @@ label_panel(ax4C, "C", x=-0.24)
 save_fig(fig4, "figure_4_benchmarking")
 plt.close(fig4)
 
-# =============================================================================
+
 # FIGURE 6E — Cross-species conservation (fixed label collision)
-# =============================================================================
+
 print("Building Figure 6E ...")
 
 fig_e, ax_e = plt.subplots(figsize=(3.2, 2.8))
@@ -353,9 +344,9 @@ label_panel(ax_e, "E")
 save_fig(fig_e, "figure_6e_conservation")
 plt.close(fig_e)
 
-# =============================================================================
+
 # FIGURE 2D — Entropy (minor fixes: consistent label size, value placement)
-# =============================================================================
+
 print("Building Figure 2D ...")
 
 fig_d, ax_d = plt.subplots(figsize=(3.0, 2.6))

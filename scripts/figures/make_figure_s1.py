@@ -9,9 +9,9 @@ from frozen_inputs import read_view, view_path
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 
-# ============================================================
+
 # PATHS
-# ============================================================
+
 
 DATA = INPUT_ROOT / "Data" / "processed"
 OUT = REPO_ROOT / "build" / "figures" / "supplementary"
@@ -40,9 +40,9 @@ FILES = {
     },
 }
 
-# ============================================================
+
 # STYLE
-# ============================================================
+
 
 plt.rcParams.update({
     "font.family": "Arial",
@@ -78,9 +78,9 @@ def comma(x, pos=None):
     return f"{x:,.0f}"
 
 
-# ============================================================
+
 # HELPERS
-# ============================================================
+
 
 def ensure_qc_columns(adata, name):
     """
@@ -492,12 +492,12 @@ def plot_dataset(
     )
 
 
-# ============================================================
+
 # LOAD CHECK
-# ============================================================
+
 
 print(
-    "===== FIGURE S1 INPUT AUDIT ====="
+    "===== FIGURE S1 INPUT VALIDATION ====="
 )
 
 for letter, cfg in FILES.items():
@@ -522,9 +522,9 @@ for letter, cfg in FILES.items():
     del adata
 
 
-# ============================================================
+
 # FIGURE
-# ============================================================
+
 
 fig = plt.figure(
     figsize=(15.5, 11.5),
