@@ -26,9 +26,6 @@ if explicit:
         raise SystemExit('The supplied folder must contain scripts/ and Data/, data/, or results/.')
 else:
     candidates = [Path.cwd(), *Path.cwd().parents, Path.home()/'TrajRisk']
-    research = Path.home()/'Personal_System'/'Research'
-    if research.is_dir():
-        candidates += [research/'TrajRisk'] + list(research.glob('*/TrajRisk'))
     candidates = list(dict.fromkeys(p.resolve() for p in candidates if is_project(p)))
     if len(candidates) != 1:
         raise SystemExit('Run this from your TrajRisk folder, or pass that folder as the first argument.')

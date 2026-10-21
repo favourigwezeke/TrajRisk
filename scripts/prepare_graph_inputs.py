@@ -1,65 +1,8 @@
 #!/usr/bin/env python3
-"""
-TrajRisk: Week 6 — Graph Neural Network Architecture
-=====================================================
-Project: TrajRisk — Trajectory-Informed Risk Propagation in APAP Hepatotoxicity
-Target Journal: Cell Reports Methods
+"""Prepare 31-dimensional node inputs and the reference training split.
 
-Overview
---------
-This script implements and validates the TrajRiskGNN architecture: a multi-scale
-graph neural network that propagates risk scores through the APAP injury trajectory.
-
-The architecture rests on three Week-5 outputs:
-  - multiscale_graphs.pt      : 4 directed transition graphs (PyG edge format)
-  - walesky_cell_index.csv    : cell metadata and global index mapping
-  - adata_integrated_with_trajectory.h5ad : scVI latent + pseudotime_norm
-
-Architecture Summary
---------------------
-Node features (31D per cell):
-    z_i  (30D): scVI latent representation (from Week 3)
-    r_i   (1D): XGBoost initial risk trained on 0h Control vs 6h APAP cells
-
-Graph: 4 directed temporal scales (0h→6h, 6h→24h, 24h→48h, 48h→96h)
-    Each scale provides a directed edge set with learned RF transition probabilities
-    as edge weights (row-stochastic per source cell, from Week 5 Random Forests).
-
-GNN per scale:
-    TrajRiskConv Layer 1: 31D → 64D  (aggregate source features weighted by T_s)
-    TrajRiskConv Layer 2: 64D → 64D  (refine aggregated representation)
-    Residual self-connection in both layers (prevents dead nodes with no in-edges)
-
-Fusion MLP:
-    Concat all 4 scale outputs → 256D
-    Linear(256 → 128) → ReLU → Dropout(0.3)
-    Linear(128 → 32)  → ReLU
-    Linear(32 → 1)    → Sigmoid
-    Output: risk_score ∈ [0, 1]
-
-Training objective:
-    Continuous regression on pseudotime_norm (0 → 1), not binary APAP/Control.
-    MSE loss forces the GNN to distinguish the gradient between recovered cells
-    (pseudotime_norm ≈ 0.02) and compensation-mode cells (pseudotime_norm ≈ 0.89),
-    which is the biologically meaningful risk signal identified in Week 5.
-
-Week 6 scope: architecture implementation + quick 10-epoch diagnostic run.
-Full training (200 epochs with early stopping) is performed in Week 7.
-
-Outputs
--------
-Data/processed/week6_node_features.pt      — node feature tensor (6582, 31)
-Data/processed/week6_training_data.pt      — train/val indices and labels
-Data/processed/week6_xgboost_risk.npy      — XGBoost initial risk scores
-models/week6_trajrisk_test.pt              — model checkpoint (10-epoch test)
-models/week6_xgboost_model.pkl             — trained XGBoost scorer
-results/week6_diagnostics.json             — architecture and training metrics
-results/figures/week6_*.png                — diagnostic figures
-
-Usage
------
-    conda activate trajrisk
-    python scripts/week6_gnn_architecture.py
+The input combines 30 scVI coordinates with the initial XGBoost score.
+This script also performs the original short architecture diagnostic.
 """
 
 import os
@@ -188,7 +131,7 @@ def load_week5_outputs() -> Tuple[Dict, pd.DataFrame, sc.AnnData]:
     if "pseudotime_norm" not in cell_index.columns:
         raise ValueError(
             "pseudotime_norm not in cell_index. "
-            "Ensure week5_transition_matrices.py completed successfully."
+            "Ensure build_transition_graphs.py completed successfully."
         )
 
     # Walesky AnnData

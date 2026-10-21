@@ -1,17 +1,21 @@
-# Preprocessing and trajectory sources
+# Preprocessing and trajectory inference
 
-The ten numbered notebooks preserve all 97 collected code cells, with outputs and execution counts removed. Project paths use `TRAJRISK_ROOT` when set or locate this repository from the current working directory. The biological operations and thresholds are unchanged.
+Run notebooks from the repository root or set `TRAJRISK_ROOT` to the working project directory. Inputs use `Data/raw/` and `Data/processed/`. Distributed sources have notebook outputs and execution counts cleared.
 
-| Source | Role |
+| Source | Analysis |
 | --- | --- |
-| 01–05 | Dataset loading, source metadata, hepatocyte selection and QC |
-| 06 | Cohort summary |
-| 07 | Normalization and exploratory clustering |
-| 08 | Mouse scVI integration and diagnostics |
-| 09 | Export to Monocle 3 |
-| monocle3_trajectory.R | Walesky trajectory inference |
-| 10 | Pseudotime import and exploratory follow-up |
+| `01_walesky_loading.ipynb` | Walesky reference loading and selection. |
+| `02_umbaugh_2h_loading.ipynb` | Umbaugh early cohort loading, QC annotations and recorded filters. |
+| `03_benmoshe_loading.ipynb` | Ben-Moshe cohort preparation. |
+| `04_umbaugh_48h72h_loading.ipynb` | Umbaugh later-injury cohort preparation. |
+| `05_matchett_human_loading.ipynb` | Matchett human hepatocyte nuclei. |
+| `06_cohort_summary.ipynb` | Cohort composition summaries. |
+| `07_normalization_clustering.ipynb` | Normalization and exploratory clustering. |
+| `08_scvi_integration.ipynb` | Mouse scVI integration and diagnostics. |
+| `09_monocle_export.ipynb` | Export for Monocle 3. |
+| `monocle3_trajectory.R` | Walesky trajectory inference. |
+| `10_pseudotime_import.ipynb` | Pseudotime import and exploratory follow-up. |
 
-The notebooks contain exploratory and repeated cells. They are preserved sources, not yet a validated “run all” pipeline. Static review identified missing QC setup in the saved Umbaugh 2 h notebook and a missing `csr_matrix` import on the dense-input branch of the export notebook. A clean raw-data replay must resolve these explicitly rather than silently changing a filter or claiming the source was executed as supplied.
+The trajectory environment was R 4.5.1 / Monocle 3 1.4.27 in RStudio. Run the R source from the project root or pass its separate work directory as its first argument.
 
-For the R source, run from the repository root using the RStudio/R installation used for trajectory analysis, or pass a separate work directory as its first argument. The R session was not rerun during source preparation.
+The notebooks preserve exploratory and repeated cells. Raw-data execution requires the full source files described in [datasets.md](../docs/datasets.md). The supported saved-model workflow is documented in [reproduction.md](../docs/reproduction.md).

@@ -2,11 +2,12 @@
 # Replay the author-supplied frozen packet; writes only beneath build/.
 set -euo pipefail
 if [[ $# -ne 1 ]]; then
-  printf 'Usage: bash scripts/reproduce_saved.sh /path/to/TrajRisk_Repository_Check_2.zip\n' >&2
+  printf 'Usage: bash scripts/reproduce_saved.sh /path/to/TrajRisk_frozen_inputs.zip\n' >&2
   exit 2
 fi
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 packet_argument="$1"
+python3 "$repo_root/scripts/verify_repository.py"
 python3 "$repo_root/scripts/verify_release_assets.py"
 python3 "$repo_root/scripts/reproduce_frozen.py" --bundle "$packet_argument" --bootstrap-ci
 packet_root="$(python3 - "$packet_argument" "$repo_root/build/frozen_replay/inputs" <<'PY'

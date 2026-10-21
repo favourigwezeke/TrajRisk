@@ -34,11 +34,14 @@
       "original_path": "scripts/generate_bottleneck_figures.py",
       "original_sha256": "a0d26d7fb9a1d44198bca42fa0199944c8093f77144048c96e1cc27bff6c75e1",
       "collected_sha256": "a0d26d7fb9a1d44198bca42fa0199944c8093f77144048c96e1cc27bff6c75e1",
-      "repository_path": "scripts/figures/candidates/generate_bottleneck_figures.py",
+      "repository_path": "archive/figure_components/generate_bottleneck_panels.py",
       "portable_sha256": "54956d89df3d9dca0113d08025ca297e6c50d4f1e838bcc36b6a693d46174c47",
       "status": "main_figure_component_pending_final_alignment",
       "scientific_ast_unchanged": true,
-      "executed_after_port": false
+      "executed_after_port": false,
+      "previous_repository_path": "scripts/figures/candidates/generate_bottleneck_figures.py",
+      "previous_portable_sha256": "54956d89df3d9dca0113d08025ca297e6c50d4f1e838bcc36b6a693d46174c47",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "scripts/generate_bottleneck_figures_OLD.py",
@@ -62,11 +65,14 @@
       "original_path": "scripts/generate_figure1b.py",
       "original_sha256": "5988fe91091f0e9c444a4ee21fd44de8880caa9a059c4d5044f56d4b094aa199",
       "collected_sha256": "5988fe91091f0e9c444a4ee21fd44de8880caa9a059c4d5044f56d4b094aa199",
-      "repository_path": "scripts/figures/candidates/generate_figure1b.py",
+      "repository_path": "archive/figure_components/generate_cohort_panel.py",
       "portable_sha256": "b6c751f308330defd9c51250666b89136a873cab68e38cc7d7d71b2b857cf2a3",
       "status": "main_figure_component_pending_final_alignment",
       "scientific_ast_unchanged": true,
-      "executed_after_port": false
+      "executed_after_port": false,
+      "previous_repository_path": "scripts/figures/candidates/generate_figure1b.py",
+      "previous_portable_sha256": "b6c751f308330defd9c51250666b89136a873cab68e38cc7d7d71b2b857cf2a3",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "scripts/generate_figures OLD.py",
@@ -114,11 +120,14 @@
       "original_path": "scripts/generate_week2_panels.py",
       "original_sha256": "f81d268264b84a4c1ec67df7b8e371e2f61894f2e3efa7182323f09b14cbb997",
       "collected_sha256": "f81d268264b84a4c1ec67df7b8e371e2f61894f2e3efa7182323f09b14cbb997",
-      "repository_path": "scripts/figures/candidates/generate_week2_panels.py",
+      "repository_path": "archive/figure_components/generate_reference_panels.py",
       "portable_sha256": "ac0462e8b5118ec8b5b7f8038db54398c445d563968fb15aa3fcaffdde7c12d9",
       "status": "main_figure_component_pending_final_alignment",
       "scientific_ast_unchanged": true,
-      "executed_after_port": false
+      "executed_after_port": false,
+      "previous_repository_path": "scripts/figures/candidates/generate_week2_panels.py",
+      "previous_portable_sha256": "ac0462e8b5118ec8b5b7f8038db54398c445d563968fb15aa3fcaffdde7c12d9",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "scripts/generate_week3_panels.py",
@@ -195,31 +204,40 @@
       "original_path": "scripts/week5_transition_matrices.py",
       "original_sha256": "2be777dd0c2704f3f476b8f50fe3a63f79ff8f6a61eb07119d2edc3f2aa56329",
       "collected_sha256": "2be777dd0c2704f3f476b8f50fe3a63f79ff8f6a61eb07119d2edc3f2aa56329",
-      "repository_path": "scripts/week5_transition_matrices.py",
-      "portable_sha256": "e24a14cf022bfa74b6e5bdfccf641b3c21a841a38ee73997b5d4b2270e7cde8d",
+      "repository_path": "scripts/build_transition_graphs.py",
+      "portable_sha256": "d095ccfbbdad8d44c7771910fa52ae656bafc20c5bce9f03ffbdf84f1120f34f",
       "status": "audited_core",
       "scientific_ast_unchanged": true,
-      "executed_after_port": false
+      "executed_after_port": false,
+      "previous_repository_path": "scripts/week5_transition_matrices.py",
+      "previous_portable_sha256": "e24a14cf022bfa74b6e5bdfccf641b3c21a841a38ee73997b5d4b2270e7cde8d",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "scripts/week6_gnn_architecture.py",
       "original_sha256": "c4e8dba6221ff80b3250d87baeb82769b338f6d5e92c2f04afaf3c2565ed319d",
       "collected_sha256": "c4e8dba6221ff80b3250d87baeb82769b338f6d5e92c2f04afaf3c2565ed319d",
-      "repository_path": "scripts/week6_gnn_architecture.py",
-      "portable_sha256": "95c08f4b578135499ddbbce206cbf049551638454f47769c1efb81492b1de48a",
+      "repository_path": "scripts/prepare_graph_inputs.py",
+      "portable_sha256": "fa70020bda05ba3da44c12f07496614f033a7f356bef1ae9c64d7d974e0b82e4",
       "status": "audited_core",
       "scientific_ast_unchanged": true,
-      "executed_after_port": false
+      "executed_after_port": false,
+      "previous_repository_path": "scripts/week6_gnn_architecture.py",
+      "previous_portable_sha256": "95c08f4b578135499ddbbce206cbf049551638454f47769c1efb81492b1de48a",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "scripts/week7_full_training.py",
       "original_sha256": "4ceba15a846619db37019532ad8c779bfb6339fa9488fdf03829bd541d7177f7",
       "collected_sha256": "4ceba15a846619db37019532ad8c779bfb6339fa9488fdf03829bd541d7177f7",
-      "repository_path": "scripts/week7_full_training.py",
-      "portable_sha256": "000a3cea01d9c12a5cf260cad07b57fbeebd0730ca8e39c87983b6d379739534",
+      "repository_path": "scripts/train_reference_model.py",
+      "portable_sha256": "6803bdd2154ba8292156275e0d09dfaebe38b738a3a97de1f8606c309eaafa49",
       "status": "audited_core",
       "scientific_ast_unchanged": true,
-      "executed_after_port": false
+      "executed_after_port": false,
+      "previous_repository_path": "scripts/week7_full_training.py",
+      "previous_portable_sha256": "000a3cea01d9c12a5cf260cad07b57fbeebd0730ca8e39c87983b6d379739534",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "scripts/week7_full_training_old.py",
@@ -231,21 +249,27 @@
       "original_path": "scripts/week8_baselines_ablations.py",
       "original_sha256": "bf0c4cefed0471fcc444fa1e75f0d7d124c8bbaf760bc6f3df1d2052c2e100f1",
       "collected_sha256": "bf0c4cefed0471fcc444fa1e75f0d7d124c8bbaf760bc6f3df1d2052c2e100f1",
-      "repository_path": "scripts/week8_baselines_ablations.py",
-      "portable_sha256": "f89cfe96eb657daa11d86c6e3578aefebc186423547fbdcd63add98400649bce",
+      "repository_path": "scripts/evaluate_baselines.py",
+      "portable_sha256": "3564855ea04cee8954118c628f4d9b4a21838431bc3a6747c575f31e54b81d60",
       "status": "audited_core",
       "scientific_ast_unchanged": true,
-      "executed_after_port": false
+      "executed_after_port": false,
+      "previous_repository_path": "scripts/week8_baselines_ablations.py",
+      "previous_portable_sha256": "f89cfe96eb657daa11d86c6e3578aefebc186423547fbdcd63add98400649bce",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "scripts/week8_supplementary_analysis.py",
       "original_sha256": "d732ef83d92427f626c09b0b71539a9a7dc0b281a3228f6ab3c9c290a92d861c",
       "collected_sha256": "d732ef83d92427f626c09b0b71539a9a7dc0b281a3228f6ab3c9c290a92d861c",
-      "repository_path": "scripts/week8_supplementary_analysis.py",
-      "portable_sha256": "474e943da883a4da95f3186ae2055f91b69d80b29f53fb7a228a0a01e90f1b29",
+      "repository_path": "scripts/analyze_reference_predictions.py",
+      "portable_sha256": "38270b90f3c93e243cb5833bb8b89251c908ffa58690d5088c25549901608f01",
       "status": "supplementary_analysis_source",
       "scientific_ast_unchanged": true,
-      "executed_after_port": false
+      "executed_after_port": false,
+      "previous_repository_path": "scripts/week8_supplementary_analysis.py",
+      "previous_portable_sha256": "474e943da883a4da95f3186ae2055f91b69d80b29f53fb7a228a0a01e90f1b29",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "scripts/week8_supplementary_analysis_OLD.py",
@@ -297,13 +321,16 @@
       "original_path": "scripts/week9a_mouse_cross_dataset_final.py",
       "original_sha256": "7bbae518f6e464abd552b88473a44ca9ca17df78dec864e18911e66f68fe8922",
       "collected_sha256": "7bbae518f6e464abd552b88473a44ca9ca17df78dec864e18911e66f68fe8922",
-      "repository_path": "scripts/week9a_mouse_cross_dataset_final.py",
-      "portable_sha256": "2307973787a4354ea9d99adc1d1c2216f67092a2b5fad6751af5456f98ae3bf5",
+      "repository_path": "scripts/validate_mouse_transfer.py",
+      "portable_sha256": "2b6f367bc50432feb9a51f88291c85b99cdeba8896c527ba21d1d811737b6f8e",
       "status": "audited_core",
       "scientific_ast_unchanged": true,
       "executed_after_port": false,
       "frozen_definitions_replayed": true,
-      "full_training_script_executed": false
+      "full_training_script_executed": false,
+      "previous_repository_path": "scripts/week9a_mouse_cross_dataset_final.py",
+      "previous_portable_sha256": "2307973787a4354ea9d99adc1d1c2216f67092a2b5fad6751af5456f98ae3bf5",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "scripts/week9b_audit OLD.py",
@@ -331,14 +358,17 @@
       "original_path": "scripts/week9b_human_cross_species.py",
       "original_sha256": "34db603202f0892602a2faf026ca7d76cbd7d3a76a8b1983a2864cb9f2a014d3",
       "collected_sha256": "34db603202f0892602a2faf026ca7d76cbd7d3a76a8b1983a2864cb9f2a014d3",
-      "repository_path": "scripts/week9b_human_cross_species.py",
-      "portable_sha256": "2fbfd7040fee5039c60d41c03d885ee9df5f7a6bf9b6164aa1452861d49d47c7",
+      "repository_path": "scripts/validate_human_transfer.py",
+      "portable_sha256": "675bc5338fcd3531a5ee6f66069dd8957c394f9155da0e584182dba8c94fc215",
       "status": "audited_core",
       "scientific_ast_unchanged": true,
       "executed_after_port": false,
       "documentation_correction": "Scale-assignment docstring now states the implemented phase vote and first-encountered tie rule. Executable statements unchanged.",
       "frozen_definitions_replayed": true,
-      "full_training_script_executed": false
+      "full_training_script_executed": false,
+      "previous_repository_path": "scripts/week9b_human_cross_species.py",
+      "previous_portable_sha256": "2fbfd7040fee5039c60d41c03d885ee9df5f7a6bf9b6164aa1452861d49d47c7",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "notebooks/01_walesky_loading.ipynb",
@@ -358,13 +388,15 @@
       "original_sha256": "949bb20b862b8f4716d385004e4585be3bf486b93675a47c06cddb56cc20491c",
       "collected_sha256": "321173ae34a5c40879d885d3f0070f38db1bee5b6d35030d7584aad11dfd49b2",
       "repository_path": "notebooks/02_umbaugh_2h_loading.ipynb",
-      "portable_sha256": "b061e28dd57276efdb5a35abd9d9139c8dc9458f664b0065d19564bd8e3a1b14",
+      "portable_sha256": "963010bfa3f0482642953a8e3d50249e5bcfe62ec2de6170d48e4378f01d86cb",
       "status": "preprocessing_notebook_source_not_clean_run_verified",
       "changed_path_cells": [
         0
       ],
-      "scientific_ast_unchanged": true,
-      "notebook_code_cells": 11
+      "scientific_ast_unchanged": false,
+      "notebook_code_cells": 11,
+      "support_repair": "Restore missing QC-annotation calculation or existing dense-branch import; original filters and data labels retained.",
+      "full_raw_data_replayed_after_repair": false
     },
     {
       "original_path": "notebooks/03_benmoshe_loading.ipynb",
@@ -409,27 +441,33 @@
       "original_path": "notebooks/06_week1_master_summary.ipynb",
       "original_sha256": "daa830363c356c77f6d7c0b4bf3fe07be9ba7f3ccf9f6ce91135a0e94dff879d",
       "collected_sha256": "66a18222d0a74730a3cf26845140210b1dce734decdf8d03a2f5beaf2e9da055",
-      "repository_path": "notebooks/06_week1_master_summary.ipynb",
-      "portable_sha256": "618bd92d2f5345a98549ea9a9252d6bf776a15840e16a4138ae1d66577044733",
+      "repository_path": "notebooks/06_cohort_summary.ipynb",
+      "portable_sha256": "b48ba5c377f5f39e205a54b5e3281ba39e920ec3e54da133180e1d6ca7d15b1e",
       "status": "preprocessing_notebook_source_not_clean_run_verified",
       "changed_path_cells": [
         0
       ],
       "scientific_ast_unchanged": true,
-      "notebook_code_cells": 2
+      "notebook_code_cells": 2,
+      "previous_repository_path": "notebooks/06_week1_master_summary.ipynb",
+      "previous_portable_sha256": "618bd92d2f5345a98549ea9a9252d6bf776a15840e16a4138ae1d66577044733",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "notebooks/07_week2_normalization_clustering.ipynb",
       "original_sha256": "739b2f146b5285acab57ce3793a01b52f89477085402c8d11c57bee933bd05ce",
       "collected_sha256": "746e2d81c170f171efb105fd12a97a05345fbdda4e987dcb1041f24372fd8e75",
-      "repository_path": "notebooks/07_week2_normalization_clustering.ipynb",
-      "portable_sha256": "a621f727b91f71e3968d76825d1ab2d9427c9c6577f7961dbe8d879cb7f71111",
+      "repository_path": "notebooks/07_normalization_clustering.ipynb",
+      "portable_sha256": "19e5acde70e37897c105e28e0aba782f1c6d70f8e10416892676c3e22c43117d",
       "status": "preprocessing_notebook_source_not_clean_run_verified",
       "changed_path_cells": [
         0
       ],
       "scientific_ast_unchanged": true,
-      "notebook_code_cells": 9
+      "notebook_code_cells": 9,
+      "previous_repository_path": "notebooks/07_week2_normalization_clustering.ipynb",
+      "previous_portable_sha256": "a621f727b91f71e3968d76825d1ab2d9427c9c6577f7961dbe8d879cb7f71111",
+      "public_cleanup": "Descriptive source filename and module documentation; numerical operations unchanged."
     },
     {
       "original_path": "notebooks/08_scvi_integration.ipynb",
@@ -449,13 +487,15 @@
       "original_sha256": "9d679a60aa4ae2d2e63ffd989a2630e27d7b14029834e65907110310f1367f0f",
       "collected_sha256": "4b753a67f5058b4217bc3ce867390ebb5ec487e06fcf1b2ebe21f0c3996fcf59",
       "repository_path": "notebooks/09_monocle_export.ipynb",
-      "portable_sha256": "197221cc589396c7351cd05648e537cafe3ab57ac9ca5ee2c44064b3df40ff58",
+      "portable_sha256": "dee14be7596a90285e1b6dfe15be29ae1d4ba8015d0293ab377ba4a0d707aa9b",
       "status": "preprocessing_notebook_source_not_clean_run_verified",
       "changed_path_cells": [
         0
       ],
-      "scientific_ast_unchanged": true,
-      "notebook_code_cells": 2
+      "scientific_ast_unchanged": false,
+      "notebook_code_cells": 2,
+      "support_repair": "Restore missing QC-annotation calculation or existing dense-branch import; original filters and data labels retained.",
+      "full_raw_data_replayed_after_repair": false
     },
     {
       "original_path": "notebooks/10_pseudotime_import.ipynb",

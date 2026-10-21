@@ -1,65 +1,9 @@
 #!/usr/bin/env python3
-"""
-TrajRisk — Week 9B: Human Cross-Species Validation  (corrected)
-===================================================================
-Project : TrajRisk — Trajectory-Informed Risk in APAP Hepatotoxicity
-Journal : Cell Reports Methods
+"""Fit cross-species coordinates and evaluate human donor-level transfer.
 
-COORDINATE-SYSTEM COHERENCE (the central fix in this version)
---------------------------------------------------------------
-The original Week 7 TrajRiskGNN was trained on original mouse-only scVI
-coordinates.  Feeding human cells with cross-species scVI coordinates into
-that model creates a latent-dimension mismatch (dimension i in the original
-mouse scVI space is NOT dimension i in the cross-species scVI space).
-
-Fix: after training cross-species scVI, we RETRAIN TrajRiskGNN on Walesky
-cells using their CROSS-SPECIES scVI latent coordinates.  Same architecture,
-same pseudotime_norm labels, same transition graphs, same train/val split —
-only the node features change.  This creates a cross-species-compatible model
-where:
-
-  x_walesky_cross = [z_walesky_cross (30D) ; r_cross_seeder (1D)]
-  x_human_cross   = [z_human_cross   (30D) ; r_cross_seeder (1D)]
-
-Both species are now in the SAME 30-dimensional coordinate system.
-
-The original Week 7 model (week7_trajrisk_FINAL.pt) is NOT modified and
-continues to be used for all mouse analyses.
-
-ANALYSIS LAYERS
----------------
-  Layer 1   Cross-species scVI (Walesky + Human, 13,122 strict 1:1 orthologs)
-  Layer 2A  W_self-only transfer  →  PRIMARY RESULT
-  Layer 2B  Scale-specific KNN   →  SENSITIVITY ANALYSIS
-  Layer 3   Independent dual gene signature (risk / recovery)
-
-PRIMARY STATISTICS
-------------------
-  Donor-level Mann-Whitney U  (10 ALF patients vs 9 Healthy donors)
-  Cell-level statistics in supplement only (pseudoreplication-aware)
-
-SENSITIVITY ANALYSES
---------------------
-  (a) KNN vs W_self comparison
-  (b) Exclude low-cell-count APAP patients (< 300 cells)
-
-CONFIRMED DATA (from two diagnostic runs before writing this script)
---------------------------------------------------------------------
-  matchett_human_hepatocytes.h5ad  49,984 cells, 33,538 genes
-  Condition column: 'condition'  values: 'APAP_ALF', 'Healthy'
-  Patient column:   'sample'    e.g. GSM6964924_apap01
-  10 APAP patients, 9 Healthy donors  (apap09A+B merged → apap09)
-  Strict 1:1 orthologs in both adatas: 13,122
-
-RUNTIME ESTIMATE
-  Cross-species scVI:         30-60 min CPU
-  Cross-species TrajRisk:      5-10 min CPU
-  Everything else:             5-10 min CPU
-
-Usage:
-    conda activate trajrisk
-    cd /path/to/TrajRisk
-    python scripts/week9b_human_cross_species.py
+Supervised graph-model training uses Walesky mouse cells in shared coordinates.
+W_self-only is the primary human transfer mode; Reference-KNN is a sensitivity
+analysis. Human nuclei are summarized over 10 APAP-ALF and 9 healthy donors.
 """
 
 import json
@@ -1046,7 +990,7 @@ def main() -> None:
     donor_sens.to_csv(RES / "week9b_donor_sensitivity.csv", index=False)
 
     summary = {
-        "script": "week9b_human_cross_species.py",
+        "script": "validate_human_transfer.py",
         "n_orthologs": len(gi["shared_mouse"]),
         "n_wal": n_wal, "n_human": combined.n_obs - n_wal,
         "cs_trajrisk_val_auroc": cs_val_auroc,

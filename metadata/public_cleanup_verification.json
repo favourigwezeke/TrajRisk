@@ -1,0 +1,507 @@
+{
+  "date": "2026-10-21",
+  "frozen_replay": {
+    "status": "passed",
+    "input_packet_files_verified": 135,
+    "input_packet_manifest_sha256": "ad5127aac02d978b282673c293ccbc271391ff053ec1cd24b6af749977403aee",
+    "environment": {
+      "python": "3.12.14",
+      "platform": "Linux",
+      "torch": "2.10.0+cpu",
+      "torch-geometric": "2.7.0",
+      "numpy": "2.2.6",
+      "pandas": "2.3.3",
+      "scipy": "1.15.2",
+      "scikit-learn": "1.7.2",
+      "xgboost": "3.2.0",
+      "joblib": "1.5.3"
+    },
+    "bootstrap_ci_replayed": true,
+    "checks": [
+      {
+        "check": "Reference barcode order",
+        "passed": true
+      },
+      {
+        "check": "Reference features: 6,582 x 31",
+        "passed": true
+      },
+      {
+        "check": "Four graph edge counts",
+        "passed": true
+      },
+      {
+        "check": "87,233 trainable parameters",
+        "passed": true
+      },
+      {
+        "check": "Reference frozen scores",
+        "passed": true,
+        "max_absolute_difference": 1.4733810427269844e-07,
+        "absolute_tolerance": 2e-06,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "Four saved scale embeddings",
+        "passed": true,
+        "max_absolute_difference": 1.1444091796875e-05,
+        "absolute_tolerance": 3e-05,
+        "relative_tolerance": 1e-05
+      },
+      {
+        "check": "Validation MSE",
+        "passed": true,
+        "max_absolute_difference": 1.2523909296777158e-10,
+        "absolute_tolerance": 2e-08,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "Validation AUROC rounds to 0.9071",
+        "passed": true
+      },
+      {
+        "check": "Reference latent axis in integrated object",
+        "passed": true,
+        "max_absolute_difference": 0.0,
+        "absolute_tolerance": 0,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "Ben_Moshe reference-edge counts",
+        "passed": true
+      },
+      {
+        "check": "Ben_Moshe / trajrisk_knn table match",
+        "passed": true
+      },
+      {
+        "check": "Ben_Moshe / trajrisk_knn AUROC and AUPRC",
+        "passed": true,
+        "auroc": 0.7196561964510142,
+        "auprc": 0.5652149995054137
+      },
+      {
+        "check": "Ben_Moshe / trajrisk_knn cohort denominator",
+        "passed": true
+      },
+      {
+        "check": "Ben_Moshe / trajrisk_knn 1,000-bootstrap AUROC CI",
+        "passed": true,
+        "lower": 0.6972888655836075,
+        "upper": 0.7418239399549351
+      },
+      {
+        "check": "Ben_Moshe / trajrisk_wself table match",
+        "passed": true
+      },
+      {
+        "check": "Ben_Moshe / trajrisk_wself AUROC and AUPRC",
+        "passed": true,
+        "auroc": 0.8068599799251117,
+        "auprc": 0.7102618366778384
+      },
+      {
+        "check": "Ben_Moshe / trajrisk_wself cohort denominator",
+        "passed": true
+      },
+      {
+        "check": "Ben_Moshe / trajrisk_wself 1,000-bootstrap AUROC CI",
+        "passed": true,
+        "lower": 0.7869377818106131,
+        "upper": 0.826074085300158
+      },
+      {
+        "check": "Ben_Moshe / seeder table match",
+        "passed": true
+      },
+      {
+        "check": "Ben_Moshe / seeder AUROC and AUPRC",
+        "passed": true,
+        "auroc": 0.854134914409215,
+        "auprc": 0.7370895737099067
+      },
+      {
+        "check": "Ben_Moshe / seeder cohort denominator",
+        "passed": true
+      },
+      {
+        "check": "Ben_Moshe / seeder 1,000-bootstrap AUROC CI",
+        "passed": true,
+        "lower": 0.8380753774875056,
+        "upper": 0.8690931073812798
+      },
+      {
+        "check": "Umbaugh_2h reference-edge counts",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_2h / trajrisk_knn table match",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_2h / trajrisk_knn AUROC and AUPRC",
+        "passed": true,
+        "auroc": 0.6524483573549624,
+        "auprc": 0.7943658535944979
+      },
+      {
+        "check": "Umbaugh_2h / trajrisk_knn cohort denominator",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_2h / trajrisk_knn 1,000-bootstrap AUROC CI",
+        "passed": true,
+        "lower": 0.6450760350984583,
+        "upper": 0.6600063303662235
+      },
+      {
+        "check": "Umbaugh_2h / trajrisk_wself table match",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_2h / trajrisk_wself AUROC and AUPRC",
+        "passed": true,
+        "auroc": 0.6086644893157582,
+        "auprc": 0.7566152922937925
+      },
+      {
+        "check": "Umbaugh_2h / trajrisk_wself cohort denominator",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_2h / trajrisk_wself 1,000-bootstrap AUROC CI",
+        "passed": true,
+        "lower": 0.6011621222276763,
+        "upper": 0.6165883206739843
+      },
+      {
+        "check": "Umbaugh_2h / seeder table match",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_2h / seeder AUROC and AUPRC",
+        "passed": true,
+        "auroc": 0.6464792057468096,
+        "auprc": 0.7901686355808557
+      },
+      {
+        "check": "Umbaugh_2h / seeder cohort denominator",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_2h / seeder 1,000-bootstrap AUROC CI",
+        "passed": true,
+        "lower": 0.6393032319184597,
+        "upper": 0.6541456771910339
+      },
+      {
+        "check": "Umbaugh_48h72h reference-edge counts",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_48h72h / trajrisk_knn table match",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_48h72h / trajrisk_knn AUROC and AUPRC",
+        "passed": true,
+        "auroc": 0.7939053776953098,
+        "auprc": 0.8192012459635781
+      },
+      {
+        "check": "Umbaugh_48h72h / trajrisk_knn cohort denominator",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_48h72h / trajrisk_knn 1,000-bootstrap AUROC CI",
+        "passed": true,
+        "lower": 0.7824332972541914,
+        "upper": 0.8067117382207615
+      },
+      {
+        "check": "Umbaugh_48h72h / trajrisk_wself table match",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_48h72h / trajrisk_wself AUROC and AUPRC",
+        "passed": true,
+        "auroc": 0.8958453054357385,
+        "auprc": 0.9046534911125687
+      },
+      {
+        "check": "Umbaugh_48h72h / trajrisk_wself cohort denominator",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_48h72h / trajrisk_wself 1,000-bootstrap AUROC CI",
+        "passed": true,
+        "lower": 0.8869344612565769,
+        "upper": 0.9047367382254419
+      },
+      {
+        "check": "Umbaugh_48h72h / seeder table match",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_48h72h / seeder AUROC and AUPRC",
+        "passed": true,
+        "auroc": 0.9329689198451877,
+        "auprc": 0.930550128236918
+      },
+      {
+        "check": "Umbaugh_48h72h / seeder cohort denominator",
+        "passed": true
+      },
+      {
+        "check": "Umbaugh_48h72h / seeder 1,000-bootstrap AUROC CI",
+        "passed": true,
+        "lower": 0.926333252054086,
+        "upper": 0.9396332856544721
+      },
+      {
+        "check": "Cross-species reference barcode order",
+        "passed": true
+      },
+      {
+        "check": "Strict shared mouse-human symbol pairs",
+        "passed": true
+      },
+      {
+        "check": "Cross-species expression-axis gene order",
+        "passed": true
+      },
+      {
+        "check": "Human barcode order",
+        "passed": true
+      },
+      {
+        "check": "Human frozen risk_2a",
+        "passed": true,
+        "max_absolute_difference": 2.0757522578573884e-07,
+        "absolute_tolerance": 2e-06,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "Human frozen risk_2b",
+        "passed": true,
+        "max_absolute_difference": 2.5763931277289487e-07,
+        "absolute_tolerance": 2e-06,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "primary donor counts",
+        "passed": true
+      },
+      {
+        "check": "primary risk_2a donor AUROC",
+        "passed": true,
+        "max_absolute_difference": 0.0,
+        "absolute_tolerance": 1e-12,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "primary risk_2a donor one-sided MW p",
+        "passed": true,
+        "max_absolute_difference": 0.0,
+        "absolute_tolerance": 1e-12,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "primary risk_2a donor means",
+        "passed": true,
+        "max_absolute_difference": 6.6227383022088304e-09,
+        "absolute_tolerance": 2e-06,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "primary risk_2b donor AUROC",
+        "passed": true,
+        "max_absolute_difference": 0.0,
+        "absolute_tolerance": 1e-12,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "primary risk_2b donor one-sided MW p",
+        "passed": true,
+        "max_absolute_difference": 0.0,
+        "absolute_tolerance": 1e-12,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "primary risk_2b donor means",
+        "passed": true,
+        "max_absolute_difference": 7.450580596923828e-09,
+        "absolute_tolerance": 2e-06,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "sensitivity donor counts",
+        "passed": true
+      },
+      {
+        "check": "sensitivity risk_2a donor AUROC",
+        "passed": true,
+        "max_absolute_difference": 0.0,
+        "absolute_tolerance": 1e-12,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "sensitivity risk_2a donor one-sided MW p",
+        "passed": true,
+        "max_absolute_difference": 0.0,
+        "absolute_tolerance": 1e-12,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "sensitivity risk_2a donor means",
+        "passed": true,
+        "max_absolute_difference": 6.6227383022088304e-09,
+        "absolute_tolerance": 2e-06,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "sensitivity risk_2b donor AUROC",
+        "passed": true,
+        "max_absolute_difference": 0.0,
+        "absolute_tolerance": 1e-12,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "sensitivity risk_2b donor one-sided MW p",
+        "passed": true,
+        "max_absolute_difference": 0.0,
+        "absolute_tolerance": 1e-12,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "sensitivity risk_2b donor means",
+        "passed": true,
+        "max_absolute_difference": 7.036659449566329e-09,
+        "absolute_tolerance": 2e-06,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "All-edge flux = weight x source score",
+        "passed": true,
+        "max_absolute_difference": 1.84590339541435e-09,
+        "absolute_tolerance": 1e-07,
+        "relative_tolerance": 2e-06
+      },
+      {
+        "check": "All-edge signed amplification = target - source",
+        "passed": true,
+        "max_absolute_difference": 2.980194091506405e-08,
+        "absolute_tolerance": 2e-07,
+        "relative_tolerance": 0
+      },
+      {
+        "check": "Within-scale top-percentile bottleneck counts",
+        "passed": true,
+        "counts": [
+          1677,
+          637,
+          1175,
+          728
+        ]
+      },
+      {
+        "check": "S6F higher-quartile boundary ties and edge counts",
+        "passed": true,
+        "source_cells": [
+          261,
+          260,
+          261,
+          261
+        ],
+        "cutoffs": [
+          0.016547829,
+          0.056113873,
+          0.0923301125
+        ]
+      },
+      {
+        "check": "S6F normalized source values do not exceed 1",
+        "passed": true
+      },
+      {
+        "check": "Distinct human genes significant at nominal p <= .05",
+        "passed": true,
+        "fraction": 0.4037095501183899
+      },
+      {
+        "check": "Scale1_AcuteStress corrected distinct-human significance counts",
+        "passed": true
+      },
+      {
+        "check": "Scale2_PeakInjury corrected distinct-human significance counts",
+        "passed": true
+      },
+      {
+        "check": "Scale3_FateDecision corrected distinct-human significance counts",
+        "passed": true
+      },
+      {
+        "check": "Scale4_Resolution corrected distinct-human significance counts",
+        "passed": true
+      },
+      {
+        "check": "All input files unchanged after replay",
+        "passed": true,
+        "files_checked": 135,
+        "changed": []
+      }
+    ],
+    "notes": [
+      "Cdkn1a labels require expression values and were not regenerated from the compact packet. B1 is not refitted or assigned placeholder predictions.",
+      "The historical manuscript_mouse_cell_scores.csv is not used as a corrected Figure 5B score source. Use the frozen-replay external_mouse_predictions.csv.",
+      "Human signature gene selection and normalization require expression matrices; frozen risk scoring and donor statistics are replayed here, not signature discovery.",
+      "Per-scale conservation uses the previously audited mouse-selection rule; the original conservation/pathway generator is not recovered or rerun."
+    ],
+    "error": null,
+    "scope": "Frozen inference and saved-output numerical replay. No training, expression reconstruction, R rerun, or canonical figure replacement.",
+    "remaining": [
+      "Clean raw-expression preprocessing/training replay",
+      "Final main-figure generator alignment",
+      "Full training-environment installation including scVI; original RStudio versions remain user-confirmed"
+    ]
+  },
+  "supplementary_figures": [
+    {
+      "file": "Figure_S1_external_dataset_QC_FINAL.pdf",
+      "bytes": 71597,
+      "sha256": "17d31134987c4ef0ca5211e791462a71fe60596c42d22918b16b7c796ac04aba"
+    },
+    {
+      "file": "Figure_S2_pseudotime_representation_FINAL.pdf",
+      "bytes": 58689,
+      "sha256": "2d7463bb1f438a74b2c50f9b5cf2b0cc7e49b4afd1e9991154e8c78f50964f05"
+    },
+    {
+      "file": "Figure_S3_cross_species_diagnostics_FINAL.pdf",
+      "bytes": 208853,
+      "sha256": "a3dcf08fcfdd860463d13f1cbdaaab5ecfabebb90667ee6afbbf3ac1ddb2c3a9"
+    },
+    {
+      "file": "Figure_S4_spatial_validation_FINAL.pdf",
+      "bytes": 38025,
+      "sha256": "16779ebad2c235ccd95fa38581b7217bcd5abb8c5f80aae6786c4f488e7b6940"
+    },
+    {
+      "file": "Figure_S5_bottleneck_sensitivity_FINAL.pdf",
+      "bytes": 25248,
+      "sha256": "3620afb83084ffca2e3c297b8e842f49a5004b31fa05657fff348de9f2a659a5"
+    }
+  ],
+  "notebook_repair_checks": {
+    "qc_dense_and_sparse_counts": "passed; totals, detected genes, mitochondrial percentage and strict >1000 filter checked",
+    "monocle_dense_and_sparse_export": "passed; matrix entries and orientation preserved"
+  },
+  "manuscript_assets_unchanged": 101,
+  "original_core_executable_asts_unchanged": 7,
+  "wrapper_syntax": "bash -n passed",
+  "scope": "Saved-model calculations and supplementary figure generation. No raw-data training replay or main-figure replacement.",
+  "publisher_guard_tests": {
+    "cases": 16,
+    "result": "passed; publication preservation, source-change rejection, workflow patching, checksum rejection, push/dispatch resume and release idempotency"
+  }
+}

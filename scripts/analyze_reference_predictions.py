@@ -1,44 +1,8 @@
 #!/usr/bin/env python3
-"""
-TrajRisk: Week 8 Supplementary Analysis
-========================================
-Computes the four metrics that close out Week 8:
+"""Evaluate reference predictions within sampling-time subsets.
 
-  1. Week 6 XGBoost seeder AUROC on val
-     Already computed — just evaluates week6_xgboost_risk.npy.
-     Tests: what does the initial risk seed alone achieve?
-
-  2. Non-6h AUROC
-     Removes 6h cells from the val set. The remaining cells are
-     0h, 24h, 48h, 96h — where risk is NOT dominated by the
-     near-perfect 6h vs non-6h separation.
-     Methods compared: TrajRisk, Seeder, B1 XGBoost.
-
-  3. 24h-only AUPRC
-     Among the ~209 24h val cells, ~11 are high-risk (5.2%).
-     AUPRC is reported (not AUROC) because at 5% prevalence,
-     AUROC overstates separability; AUPRC directly measures
-     precision of the high-risk ranking.
-     Biological meaning: these are functional compensation cells
-     (Cyp2e1+, non-proliferating) described in Walesky 2020.
-
-  4. 96h-only AUPRC
-     Same logic. ~162 96h val cells, ~9 high-risk (5.6%).
-     Biological meaning: late-compensating subset persisting
-     beyond expected recovery window.
-
-B1 XGBoost is refitted here using the best hyperparameters
-selected by 5-fold CV in Week 8 (n_estimators=500, max_depth=6,
-learning_rate=0.05). No additional CV is performed.
-
-All predictions are compared against the binary label
-pseudotime_norm > HIGH_RISK_THRESHOLD (0.10), identical
-to the Week 8 evaluation protocol.
-
-Outputs
--------
-results/week8_supplementary_table.csv
-results/figures/week8_within_timepoint_auprc.png
+Compare TrajRisk, the initial seed and the expression-only XGBoost comparator
+using the recorded split and normalized-pseudotime threshold.
 """
 
 import logging

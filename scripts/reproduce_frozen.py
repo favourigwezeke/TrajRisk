@@ -52,6 +52,9 @@ def sha256(path):
 def open_bundle(path, destination):
     path = path.expanduser().resolve()
     if path.is_file():
+        release = json.loads((REPO / "metadata/frozen_release.json").read_text())
+        if sha256(path) != release["archive_sha256"]:
+            raise ValueError("Input ZIP differs from the verified frozen archive")
         destination.mkdir(parents=True, exist_ok=True)
         with zipfile.ZipFile(path) as archive:
             for member in archive.infolist():
@@ -151,10 +154,10 @@ class Replay:
         return read_csv(REPO / "manuscript/tables/data" / filename)
 
     def reference(self):
-        self.mouse_source = source_module("week9a_mouse_cross_dataset_final.py", [
+        self.mouse_source = source_module("validate_mouse_transfer.py", [
             "TrajRiskConv", "TrajRiskGNN", "get_scale_and_anchors_for_cell",
             "build_cell_specific_reference_edges", "bootstrap_auroc_ci"])
-        self.human_source = source_module("week9b_human_cross_species.py", [
+        self.human_source = source_module("validate_human_transfer.py", [
             "prepare_ortholog_gene_space", "_gaussian_knn_edges", "_assign_scale", "compute_human_risk_scores"])
         self.x = torch.load(self.processed / "week6_node_features.pt", map_location="cpu", weights_only=True)
         self.graphs = torch.load(self.processed / "multiscale_graphs.pt", map_location="cpu", weights_only=True)

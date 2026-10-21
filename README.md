@@ -1,62 +1,58 @@
 # TrajRisk
 
-TrajRisk learns treatment-aware, directed transition graphs at four temporal scales and integrates expression-derived features with a graph neural network. Its dimensionless score estimates normalized Monocle 3 pseudotime in a mouse injury–recovery reference.
+**Treatment-aware, multi-scale graph neural networks for studying liver injury and recovery.**
 
-## Current contents
+TrajRisk learns directed transition graphs from sampling times, treatment labels and single-cell transcriptomic features. Four graph branches represent acute stress, peak injury, fate decision and resolution. Their embeddings are combined to estimate normalized Monocle 3 pseudotime in the mouse injury–recovery reference. The resulting dimensionless trajectory-state score is the operational meaning of “risk” in TrajRisk; it is not a probability of an adverse clinical outcome.
 
-This repository draft contains the six audited core analysis scripts, preprocessing notebooks and R trajectory source, supplementary-figure generators, the active LaTeX manuscript, Figures 1–7 and S1–S5, 20 table CSV components, and Data S1–S5. Portable scripts use relative input paths and isolated build outputs. Source provenance is in `metadata/workflow_sources.json`.
+The analysis includes mouse reference training, external mouse and human reference projection, expression-only comparators, and graph perturbations that nominate candidate recovery-associated transitions.
 
-## Reproduce saved-model results
-
-Download the versioned frozen inputs using [the frozen-input reproduction instructions](docs/frozen_inputs.md). Input checksums are recorded in `metadata/frozen_input_manifest.json`.
-
-From this directory:
+## Get started
 
 ```bash
-python3 -m venv .venv
+git clone https://github.com/favourigwezeke/TrajRisk.git
+cd TrajRisk
+```
+
+For saved-model reproduction on Linux, use Python 3.12 and the tested environment:
+
+```bash
+python3.12 -m venv .venv
 source .venv/bin/activate
-python3 -m pip install -r requirements-frozen.txt
+python -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r environments/frozen-linux-py312.lock.txt
+```
+
+Download the versioned frozen inputs and reproduce the saved-model analyses and supplementary figures:
+
+```bash
+gh release download v0.1.0-rc1 --repo favourigwezeke/TrajRisk \
+  --pattern TrajRisk_frozen_inputs.zip --pattern SHA256SUMS --dir build/downloads
 bash scripts/reproduce_saved.sh build/downloads/TrajRisk_frozen_inputs.zip
 ```
 
-An existing environment with these dependencies can run the script directly. On Linux, CPU-only PyTorch can be installed first with `python3 -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu`.
+The download command uses [GitHub CLI](https://cli.github.com/). Alternatively, download the ZIP from the [input release](https://github.com/favourigwezeke/TrajRisk/releases/tag/v0.1.0-rc1) and pass its local filename to the same reproduction command. Input checksums are verified before analysis.
 
-The command verifies the supplied assets, replays frozen reference and external mouse/human models, checks published metrics and derived results, and regenerates Figures S1–S5. Predictions, metrics and a JSON report go to `build/frozen_replay/`; plots go to `build/figures/supplementary/`. Canonical manuscript assets are preserved. For inference alone, use `python3 scripts/reproduce_frozen.py --bundle build/downloads/TrajRisk_frozen_inputs.zip --bootstrap-ci`.
-
-## Check the supplied files
-
-From this directory, run:
-
-```bash
-python scripts/verify_release_assets.py
-```
-
-This checks file hashes, citation matching, equation count, and the supplied CSV structures. It does not rerun models or regenerate plots.
-
-## Compile the combined review PDF
-
-Upload `manuscript/` to Overleaf, select `review_all.tex`, and use pdfLaTeX. Alternatively, run `python scripts/build_manuscript.py` with pdfLaTeX installed. The combined review is the canonical reading version and includes the supplement. Its scientific sources retain the approved 178-word abstract, 126 references, and 26 numbered equations.
-
-## Environment
-
-The frozen workflow has been tested in a new Linux/Python 3.12 environment. Its resolved package snapshot is `environments/frozen-linux-py312.lock.txt`. Plot typography follows available fonts; the generators request Arial. The root `environment.yml` and `requirements.txt` record the broader project dependencies; full observed Python/Conda snapshots are in `environments/`. A clean installation of the full training environment remains to be tested.
+Generated predictions, metrics and the report are written to `build/frozen_replay/`; Figures S1–S5 are written to `build/figures/supplementary/`. See the [reproduction guide](docs/reproduction.md) for outputs, expected checks and supported scope.
 
 ## Analysis workflow
 
-1. Acquire and preprocess the datasets described in `docs/datasets.md`.
-2. Integrate expression data with scVI and derive Walesky Monocle 3 pseudotime.
-3. Construct temporal transition matrices with `week5_transition_matrices.py`.
-4. Build the graph inputs with `week6_gnn_architecture.py` and train with `week7_full_training.py`.
-5. Evaluate baselines with `week8_baselines_ablations.py`.
-6. Evaluate mouse and human transfer with `week9a_mouse_cross_dataset_final.py` and `week9b_human_cross_species.py`.
-7. Use the supported frozen workflow for supplementary plots and checked endpoints. Complete final main-figure assembly and remaining table reproduction before claiming end-to-end reproduction.
+To preprocess the study data, train the reference model or run the complete external-cohort analyses, follow the [analysis workflow](docs/workflow.md). It links each stage to its inputs, script and outputs. Full-expression analyses use the [study datasets](docs/datasets.md) and the [analysis environment](environments/README.md).
 
-Training scripts expect `Data/processed/`, `models/`, and `results/` beneath the project root. Full expression, RF and scVI model archives remain separate inputs. The user-confirmed trajectory environment is RStudio R 4.5.1 / Monocle 3 1.4.27. `docs/reproduction_status.md` records the tested scope and remaining work.
+| Component | Location |
+| --- | --- |
+| Dataset preprocessing and trajectory inference | [notebooks/](notebooks/README.md) |
+| Transition graphs, model training and external validation | [scripts/](docs/workflow.md) |
+| Supplementary figure generation | [scripts/figures/](scripts/figures/README.md) |
+| Manuscript, canonical figures and supplementary data | [manuscript/](manuscript/) |
+| Environment specifications | [environments/](environments/README.md) |
+| Data definitions and reproduction instructions | [docs/](docs/reproduction.md) |
 
-## Interpretation
+## Interpretation and supported use
 
-The score describes a model-derived trajectory state. Reference evaluation is transductive, external performance varies across cohorts, and the candidate recovery gateway is a hypothesis for experimental testing. The manuscript reports expression-only comparators and null signature/spatial findings.
+TrajRisk describes position in an injury–recovery reference. Reference-KNN projects query cells onto that reference; it does not infer a human temporal trajectory. External performance is cohort-dependent. Candidate bottlenecks and recovery gateways are model-derived hypotheses for experimental follow-up. The accompanying manuscript reports the comparator results and biological limitations.
 
-## Before public release
+## Citation, license and support
 
-Complete final main-figure generator alignment, remaining table/raw-data reproduction, and versioned data/model deposition. Add the author-approved code license, citation metadata, repository URL and release identifier. This repository supports the TrajRisk preprint workflow. PyPI packaging can follow the preprint.
+When using TrajRisk, cite the accompanying manuscript and identify the software commit or release used. Frozen input archives have their own version and checksum; the [input guide](docs/frozen_inputs.md) explains how they relate to the code version.
+
+See [LICENSE](LICENSE) for the code's licensing terms. Please report questions and reproducible problems through [GitHub Issues](https://github.com/favourigwezeke/TrajRisk/issues).

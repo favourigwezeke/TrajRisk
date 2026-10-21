@@ -1,7 +1,5 @@
-# Figure sources
+# Figure generation
 
-`make_figure_s1.py` through `make_figure_s5.py` are the collected supplementary-figure generators. Their calculations and statistical assertions are unchanged. File paths now select saved inputs using `TRAJRISK_ROOT`, use the canonical manuscript table/data CSVs, and write generated outputs beneath this repository's `build/figures/supplementary/`.
+The active supplementary generators are `make_figure_s1.py` through `make_figure_s5.py`. Run them through `bash scripts/reproduce_saved.sh INPUT_ZIP`, which verifies and resolves the compact metadata, latent coordinates and result CSVs first. Outputs are written beneath `build/figures/supplementary/`.
 
-The candidate main-figure component scripts in `candidates/` still require alignment with the canonical final figures. Earlier full-figure sources are archived. In particular, an earlier Figure 6 generator still reads the old overall percentage and calls it a mean; it is not the publication generator.
-
-The final PDFs in `manuscript/figures/` are the canonical assets. They are not overwritten by these generators. Numerical replay and plot comparisons remain pending the saved-input packet.
+Canonical publication exports are in `manuscript/figures/`. Older main-figure component sources are retained under `archive/figure_components/` and excluded from the active wrapper because they predate final panel/composite corrections. See [the reproduction map](../../docs/reproduction.md) for exact coverage.

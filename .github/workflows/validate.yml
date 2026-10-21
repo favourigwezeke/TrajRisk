@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
+      - name: Verify portable sources
+        run: python scripts/verify_repository.py
       - name: Verify publication assets
         run: python scripts/verify_release_assets.py
       - name: Check Python syntax

@@ -1,79 +1,9 @@
 #!/usr/bin/env python3
-"""
-TrajRisk — Week 9A: Mouse Cross-Dataset Validation (Reference-KNN)
-===================================================================
-Project : TrajRisk — Trajectory-Informed Risk Propagation in APAP Hepatotoxicity
-Journal : Cell Reports Methods
+"""Evaluate mouse external transfer using frozen reference weights.
 
-WHAT THIS IS
-------------
-This is the final Week 9A mouse cross-dataset validation script.
-Week 9B (human cross-species) follows this.
-
-WHAT TRAJRISK IS (NOT AN APAP CLASSIFIER)
--------------------------------------------
-TrajRisk is a multi-scale trajectory risk propagation model.
-It was trained to predict pseudotime_norm — a continuous measure of
-where a hepatocyte sits in the Walesky APAP injury-to-recovery trajectory.
-
-  Scale 1 (AcuteStress,   0h  → 6h ): risk INCREASES — cells moving toward peak injury
-  Scale 2 (PeakInjury,    6h  → 24h): risk begins decreasing — peak to early recovery
-  Scale 3 (FateDecision,  24h → 48h): risk DECREASES — strongest recovery signal
-  Scale 4 (Resolution,    48h → 96h): risk stays low — late recovery
-
-TrajRisk is not an APAP-vs-Control expression classifier.
-APAP-vs-Control benchmarks test a different question than TrajRisk was built for.
-The correct benchmark for TrajRisk is: does it identify cells in high-trajectory-risk
-states? The key results demonstrating this are:
-
-  Week 8 internal:   24h AUPRC 0.4983 vs Seeder 0.3224, B1 XGBoost 0.3793
-  Week 9A external:  Umbaugh 2h KNN AUROC 0.6909 vs Seeder 0.6465, B1 0.6422
-
-WHY MONOCLE WAS RESTRICTED TO WALESKY
-----------------------------------------
-Early experimentation with Monocle3 on all four integrated mouse datasets
-showed that the pseudotime axis INVERTED when multi-dataset trajectory inference
-was run. This confirmed that the Walesky trajectory geometry is platform-specific
-(Seq-Well), and multi-dataset pseudotime is not meaningful. This is why:
-  (a) Trajectory inference was restricted to Walesky only
-  (b) TrajRisk's training target (pseudotime_norm) is Walesky-specific
-  (c) Cross-dataset transfer uses reference-KNN projection, not re-inference
-
-REFERENCE-KNN PROJECTION DESIGN
----------------------------------
-For each external cell, TrajRisk finds k=15 nearest Walesky ANCHOR cells
-in the integrated 30D scVI space and adds directed edges:
-  Walesky anchor → external cell (source_to_target, biologically motivated)
-
-Anchor selection is cell-specific and biologically motivated:
-  Control cells             → Walesky 0h control anchors (Scale 1)
-  Umbaugh 2h APAP           → Walesky 0h + 6h anchors    (Scale 1: early injury)
-  Ben-Moshe APAP 48h        → Walesky 24h + 48h anchors  (Scale 3: fate decision)
-  Ben-Moshe APAP 72h        → Walesky 48h + 96h anchors  (Scale 4: resolution)
-  Umbaugh 48h/72h APAP 48h  → Walesky 24h + 48h anchors  (Scale 3)
-  Umbaugh 48h/72h APAP 72h  → Walesky 48h + 96h anchors  (Scale 4)
-
-Edges are injected ONLY into the biologically relevant scale branch,
-not into all 4 scales identically.
-
-METHODS REPORTED
------------------
-  trajrisk_knn   — reference-KNN TrajRisk (this script's main result)
-  trajrisk_wself — W_self-only TrajRisk   (retained for comparison)
-  seeder         — Week 6 XGBClassifier   (0h vs 6h expression only, no graph)
-  b1_xgb         — Week 8 XGBRegressor   (scVI → pseudotime_norm, expression only)
-
-OUTPUTS
---------
-  results/week9a_mouse_validation_table.csv
-  results/week9a_mouse_p21_analysis.csv
-  results/week9a_mouse_summary.csv
-  results/week9a_mouse_summary.json
-
-Usage:
-    conda activate trajrisk
-    cd /path/to/TrajRisk
-    python scripts/week9a_mouse_cross_dataset_final.py
+Reference-KNN uses 15 reference neighbours in the appropriate temporal branch;
+W_self-only and expression-only comparators are also evaluated. Cohort-dependent
+results are reported against the specified treatment and Cdkn1a endpoints.
 """
 
 import json
@@ -939,7 +869,7 @@ def main() -> None:
 
     with open(out_json, "w") as f:
         json.dump({
-            "script":            "week9a_mouse_cross_dataset_final.py",
+            "script":            "validate_mouse_transfer.py",
             "description":       "Week 9A mouse cross-dataset validation — reference-KNN",
             "knn_k":             KNN_K,
             "anchor_strategy":   "cell-specific, scale-specific, biologically motivated",
@@ -952,7 +882,7 @@ def main() -> None:
 
     log.info(f"\nWeek 9A complete in {(time.time()-t_start)/60:.1f} minutes.")
     log.info("Next: Week 9B — Human Cross-Species Validation")
-    log.info("  Script: week9b_human_cross_species.py")
+    log.info("  Script: validate_human_transfer.py")
 
 
 if __name__ == "__main__":

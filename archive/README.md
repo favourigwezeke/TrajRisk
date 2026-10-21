@@ -1,5 +1,5 @@
-# Earlier source versions
+# Source history
 
-These scripts are retained for provenance and comparison. They are excluded from the active reproduction workflow. Older transfer variants and figure generators predate the frozen-score correction, distinct-human-gene percentages, or final panel wording.
+Earlier transfer implementations, figure components and author-side input collectors are retained here for provenance and excluded from the active entry points. Use the [current analysis workflow](../docs/workflow.md) and [reproduction guide](../docs/reproduction.md).
 
-Backup files explicitly named OLD/backup were omitted from this public draft. Their original hashes and exclusion status remain in `metadata/workflow_sources.json`. The complete uploaded source-collection packet is separate from the repository draft.
+Some archived figure sources predate frozen-score, distinct-human-gene or final panel corrections. Their historical names and hashes remain in `metadata/workflow_sources.json`; they should not replace final publication panels. Redundant OLD/backup files were omitted from the distributed source collection.

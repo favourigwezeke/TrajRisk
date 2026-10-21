@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: Release containing matching code and frozen inputs
+        description: Release containing the verified frozen inputs
         required: true
-        default: v0.1.0-rc2
+        default: v0.1.0-rc1
         type: string
 permissions:
   contents: read
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
-          ref: ${{ inputs.release_tag }}
+          ref: ${{ github.sha }}
           persist-credentials: false
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:

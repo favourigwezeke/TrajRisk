@@ -1,0 +1,140 @@
+{
+  "date": "2026-10-21",
+  "moves": [
+    {
+      "previous_path": "scripts/week5_transition_matrices.py",
+      "path": "scripts/build_transition_graphs.py",
+      "previous_sha256": "e24a14cf022bfa74b6e5bdfccf641b3c21a841a38ee73997b5d4b2270e7cde8d",
+      "executable_ast_unchanged_after_path_normalization": true,
+      "sha256": "d095ccfbbdad8d44c7771910fa52ae656bafc20c5bce9f03ffbdf84f1120f34f",
+      "executable_ast_sha256": "a856f483e83e43b657e3b44ab00c08eb85577761fda8fee71051473cfbdfa110",
+      "legacy_python312_ast_dump_sha256": "86985a51c7697cce5517a3161fc5b6173dd452e527531c92feef9bca507fd9d2"
+    },
+    {
+      "previous_path": "scripts/week6_gnn_architecture.py",
+      "path": "scripts/prepare_graph_inputs.py",
+      "previous_sha256": "95c08f4b578135499ddbbce206cbf049551638454f47769c1efb81492b1de48a",
+      "executable_ast_unchanged_after_path_normalization": true,
+      "sha256": "fa70020bda05ba3da44c12f07496614f033a7f356bef1ae9c64d7d974e0b82e4",
+      "executable_ast_sha256": "9ef814174aa55b721ebc21f69ade0d384d9f7cba1a759350e9aac0dcbd64a6ba",
+      "legacy_python312_ast_dump_sha256": "4fe90e5d5308e4007e8d3f7f9321053a79c26430ae4b1afe1234d5871567a2bc"
+    },
+    {
+      "previous_path": "scripts/week7_full_training.py",
+      "path": "scripts/train_reference_model.py",
+      "previous_sha256": "000a3cea01d9c12a5cf260cad07b57fbeebd0730ca8e39c87983b6d379739534",
+      "executable_ast_unchanged_after_path_normalization": true,
+      "sha256": "6803bdd2154ba8292156275e0d09dfaebe38b738a3a97de1f8606c309eaafa49",
+      "executable_ast_sha256": "bd1925bda6a62182d20d8c2239be9ec629219695e87be04664d34d59633a08f7",
+      "legacy_python312_ast_dump_sha256": "536d71ad69ee52a82353eb442ab26c1b484a9bab9f2d2f22eb6a15008bd7cf39"
+    },
+    {
+      "previous_path": "scripts/week8_baselines_ablations.py",
+      "path": "scripts/evaluate_baselines.py",
+      "previous_sha256": "f89cfe96eb657daa11d86c6e3578aefebc186423547fbdcd63add98400649bce",
+      "executable_ast_unchanged_after_path_normalization": true,
+      "sha256": "3564855ea04cee8954118c628f4d9b4a21838431bc3a6747c575f31e54b81d60",
+      "executable_ast_sha256": "737c233a7393d52ac64617b98dc56ea4afae3e42e629decab792b40574193bae",
+      "legacy_python312_ast_dump_sha256": "c1373295f67bce15f8f9d4db3276f1ea36315f68c5edaae0383d10b7ca56d8ae"
+    },
+    {
+      "previous_path": "scripts/week8_supplementary_analysis.py",
+      "path": "scripts/analyze_reference_predictions.py",
+      "previous_sha256": "474e943da883a4da95f3186ae2055f91b69d80b29f53fb7a228a0a01e90f1b29",
+      "executable_ast_unchanged_after_path_normalization": true,
+      "sha256": "38270b90f3c93e243cb5833bb8b89251c908ffa58690d5088c25549901608f01",
+      "executable_ast_sha256": "a3fca2b2cf030021d2233b4b7903d08b7626e53a316dd61b7331b0c573c96512",
+      "legacy_python312_ast_dump_sha256": "fd31b6ca8611177d1c22a032c7f592dc32a78d7b43f3c92e97ed9be88ca22c2e"
+    },
+    {
+      "previous_path": "scripts/week9a_mouse_cross_dataset_final.py",
+      "path": "scripts/validate_mouse_transfer.py",
+      "previous_sha256": "2307973787a4354ea9d99adc1d1c2216f67092a2b5fad6751af5456f98ae3bf5",
+      "executable_ast_unchanged_after_path_normalization": true,
+      "sha256": "2b6f367bc50432feb9a51f88291c85b99cdeba8896c527ba21d1d811737b6f8e",
+      "executable_ast_sha256": "a89af0cc680a515507b8335d19c1672c844ad5cd43f0203aa654cd78267b3310",
+      "legacy_python312_ast_dump_sha256": "2c0368452a644d2575ad56a3b92db16effca7e208f5175674ff9f65aaac56526"
+    },
+    {
+      "previous_path": "scripts/week9b_human_cross_species.py",
+      "path": "scripts/validate_human_transfer.py",
+      "previous_sha256": "2fbfd7040fee5039c60d41c03d885ee9df5f7a6bf9b6164aa1452861d49d47c7",
+      "executable_ast_unchanged_after_path_normalization": true,
+      "sha256": "675bc5338fcd3531a5ee6f66069dd8957c394f9155da0e584182dba8c94fc215",
+      "executable_ast_sha256": "ee158e7144de15c305b957f4f936d5ce69f2894cbf84285d1f0960160d2c46d8",
+      "legacy_python312_ast_dump_sha256": "e4ae921644c6bca37dd05a89c94896c061ed085d2aeaf736d1b414e2d27666ef"
+    },
+    {
+      "previous_path": "notebooks/06_week1_master_summary.ipynb",
+      "path": "notebooks/06_cohort_summary.ipynb",
+      "previous_sha256": "618bd92d2f5345a98549ea9a9252d6bf776a15840e16a4138ae1d66577044733",
+      "sha256": "b48ba5c377f5f39e205a54b5e3281ba39e920ec3e54da133180e1d6ca7d15b1e"
+    },
+    {
+      "previous_path": "notebooks/07_week2_normalization_clustering.ipynb",
+      "path": "notebooks/07_normalization_clustering.ipynb",
+      "previous_sha256": "a621f727b91f71e3968d76825d1ab2d9427c9c6577f7961dbe8d879cb7f71111",
+      "sha256": "19e5acde70e37897c105e28e0aba782f1c6d70f8e10416892676c3e22c43117d"
+    },
+    {
+      "previous_path": "scripts/figures/candidates/generate_week2_panels.py",
+      "path": "archive/figure_components/generate_reference_panels.py",
+      "previous_sha256": "ac0462e8b5118ec8b5b7f8038db54398c445d563968fb15aa3fcaffdde7c12d9",
+      "sha256": "ac0462e8b5118ec8b5b7f8038db54398c445d563968fb15aa3fcaffdde7c12d9"
+    },
+    {
+      "previous_path": "scripts/figures/candidates/generate_bottleneck_figures.py",
+      "path": "archive/figure_components/generate_bottleneck_panels.py",
+      "previous_sha256": "54956d89df3d9dca0113d08025ca297e6c50d4f1e838bcc36b6a693d46174c47",
+      "sha256": "54956d89df3d9dca0113d08025ca297e6c50d4f1e838bcc36b6a693d46174c47"
+    },
+    {
+      "previous_path": "scripts/figures/candidates/generate_figure1b.py",
+      "path": "archive/figure_components/generate_cohort_panel.py",
+      "previous_sha256": "b6c751f308330defd9c51250666b89136a873cab68e38cc7d7d71b2b857cf2a3",
+      "sha256": "b6c751f308330defd9c51250666b89136a873cab68e38cc7d7d71b2b857cf2a3"
+    },
+    {
+      "previous_path": "scripts/collect_repository_inputs.sh",
+      "path": "archive/author_tools/collect_repository_inputs.sh",
+      "previous_sha256": "c2cbe445562d775ba0252f23edd0e0794f8c9f4c4e13a5c5e97454c8233ac648",
+      "sha256": "f23a017eb9cbeaebdb06f8f62e72b7d7f9b82a135908f19081997ae192a78922",
+      "public_cleanup": "Remove author-specific home-folder discovery from the archived collection utility."
+    },
+    {
+      "previous_path": "scripts/collect_frozen_inputs.sh",
+      "path": "archive/author_tools/collect_frozen_inputs.sh",
+      "previous_sha256": "bf0206e8ac28a4a38b4fa556ec23ea9bc82da3972b4d9a5504f9fc5f8a0a90a4",
+      "sha256": "bf0206e8ac28a4a38b4fa556ec23ea9bc82da3972b4d9a5504f9fc5f8a0a90a4"
+    },
+    {
+      "previous_path": "docs/repository_check1_review.md",
+      "path": "docs/provenance/source_collection_review.md",
+      "previous_sha256": "8ba54bb2f55c7d8795ae5943ece4f3d92d9a5f3e82c802bddffa8d59ecbe437e",
+      "sha256": "8ba54bb2f55c7d8795ae5943ece4f3d92d9a5f3e82c802bddffa8d59ecbe437e"
+    },
+    {
+      "previous_path": "docs/repository_check2_review.md",
+      "path": "docs/provenance/frozen_input_review.md",
+      "previous_sha256": "80fe38bb4134249c4deacd9e808118c82fa88ad5f4bae97c2404beb6974a55e3",
+      "sha256": "80fe38bb4134249c4deacd9e808118c82fa88ad5f4bae97c2404beb6974a55e3"
+    }
+  ],
+  "notebook_repairs": [
+    {
+      "path": "notebooks/09_monocle_export.ipynb",
+      "change": "Import csr_matrix for the existing dense input branch."
+    },
+    {
+      "path": "notebooks/02_umbaugh_2h_loading.ipynb",
+      "change": "Calculate required QC annotations before existing plots and filter; retain the original >200 then >1000 gene thresholds."
+    }
+  ],
+  "excluded_author_documents": [
+    {
+      "path": "docs/submission_checklist.md",
+      "reason": "Internal manuscript preparation checklist; excluded from the public analysis workflow. The author copy is preserved."
+    }
+  ],
+  "executable_ast_hash_format": "portable-python-ast-v1"
+}

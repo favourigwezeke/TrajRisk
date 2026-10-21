@@ -1,62 +1,8 @@
 #!/usr/bin/env python3
-"""
-TrajRisk: Week 7 — Full Model Training
-=======================================
-Project: TrajRisk — Trajectory-Informed Risk Propagation in APAP Hepatotoxicity
-Target Journal: Cell Reports Methods
+"""Train and evaluate the four-branch reference graph neural network.
 
-Overview
---------
-This script trains the final TrajRiskGNN model through three sequential phases:
-
-Phase 1 — Hyperparameter Grid Search (9 configs × 50 epochs ≈ 7 minutes)
-    Tests learning rate × weight decay combinations to identify the configuration
-    that achieves the best validation AUROC before committing to full training.
-    Dropout is fixed at 0.3 (stable choice for this graph density and dataset size).
-
-Phase 2 — Full Training (up to 300 epochs with early stopping, patience=25)
-    Trains the final model using the best configuration from Phase 1.
-    Saves a checkpoint every time validation MSE improves.
-    Learning rate is reduced by half whenever validation loss plateaus for
-    10 consecutive epochs (ReduceLROnPlateau), which is critical for escaping
-    flat regions in the loss landscape that occur around epoch 50-80 for GNNs
-    of this depth.
-
-Phase 3 — Evaluation, Interpretation, and Output
-    Loads the best checkpoint and produces all results needed for the paper:
-    - Per-timepoint predicted risk distributions (biological sanity check)
-    - Scale-importance analysis (which temporal phase contributes most signal)
-    - PCA of multi-scale embeddings coloured by timepoint, treatment, risk
-    - Training curves and prediction visualizations
-    - Risk scores saved back into the AnnData for spatial validation (Week 10)
-
-Inputs  (from Week 6)
--------
-Data/processed/week6_node_features.pt     — (6582, 31) node feature tensor
-Data/processed/week6_training_data.pt     — train/val split and labels
-Data/processed/week6_xgboost_risk.npy    — XGBoost initial risk scores
-Data/processed/multiscale_graphs.pt       — 4 directed PyG graphs (Week 5)
-Data/processed/walesky_cell_index.csv     — cell metadata
-Data/processed/adata_integrated_with_trajectory.h5ad — for writing predictions
-
-Outputs
--------
-models/week7_trajrisk_BEST.pt             — best checkpoint (lowest val MSE)
-models/week7_trajrisk_FINAL.pt            — final epoch state
-Data/processed/week7_predictions.csv     — risk score per cell
-Data/processed/week7_scale_embeddings.npy — (6582, 4, 64) per-scale embeddings
-Data/processed/adata_integrated_with_trajectory.h5ad — updated (+risk_score)
-results/week7_hyperparameter_search.csv  — Phase 1 results table
-results/week7_training_summary.json      — full metrics for manuscript
-results/figures/week7_training_curves.png
-results/figures/week7_risk_distributions.png
-results/figures/week7_scale_embeddings_pca.png
-results/figures/week7_predictions_scatter.png
-
-Usage
------
-    conda activate trajrisk
-    python scripts/week7_full_training.py
+The supervised target is normalized Monocle 3 pseudotime. Each branch produces
+a 64-dimensional embedding; the prediction head integrates their concatenation.
 """
 
 import os

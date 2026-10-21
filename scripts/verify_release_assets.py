@@ -33,12 +33,15 @@ if equations!=26:
 data_files=json.loads((root/'metadata/supplementary_data_checks.json').read_text())['files']
 for item in data_files:
     path=paper/'data'/item['filename']
+    if not path.is_file():
+        failures.append('Missing supplementary data: '+item['filename'])
+        continue
     with path.open(newline='',encoding='utf-8-sig') as f:
         reader=csv.DictReader(f)
         rows=list(reader)
         if len(rows)!=item['rows'] or reader.fieldnames!=item['columns']:
             failures.append('CSV structure differs: '+item['filename'])
-for p in (root/'scripts').glob('*.py'):
+for p in (root/'scripts').rglob('*.py'):
     try:
         ast.parse(p.read_text())
     except SyntaxError:
@@ -47,7 +50,7 @@ if failures:
     print('\n'.join(failures),file=sys.stderr)
     raise SystemExit(1)
 print('Supplied file hashes: %d match' % len(manifest['files']))
-print('References: 126 entries, all cited exactly once in the bibliography')
+print('References: 126 unique bibliography entries; cited keys and entries match')
 print('Numbered equations: 26')
 print('Data S1–S5: expected columns and record counts match')
 print('This checks the supplied assets; it does not rerun research analyses.')
