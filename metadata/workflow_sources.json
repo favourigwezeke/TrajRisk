@@ -143,56 +143,61 @@
       "original_sha256": "d62f3440d9e0ae1fc276209991a98ecd86292eeb06ecd1183d1694c127663400",
       "collected_sha256": "d62f3440d9e0ae1fc276209991a98ecd86292eeb06ecd1183d1694c127663400",
       "repository_path": "scripts/figures/make_figure_s1.py",
-      "portable_sha256": "f8354efa88d886ff5c9c2ffcd016edbf22e8c67a0b10185dfa735679861567f5",
+      "portable_sha256": "d17ce8c3cc0151ab2114274315869f0633c3c6f17f7c79d685161b35fbb33bdc",
       "status": "supplementary_figure_candidate_pending_input_replay",
       "scientific_ast_unchanged": true,
       "executed_after_port": true,
       "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/.",
-      "presentation_change": "Limit scatter-axis major ticks to avoid overlap under fallback fonts."
+      "presentation_change": "Limit scatter-axis major ticks to avoid overlap under fallback fonts.",
+      "portability_revision": "Choose an installed sans-serif font when Arial is unavailable."
     },
     {
       "original_path": "scripts/make_figure_s2.py",
       "original_sha256": "f57373b1318ad250aa02d47f4b331c8c8f0d5fd99f56c204439a508c648a2e2d",
       "collected_sha256": "f57373b1318ad250aa02d47f4b331c8c8f0d5fd99f56c204439a508c648a2e2d",
       "repository_path": "scripts/figures/make_figure_s2.py",
-      "portable_sha256": "b19c49a386a758c62be5b94936b63726cc0b121028ede555b89285f76c0766ea",
+      "portable_sha256": "f1757489a7b9271485101837f78188a69a6854860aefffc262ad559672006ed8",
       "status": "supplementary_figure_candidate_pending_input_replay",
       "scientific_ast_unchanged": true,
       "executed_after_port": true,
-      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/."
+      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/.",
+      "portability_revision": "Choose an installed sans-serif font when Arial is unavailable."
     },
     {
       "original_path": "scripts/make_figure_s3.py",
       "original_sha256": "9a48d3188ab3420396832a7c303c9663bc7613c9f7272e3f105a3eb8239932ca",
       "collected_sha256": "9a48d3188ab3420396832a7c303c9663bc7613c9f7272e3f105a3eb8239932ca",
       "repository_path": "scripts/figures/make_figure_s3.py",
-      "portable_sha256": "2b96f9d3d85ae13c626c29b4840a84444d60541942b0d170eea7af99a2ec65a4",
+      "portable_sha256": "cab263360a3739cebc40eb966f4b79fe0384c0dce3e2ef8cd1e9a852f253ac6e",
       "status": "supplementary_figure_candidate_pending_input_replay",
       "scientific_ast_unchanged": true,
       "executed_after_port": true,
-      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/."
+      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/.",
+      "portability_revision": "Choose an installed sans-serif font when Arial is unavailable."
     },
     {
       "original_path": "scripts/make_figure_s4.py",
       "original_sha256": "a49557d00ecc986aab48243c664fc4dc99ba33f2e8ba20fa9418ebddd3aabc69",
       "collected_sha256": "a49557d00ecc986aab48243c664fc4dc99ba33f2e8ba20fa9418ebddd3aabc69",
       "repository_path": "scripts/figures/make_figure_s4.py",
-      "portable_sha256": "492875ed5581a5540503ba0d3a095360e2165d091b6f16be6efd57d39ef69269",
+      "portable_sha256": "c7f40f26a3d7ed99643d28c92a635c5f073f03ad719b9ffff02c1603e9e11244",
       "status": "supplementary_figure_candidate_pending_input_replay",
       "scientific_ast_unchanged": true,
       "executed_after_port": true,
-      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/."
+      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/.",
+      "portability_revision": "Choose an installed sans-serif font when Arial is unavailable."
     },
     {
       "original_path": "scripts/make_figure_s5.py",
       "original_sha256": "fadabf85604fef542842cf8c971879cb71284bb1fc92779bf7aa66f98ff4c5d9",
       "collected_sha256": "fadabf85604fef542842cf8c971879cb71284bb1fc92779bf7aa66f98ff4c5d9",
       "repository_path": "scripts/figures/make_figure_s5.py",
-      "portable_sha256": "efc9248e675c2055a2cb471cadfd805b3850107ae26edf78e8260ae17bbcc82f",
+      "portable_sha256": "5ccb58054dc36e454273dde0ef3b9acc6fb73c6239d11b9e63ee071bff3c588f",
       "status": "supplementary_figure_candidate_pending_input_replay",
       "scientific_ast_unchanged": true,
       "executed_after_port": true,
-      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/."
+      "execution_scope": "Supplementary figure replay from compact saved observations/coordinates and CSVs; output isolated under build/.",
+      "portability_revision": "Choose an installed sans-serif font when Arial is unavailable."
     },
     {
       "original_path": "scripts/week5_transition_matrices.py",
@@ -311,14 +316,15 @@
       "original_sha256": "7bbae518f6e464abd552b88473a44ca9ca17df78dec864e18911e66f68fe8922",
       "collected_sha256": "7bbae518f6e464abd552b88473a44ca9ca17df78dec864e18911e66f68fe8922",
       "repository_path": "scripts/validate_mouse_transfer.py",
-      "portable_sha256": "63642bdc771dee1c8fd406953055cf1f8f4e7fda7acea212dc60b1c48f4ca869",
+      "portable_sha256": "7cee3ef670586b26ed430051a2224a778ecbdbeb5ee6e12c0b86c04e33411c60",
       "status": "audited_core",
       "scientific_ast_unchanged": true,
       "executed_after_port": false,
       "frozen_definitions_replayed": true,
       "full_training_script_executed": false,
       "previous_repository_path": "scripts/week9a_mouse_cross_dataset_final.py",
-      "previous_portable_sha256": "2307973787a4354ea9d99adc1d1c2216f67092a2b5fad6751af5456f98ae3bf5"
+      "previous_portable_sha256": "2307973787a4354ea9d99adc1d1c2216f67092a2b5fad6751af5456f98ae3bf5",
+      "scientific_revision": "GSE200771 sample correction and treatment-independent 2 h reference projection"
     },
     {
       "original_path": "scripts/week9b_audit OLD.py",
@@ -375,7 +381,7 @@
       "original_sha256": "949bb20b862b8f4716d385004e4585be3bf486b93675a47c06cddb56cc20491c",
       "collected_sha256": "321173ae34a5c40879d885d3f0070f38db1bee5b6d35030d7584aad11dfd49b2",
       "repository_path": "notebooks/02_umbaugh_2h_loading.ipynb",
-      "portable_sha256": "ecc7cb98dbdc46a4d40ea5e999198035839d55e91eaaa84aff598ad4afc9f949",
+      "portable_sha256": "3802ab7174098dcc0a70606f2e72b1e34a5a61170ee5e2b88c7cdced6a7bb79d",
       "status": "preprocessing_notebook_source_not_clean_run_verified",
       "changed_path_cells": [
         0
@@ -383,7 +389,8 @@
       "scientific_ast_unchanged": false,
       "notebook_code_cells": 11,
       "support_repair": "Restore missing QC-annotation calculation or existing dense-branch import; original filters and data labels retained.",
-      "full_raw_data_replayed_after_repair": false
+      "full_raw_data_replayed_after_repair": false,
+      "scientific_revision": "GSE200771 sample correction and treatment-independent 2 h reference projection"
     },
     {
       "original_path": "notebooks/03_benmoshe_loading.ipynb",
@@ -459,13 +466,14 @@
       "original_sha256": "3065d75562e0b32189b2737aad5ec215851bfe3c7f5f762d61a87852445542a1",
       "collected_sha256": "a509d5889e55ee0e78cdd886333793f7abed2d143cd5d2cdb6029c4e23ae0a37",
       "repository_path": "notebooks/08_scvi_integration.ipynb",
-      "portable_sha256": "470e566b77ef8e3eaf60932593bc0d2a4c2eef5b567f28aa6d33ded6f1b107fe",
+      "portable_sha256": "3f2663cfe1510891ede8a5b3df6f95e190ee82178376610e139d56b43d82d0bc",
       "status": "preprocessing_notebook_source_not_clean_run_verified",
       "changed_path_cells": [
         0
       ],
       "scientific_ast_unchanged": true,
-      "notebook_code_cells": 16
+      "notebook_code_cells": 16,
+      "scientific_revision": "GSE200771 sample correction and treatment-independent 2 h reference projection"
     },
     {
       "original_path": "notebooks/09_monocle_export.ipynb",

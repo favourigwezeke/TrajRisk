@@ -70,9 +70,9 @@ for row in changes["moves"]:
             failures.append("Archived preparation file remains in active tree: " + row["path"])
         continue
     if not path.is_file() or sha(path) != row["sha256"]:
-        failures.append("Source rename checksum: " + row["path"])
+        failures.append("Recorded source checksum mismatch: " + row["path"])
     elif row.get("executable_ast_sha256") and executable_hash(path.read_text()) != row["executable_ast_sha256"]:
-        failures.append("Executable code differs from original: " + row["path"])
+        failures.append("Recorded executable structure mismatch: " + row["path"])
     if (ROOT / row["previous_path"]).exists():
         failures.append("Retired active path remains: " + row["previous_path"])
 

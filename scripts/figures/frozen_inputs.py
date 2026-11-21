@@ -6,6 +6,7 @@ for the S1 QC plots, S2 representation plots, and S3 latent-space diagnostics.
 from pathlib import Path
 import json
 import os
+import sys
 from types import SimpleNamespace
 
 import numpy as np
@@ -52,6 +53,10 @@ def read_view(path, backed=None):
     if metadata.get("expression_matrix_exported") is not False:
         raise ValueError("Expected an explicit compact metadata/coordinate object")
     obs = pd.read_csv(path.parent / "observations.csv", index_col=0, float_precision="round_trip")
+    if path.parent.name == "umbaugh_2h_qc":
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from umbaugh_2h import annotate
+        obs = annotate(obs)
     arrays = {}
     if (path.parent / "coordinates.npz").exists():
         with np.load(path.parent / "coordinates.npz", allow_pickle=False) as archive:

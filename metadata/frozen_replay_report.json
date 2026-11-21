@@ -5,13 +5,13 @@
   "environment": {
     "python": "3.12.14",
     "platform": "Linux",
+    "xgboost": "3.2.0",
     "torch": "2.10.0+cpu",
     "torch-geometric": "2.7.0",
     "numpy": "2.2.6",
     "pandas": "2.3.3",
     "scipy": "1.15.2",
     "scikit-learn": "1.7.2",
-    "xgboost": "3.2.0",
     "joblib": "1.5.3"
   },
   "bootstrap_ci_replayed": true,
@@ -129,6 +129,18 @@
       "upper": 0.8690931073812798
     },
     {
+      "check": "Umbaugh 2 h: GEO labels, both groups sampled at 2 h",
+      "passed": true
+    },
+    {
+      "check": "Umbaugh 2 h: corrected libraries",
+      "passed": true
+    },
+    {
+      "check": "Umbaugh 2 h: weights sum to one for each query",
+      "passed": true
+    },
+    {
       "check": "Umbaugh_2h reference-edge counts",
       "passed": true
     },
@@ -139,8 +151,8 @@
     {
       "check": "Umbaugh_2h / trajrisk_knn AUROC and AUPRC",
       "passed": true,
-      "auroc": 0.6524483620383508,
-      "auprc": 0.7943658582476112
+      "auroc": 0.7480370079758673,
+      "auprc": 0.8876350145521166
     },
     {
       "check": "Umbaugh_2h / trajrisk_knn cohort denominator",
@@ -149,8 +161,8 @@
     {
       "check": "Umbaugh_2h / trajrisk_knn 1,000-bootstrap AUROC CI",
       "passed": true,
-      "lower": 0.6450760350984583,
-      "upper": 0.6600063347087665
+      "lower": 0.7421452673780247,
+      "upper": 0.754701359769316
     },
     {
       "check": "Umbaugh_2h / trajrisk_wself table match",
@@ -159,8 +171,8 @@
     {
       "check": "Umbaugh_2h / trajrisk_wself AUROC and AUPRC",
       "passed": true,
-      "auroc": 0.6086645174160877,
-      "auprc": 0.7566153426391594
+      "auroc": 0.7798123490515942,
+      "auprc": 0.9008156667571517
     },
     {
       "check": "Umbaugh_2h / trajrisk_wself cohort denominator",
@@ -169,8 +181,8 @@
     {
       "check": "Umbaugh_2h / trajrisk_wself 1,000-bootstrap AUROC CI",
       "passed": true,
-      "lower": 0.6011621858670483,
-      "upper": 0.6165883311160675
+      "lower": 0.7740110893394373,
+      "upper": 0.7861836667999585
     },
     {
       "check": "Umbaugh_2h / seeder table match",
@@ -179,8 +191,8 @@
     {
       "check": "Umbaugh_2h / seeder AUROC and AUPRC",
       "passed": true,
-      "auroc": 0.6464792057468096,
-      "auprc": 0.7901686355808557
+      "auroc": 0.7221404522043635,
+      "auprc": 0.8742438590494284
     },
     {
       "check": "Umbaugh_2h / seeder cohort denominator",
@@ -189,8 +201,32 @@
     {
       "check": "Umbaugh_2h / seeder 1,000-bootstrap AUROC CI",
       "passed": true,
-      "lower": 0.6393032319184597,
-      "upper": 0.6541456771910339
+      "lower": 0.7149440197100657,
+      "upper": 0.7292707304188234
+    },
+    {
+      "check": "Umbaugh_2h / b1_xgb table match",
+      "passed": true
+    },
+    {
+      "check": "Umbaugh_2h / b1_xgb AUROC and AUPRC",
+      "passed": true,
+      "auroc": 0.7313089451954977,
+      "auprc": 0.8786595142438411
+    },
+    {
+      "check": "Umbaugh_2h / b1_xgb cohort denominator",
+      "passed": true
+    },
+    {
+      "check": "Umbaugh_2h / b1_xgb 1,000-bootstrap AUROC CI",
+      "passed": true,
+      "lower": 0.7245016985129176,
+      "upper": 0.7384369854239213
+    },
+    {
+      "check": "Umbaugh 2 h correction: integration diagnostics reported in Methods",
+      "passed": true
     },
     {
       "check": "Umbaugh_48h72h reference-edge counts",
@@ -450,8 +486,8 @@
     }
   ],
   "notes": [
-    "Expression-derived Cdkn1a labels and B1 refitting require full expression matrices.",
-    "external_mouse_predictions.csv contains the model scores used for Figure 5B.",
+    "Umbaugh 2 h B1 was fit on the saved Walesky training split; original comparison results for the other cohorts are retained.",
+    "umbaugh_2h_scores.csv contains the corrected scores used for Figure 5B.",
     "Gene-signature discovery requires expression matrices; donor-level model scores are evaluated from supplied coordinates.",
     "Per-scale gene selection uses mouse p < 0.05 and absolute log2 fold change > 0.20; human significance uses nominal p <= 0.05."
   ],

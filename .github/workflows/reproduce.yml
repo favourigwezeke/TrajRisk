@@ -1,5 +1,6 @@
 name: Reproduce study analyses
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       release_tag:
@@ -36,15 +37,15 @@ jobs:
           python -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -r environments/frozen-linux-py312.lock.txt
           python -m pip check
-      - name: Download and verify frozen inputs
+      - name: Download and verify study inputs
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ inputs.release_tag }}
+          RELEASE_TAG: ${{ inputs.release_tag || 'v0.1.0-rc1' }}
         run: |
           gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "TrajRisk_frozen_inputs.zip" --pattern "SHA256SUMS" --dir build/downloads
           cd build/downloads
           sha256sum --check SHA256SUMS
-      - name: Compute model predictions and supplementary figures
+      - name: Rebuild study outputs
         run: bash scripts/reproduce_saved.sh build/downloads/TrajRisk_frozen_inputs.zip
       - name: Save reproduction reports and figures
         if: always()
@@ -57,4 +58,8 @@ jobs:
             build/frozen_replay/*.json
             build/frozen_replay/*.csv
             build/frozen_replay/*.npy
+            build/frozen_replay/supplementary_tables/*.csv
             build/figures/supplementary/*.pdf
+            build/figures/corrected/*.pdf
+            build/figures/redrawn/*.pdf
+            build/figures/redrawn/*.json

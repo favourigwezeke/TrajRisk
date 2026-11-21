@@ -68,7 +68,7 @@ HEALTHY_COLOR = "#4C78A8"
 
 
 plt.rcParams.update({
-    "font.family": "Arial",
+    "font.family": ["Arial", "Liberation Sans", "DejaVu Sans"],
     "font.size": 8,
     "axes.titlesize": 9.5,
     "axes.titleweight": "bold",

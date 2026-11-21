@@ -28,12 +28,16 @@ import joblib
 import numpy as np
 import pandas as pd
 from scipy.stats import mannwhitneyu, spearmanr
-from sklearn.metrics import average_precision_score, mean_squared_error, roc_auc_score
+from sklearn.decomposition import PCA
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import average_precision_score, mean_squared_error, roc_auc_score, silhouette_score
 from sklearn.neighbors import NearestNeighbors
 import torch
 from torch import nn
 from torch_geometric.nn import MessagePassing
-from xgboost import XGBClassifier
+from xgboost import XGBClassifier, XGBRegressor, __version__ as xgboost_version
+
+from umbaugh_2h import annotate as annotate_early, reference_edges as early_reference_edges, sample_key
 
 REPO = Path(__file__).resolve().parents[1]
 SCALES = ["Scale1_AcuteStress", "Scale2_PeakInjury", "Scale3_FateDecision", "Scale4_Resolution"]
@@ -99,12 +103,23 @@ def source_module(filename, names):
     module.__file__ = str(source)
     module.__dict__.update(
         torch=torch, nn=nn, MessagePassing=MessagePassing, np=np, pd=pd,
-        NearestNeighbors=NearestNeighbors, XGBClassifier=XGBClassifier,
+        NearestNeighbors=NearestNeighbors, XGBClassifier=XGBClassifier, XGBRegressor=XGBRegressor,
         Dict=Dict, List=List, Tuple=Tuple,
         sc=types.SimpleNamespace(AnnData=object), log=log,
         NODE_DIM=31, HIDDEN_DIM=64, N_SCALES=4, DROPOUT=0.3,
         SCALE_NAMES=SCALES, KNN_K=15, RANDOM_SEED=42, N_BOOTSTRAP=1000,
         mannwhitneyu=mannwhitneyu, roc_auc_score=roc_auc_score, spearmanr=spearmanr)
+    if "fit_b1_xgboost" in names:
+        assignment, = [node for node in tree.body if isinstance(node, ast.Assign)
+                       and any(isinstance(target, ast.Name) and target.id == "XGB_B1_PARAMS"
+                               for target in node.targets)]
+        spec = assignment.value
+        if not isinstance(spec, ast.Call) or not isinstance(spec.func, ast.Name) or spec.func.id != "dict" or spec.args:
+            raise ValueError("Unexpected expression-only comparator parameters")
+        module.XGB_B1_PARAMS = {
+            kw.arg: 42 if isinstance(kw.value, ast.Name) and kw.value.id == "RANDOM_SEED"
+            else ast.literal_eval(kw.value) for kw in spec.keywords
+        }
     sys.modules[module.__name__] = module
     exec(compile(ast.Module(body=definitions, type_ignores=[]), str(source), "exec"), module.__dict__)
     return module
@@ -155,7 +170,7 @@ class Replay:
     def reference(self):
         self.mouse_source = source_module("validate_mouse_transfer.py", [
             "TrajRiskConv", "TrajRiskGNN", "get_scale_and_anchors_for_cell",
-            "build_cell_specific_reference_edges", "bootstrap_auroc_ci"])
+            "build_cell_specific_reference_edges", "bootstrap_auroc_ci", "fit_b1_xgboost"])
         self.human_source = source_module("validate_human_transfer.py", [
             "prepare_ortholog_gene_space", "_gaussian_knn_edges", "_assign_scale", "compute_human_risk_scores"])
         self.x = torch.load(self.processed / "week6_node_features.pt", map_location="cpu", weights_only=True)
@@ -182,6 +197,7 @@ class Replay:
         training = torch.load(self.processed / "week6_training_data.pt", map_location="cpu", weights_only=True)
         val = training["val_idx"].numpy()
         target = self.saved.pseudotime_norm.to_numpy()
+        self.reference_scores, self.embeddings, self.training = score, embeddings, training
         self.close("Validation MSE", mean_squared_error(target[val], score[val]), checkpoint["final_val_metrics"]["loss"], atol=2e-8)
         self.check("Validation AUROC rounds to 0.9071", round(roc_auc_score(target[val] > .10, score[val]), 4) == .9071)
         pd.DataFrame({"cell_id": self.saved.index, "risk_predicted": score}).to_csv(self.output / "reference_predictions.csv", index=False)
@@ -192,28 +208,58 @@ class Replay:
         self.close("Reference latent axis in integrated object", arrays["X_scvi"][obs.index.get_indexer(self.ci.index)], self.x[:, :30].numpy(), atol=0)
         seeder = joblib.load(self.originals / "models/week6_xgboost_model.pkl")
         table = self.table("Table_S3A_external_mouse_validation_FINAL.csv")
-        method_names = {"trajrisk_knn": "TrajRisk Reference-KNN", "trajrisk_wself": "TrajRisk W_self", "seeder": "Initial XGBoost seed"}
+        method_names = {"trajrisk_knn": "TrajRisk Reference-KNN", "trajrisk_wself": "TrajRisk W_self",
+                        "seeder": "Initial XGBoost seed", "b1_xgb": "Expression-only XGBoost"}
         expected_edges = {"Ben_Moshe": [29985, 0, 7980, 3585], "Umbaugh_2h": [321135, 0, 0, 0], "Umbaugh_48h72h": [34920, 0, 21615, 23055]}
         task_fragments = {"Ben_Moshe": "Ben-Moshe", "Umbaugh_2h": "Umbaugh 2h", "Umbaugh_48h72h": "Umbaugh 48/72h"}
         records = []
         score_frames = []
+        early_summary = {}
         for dataset in expected_edges:
             print("Replaying external cohort: " + dataset, flush=True)
             mask = obs.dataset.eq(dataset).to_numpy()
             current = obs.loc[mask].copy()
             latent = arrays["X_scvi"][mask].astype(np.float32)
             seed = seeder.predict_proba(latent)[:, 1].astype(np.float32)
+            early = dataset == "Umbaugh_2h"
+            if early:
+                current = annotate_early(current)
+                self.check("Umbaugh 2 h: GEO labels, both groups sampled at 2 h",
+                           current.treatment.value_counts().to_dict() == {"APAP": 15332, "Control": 6077}
+                           and current.timepoint_hours.eq(2).all()
+                           and set(current.sample_accession) == set(sample_key().index))
+                self.check("Umbaugh 2 h: corrected libraries",
+                           set(current.loc[current.treatment.ne(obs.loc[mask, "treatment"]), "sample_accession"])
+                           == {"GSM6043451", "GSM6043455"})
             features = torch.from_numpy(np.vstack([self.x.numpy(), np.column_stack([latent, seed])]).astype(np.float32))
             with torch.inference_mode():
                 wself = self.model(features, self.eis, self.ews).numpy()[6582:]
-            ref_eis, ref_ews = self.mouse_source.build_cell_specific_reference_edges(
-                {"x_walesky": self.x, "cell_index": self.ci}, latent, current, dataset, k=15)
+            if early:
+                edge, weight = early_reference_edges(self.x[:, :30].numpy(), latent, self.ci.hours, k=15)
+                ref_eis = [torch.from_numpy(edge)] + [torch.empty((2, 0), dtype=torch.long)] * 3
+                ref_ews = [torch.from_numpy(weight)] + [torch.empty(0, dtype=torch.float32)] * 3
+                self.check("Umbaugh 2 h: weights sum to one for each query",
+                           np.allclose(weight.reshape(-1, 15).sum(axis=1), 1))
+            else:
+                ref_eis, ref_ews = self.mouse_source.build_cell_specific_reference_edges(
+                    {"x_walesky": self.x, "cell_index": self.ci}, latent, current, dataset, k=15)
             self.check(dataset + " reference-edge counts", [int(e.shape[1]) for e in ref_eis] == expected_edges[dataset])
             with torch.inference_mode():
                 knn = self.model(features, [torch.cat([a, b], 1) for a, b in zip(self.eis, ref_eis)],
                                  [torch.cat([a, b]) for a, b in zip(self.ews, ref_ews)]).numpy()[6582:]
             scores = {"trajrisk_knn": knn, "trajrisk_wself": wself, "seeder": seed}
-            score_frames.append(pd.DataFrame({"cell_id": current.index, "dataset": dataset, **scores}))
+            if early:
+                b1, _ = self.mouse_source.fit_b1_xgboost({
+                    "x_walesky": self.x, "train_idx": self.training["train_idx"].numpy(),
+                    "train_y": self.training["train_y"].numpy(),
+                })
+                scores["b1_xgb"] = np.clip(b1.predict(latent).astype(np.float32), 0, 1)
+                pd.DataFrame({"accession": current.sample_accession, "treatment": current.treatment,
+                              "Reference-KNN": knn, "W_self": wself, "seed": seed, "B1": scores["b1_xgb"]},
+                             index=current.index).rename_axis("cell_id").to_csv(self.output / "umbaugh_2h_scores.csv")
+            score_frames.append(pd.DataFrame({"cell_id": current.index, "dataset": dataset,
+                                              "treatment": current.treatment.to_numpy(),
+                                              "timepoint_hours": current.timepoint_hours.to_numpy(), **scores}))
             y = current.treatment.eq("APAP").to_numpy().astype(int)
             candidates = table.loc[table.Dataset_task.str.startswith(task_fragments[dataset]) & ~table.Dataset_task.str.contains("Cdkn1a", case=False)]
             for key, values in scores.items():
@@ -228,12 +274,43 @@ class Replay:
                     lo, hi = self.mouse_source.bootstrap_auroc_ci(y, values)
                     self.check(dataset + " / " + key + " 1,000-bootstrap AUROC CI", round(lo, 4) == round(expected.AUROC_95CI_lower, 4) and round(hi, 4) == round(expected.AUROC_95CI_upper, 4), lower=float(lo), upper=float(hi))
                     row.update(auroc_ci_lower=lo, auroc_ci_upper=hi)
+                if early:
+                    display = {"trajrisk_knn": "knn", "trajrisk_wself": "self", "seeder": "seed", "b1_xgb": "b1"}
+                    early_summary[display[key]] = {
+                        "method": method_names[key], **row,
+                        "lower": row.get("auroc_ci_lower"), "upper": row.get("auroc_ci_upper"),
+                    }
                 records.append(row)
+            if early:
+                self.early_diagnostics(obs, arrays["X_scvi"], mask, current, early_summary)
         self.mouse_scores = pd.concat(score_frames, ignore_index=True)
         self.mouse_scores.to_csv(self.output / "external_mouse_predictions.csv", index=False)
         pd.DataFrame(records).to_csv(self.output / "external_mouse_metrics.csv", index=False)
-        self.notes.append("Expression-derived Cdkn1a labels and B1 refitting require full expression matrices.")
-        self.notes.append("external_mouse_predictions.csv contains the model scores used for Figure 5B.")
+        self.notes.append("Umbaugh 2 h B1 was fit on the saved Walesky training split; original comparison results for the other cohorts are retained.")
+        self.notes.append("umbaugh_2h_scores.csv contains the corrected scores used for Figure 5B.")
+
+    def early_diagnostics(self, obs, latent, mask, early, metrics):
+        treatment = obs.treatment.astype(str).to_numpy(copy=True)
+        treatment[mask] = early.treatment.to_numpy()
+        asw = silhouette_score(latent, treatment, sample_size=5000, random_state=42)
+        hours = obs.timepoint_hours.fillna(0).to_numpy(copy=True)
+        hours[mask] = early.timepoint_hours.to_numpy()
+        pcs = PCA(n_components=10, random_state=42).fit_transform(latent)
+        rho = max(abs(float(spearmanr(hours, pc).statistic)) for pc in pcs.T)
+        r2 = float(LinearRegression().fit(pcs, hours).score(pcs, hours))
+        self.check("Umbaugh 2 h correction: integration diagnostics reported in Methods",
+                   (round(float(asw), 3), round(rho, 4), round(r2, 4)) == (.060, .3693, .0906))
+        report = {
+            "geo_series": "GSE200771",
+            "sample_cell_counts": {k: int(v) for k, v in sorted(early.sample_accession.value_counts().items())},
+            "sample_labels": sample_key().treatment.to_dict(),
+            "sampling_hours": 2,
+            "corrected_cells": int(early.treatment.ne(obs.loc[mask, "treatment"]).sum()),
+            "reference_pool": {"sampling_hours": [0, 6], "k": 15, "scale": 1},
+            "treatment_asw": float(asw), "max_absolute_pc_spearman": rho, "r_squared": r2,
+            "after": metrics,
+        }
+        (self.output / "umbaugh_2h_reanalysis.json").write_text(json.dumps(report, indent=2) + "\n")
 
     def human(self):
         obs, arrays, _ = compact(self.packet, "cross_species")
@@ -320,12 +397,13 @@ class Replay:
         self.notes.append("Per-scale gene selection uses mouse p < 0.05 and absolute log2 fold change > 0.20; human significance uses nominal p <= 0.05.")
 
     def write_report(self, error=None):
-        packages = ["torch", "torch-geometric", "numpy", "pandas", "scipy", "scikit-learn", "xgboost", "joblib"]
+        packages = ["torch", "torch-geometric", "numpy", "pandas", "scipy", "scikit-learn", "joblib"]
         report = {
             "status": "passed" if error is None else "failed",
             "input_packet_files_verified": len(self.manifest["files"]),
             "input_packet_manifest_sha256": sha256(self.packet / "PACKET_MANIFEST.json"),
-            "environment": {"python": platform.python_version(), "platform": platform.system(), **{name: importlib.metadata.version(name) for name in packages}},
+            "environment": {"python": platform.python_version(), "platform": platform.system(), "xgboost": xgboost_version,
+                            **{name: importlib.metadata.version(name) for name in packages}},
             "bootstrap_ci_replayed": self.bootstrap,
             "checks": self.checks, "notes": self.notes,
             "error": error,
@@ -357,6 +435,9 @@ def main():
         replay.mouse()
         replay.human()
         replay.graph_derived()
+        if args.bootstrap_ci:
+            from rebuild_tables import Tables
+            Tables(replay).run()
         changed = []
         for item in manifest["files"]:
             path = packet / item["path"]
