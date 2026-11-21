@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Evaluate supplied checkpoints and write analysis results under build/.
+# Evaluate the supplied checkpoints and rebuild study outputs under build/.
 set -euo pipefail
 if [[ $# -ne 1 ]]; then
   printf 'Usage: bash scripts/reproduce_saved.sh /path/to/TrajRisk_frozen_inputs.zip\n' >&2
@@ -31,4 +31,6 @@ export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMBA_NUM_THRE
 for number in 1 2 3 4 5; do
   python3 "$repo_root/scripts/figures/make_figure_s${number}.py"
 done
-printf '\nSaved-model analysis complete. Results are under build/frozen_replay/ and build/figures/supplementary/.\n'
+python3 "$repo_root/scripts/figures/regenerate_umbaugh_panels.py" --bundle-dir "$packet_root"
+python3 "$repo_root/scripts/figures/redraw_main_panels.py" --bundle-dir "$packet_root"
+printf '\nStudy analyses complete. See build/frozen_replay/ and build/figures/.\n'

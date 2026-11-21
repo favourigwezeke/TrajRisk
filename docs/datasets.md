@@ -12,6 +12,8 @@
 
 Population sizes refer to the processed analysis cohorts. Dataset-specific filtering, normalization and hepatocyte selection are implemented in [notebooks/](../notebooks/README.md) and described in the manuscript Methods. Mouse integration uses scVI; trajectory inference uses Walesky cells. Cross-species analysis uses 13,122 shared mouse–human symbol pairs.
 
+The Umbaugh 2 h cohort contains 6,077 control and 15,332 APAP hepatocytes, all sampled at 2 h. The [sample map](../metadata/umbaugh_2h_samples.csv) maps six GEO sample accessions to their treatment labels.
+
 Place raw files under `Data/raw/` in the dataset directories used by the loading notebooks. Processed AnnData files are written to `Data/processed/`. Running these notebooks requires the corresponding expression and annotation files from the source repositories. The distributed inputs for saved-model analysis do not include complete expression matrices.
 
 ## Model and analysis inputs

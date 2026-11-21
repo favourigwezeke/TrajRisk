@@ -50,10 +50,13 @@
       "previous_path": "scripts/week9a_mouse_cross_dataset_final.py",
       "path": "scripts/validate_mouse_transfer.py",
       "previous_sha256": "2307973787a4354ea9d99adc1d1c2216f67092a2b5fad6751af5456f98ae3bf5",
-      "executable_ast_unchanged_after_path_normalization": true,
-      "sha256": "63642bdc771dee1c8fd406953055cf1f8f4e7fda7acea212dc60b1c48f4ca869",
-      "executable_ast_sha256": "6e99e9d480a517119370d5fb55081f9146687716b92d3b9abce0a6661138663d",
-      "legacy_python312_ast_dump_sha256": "2c0368452a644d2575ad56a3b92db16effca7e208f5175674ff9f65aaac56526"
+      "executable_ast_unchanged_after_path_normalization": false,
+      "sha256": "7cee3ef670586b26ed430051a2224a778ecbdbeb5ee6e12c0b86c04e33411c60",
+      "executable_ast_sha256": "63071c5414a0474a32115490959a939df77b6884ed5269fc8714cce82302adc9",
+      "legacy_python312_ast_dump_sha256": "2c0368452a644d2575ad56a3b92db16effca7e208f5175674ff9f65aaac56526",
+      "rc4_sha256": "63642bdc771dee1c8fd406953055cf1f8f4e7fda7acea212dc60b1c48f4ca869",
+      "rc4_executable_ast_sha256": "6e99e9d480a517119370d5fb55081f9146687716b92d3b9abce0a6661138663d",
+      "scientific_revision": "Apply the GEO sample map and the shared 0/6 h anchor pool in the Umbaugh 2 h analysis."
     },
     {
       "previous_path": "scripts/week9b_human_cross_species.py",

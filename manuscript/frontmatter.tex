@@ -1,7 +1,26 @@
-% Add the approved author list, affiliations, and correspondence here.
-% Author identities remain unfilled. The final abstract is grounded in the locked results.
-\newcommand{\manuscripttitle}{TrajRisk: Treatment-Aware Multi-Scale Graph Neural Networks for Trajectory-Informed Risk Propagation in Single-Cell Transcriptomics}
-\newcommand{\manuscriptauthors}{}
-\newcommand{\manuscriptaffiliations}{}
-\newcommand{\manuscriptcorrespondence}{}
-\newcommand{\manuscriptabstract}{Single-cell profiles of acetaminophen liver injury reveal heterogeneous hepatocyte responses, but connecting these states across injury and recovery remains challenging. We present TrajRisk, which uses sampling time and treatment annotations to learn directed transition graphs across four temporal scales and integrates expression-derived features through a graph neural network. Its dimensionless score estimates normalized Monocle 3 pseudotime in a mouse injury--recovery reference, rather than adverse-outcome probability. We evaluated TrajRisk across 36,067 mouse hepatocytes from four studies. Within the reference, TrajRisk identified elevated-pseudotime cells at 24~h with higher average precision than expression-only XGBoost (0.498 versus 0.379), although XGBoost performed better overall and at later recovery timepoints. External mouse performance varied by cohort. After mouse-only supervised training in shared mouse--human coordinates, scores distinguished donors with acetaminophen-associated acute liver failure from healthy donors (AUROC 0.844; 19 donors). Spatial signature enrichment occurred at mouse injury boundaries but not in independent pericentral zonation analyses. Graph flux analysis identified a candidate 24--48~h recovery gateway linking compensation-associated states to recovery-proximal states. TrajRisk organizes injury states across time and prioritizes transition-associated programs for experimental testing.}
+\newcommand{\titlefirstline}{Trajectory-aware multiscale graph neural networks for}
+\newcommand{\titlesecondline}{trajectory-informed risk propagation in single-cell transcriptomics}
+\newcommand{\manuscripttitle}{\titlefirstline{} \titlesecondline}
+\newcommand{\manuscriptshorttitle}{TrajRisk maps hepatocyte injury and recovery}
+\newcommand{\manuscriptkeywords}{single-cell transcriptomics; graph neural networks; pseudotime; acetaminophen-induced liver injury; liver regeneration}
+
+\newcommand{\firstauthorname}{Favour O. Igwezeke}
+\newcommand{\secondauthorname}{Collins A. Onyeto}
+\newcommand{\firstauthoremail}{favour.igwezeke.249461@unn.edu.ng}
+\newcommand{\secondauthoremail}{collins.onyeto@unn.edu.ng}
+\newcommand{\firstauthororcid}{0009-0001-9907-4696}
+\newcommand{\secondauthororcid}{0000-0002-2190-7504}
+
+\newcommand{\authorid}[1]{\hspace{0.15em}\orcidlink{#1}}
+\newcommand{\manuscriptauthors}{%
+  \firstauthorname\textsuperscript{1,*}\authorid{\firstauthororcid},
+  \quad \secondauthorname\textsuperscript{1}\authorid{\secondauthororcid}%
+}
+\newcommand{\manuscriptaffiliations}{%
+  \textsuperscript{1}Department of Pharmacology and Toxicology, Faculty of Pharmaceutical Sciences, University of Nigeria, Nsukka, Enugu State, Nigeria\par
+}
+\newcommand{\manuscriptcorrespondence}{\textsuperscript{*}Corresponding author: \href{mailto:\firstauthoremail}{\firstauthoremail}}
+
+\newcommand{\manuscriptabstract}{%
+Single-cell profiles capture how hepatocytes respond to acetaminophen, but it remains difficult to connect the states observed during injury and recovery. We developed TrajRisk to learn directed transition graphs between successive sampling times and integrate gene expression across these graphs with a multiscale graph neural network. The resulting score estimates a hepatocyte's position along a mouse injury--recovery reference. At 24~h, TrajRisk had higher average precision for identifying cells with elevated pseudotime than an expression-only model. Performance varied across external mouse cohorts. Scores from a mouse-trained model distinguished human donors with acetaminophen-associated acute liver failure from healthy donors. The associated gene signature was enriched along mouse injury boundaries. Graph flux identified a candidate 24--48~h recovery gateway connecting states associated with persistent compensation to states closer to recovery. TrajRisk prioritizes transitions and gene programs for experimental studies of liver repair.%
+}

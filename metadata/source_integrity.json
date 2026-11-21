@@ -101,32 +101,42 @@
     {
       "path": "scripts/figures/make_figure_s1.py",
       "base_sha256": "9d4e3921b0c1744e3fac6eac5d620a975dc2cfed89fec90ddaec9f11a0bac936",
-      "sha256": "f8354efa88d886ff5c9c2ffcd016edbf22e8c67a0b10185dfa735679861567f5",
-      "scientific_ast_sha256": "7ba13f23ad10710e617752d49ca3e4ad66cbece6619c8cf792e8c52814c0451e"
+      "sha256": "d17ce8c3cc0151ab2114274315869f0633c3c6f17f7c79d685161b35fbb33bdc",
+      "scientific_ast_sha256": "c701f03171a6a15d712d3258028764706cd2c4448512e7309260d13f36a3b7bc"
     },
     {
       "path": "scripts/figures/make_figure_s2.py",
       "base_sha256": "da3487494c008b3e7db87f2c6ac82ed939f289fadc495486f27fa02c76671793",
-      "sha256": "b19c49a386a758c62be5b94936b63726cc0b121028ede555b89285f76c0766ea",
-      "scientific_ast_sha256": "ade69e1a8a4ec952ae398749096747fed5baf827f451622e5176534cc4620d46"
+      "sha256": "f1757489a7b9271485101837f78188a69a6854860aefffc262ad559672006ed8",
+      "scientific_ast_sha256": "fc88c462ed882297690cffb5a646957f87a7ead670039649705da96bb009776c"
     },
     {
       "path": "scripts/figures/make_figure_s3.py",
       "base_sha256": "091290d41753fdb9e795cb4d62ef4af3e1c23e9f8b2fa17c94048173f0aae9f7",
-      "sha256": "2b96f9d3d85ae13c626c29b4840a84444d60541942b0d170eea7af99a2ec65a4",
-      "scientific_ast_sha256": "cb8cc65a75cd49ccb6b646ec0aeaee9e54342a18b1d5de1ee69c73aae2ea8722"
+      "sha256": "cab263360a3739cebc40eb966f4b79fe0384c0dce3e2ef8cd1e9a852f253ac6e",
+      "scientific_ast_sha256": "959f1bb8645ebbaa23f246bca349c11f72ed7124bf58d2f94e0516f80435f221"
     },
     {
       "path": "scripts/figures/make_figure_s4.py",
       "base_sha256": "e144ce479b6b4aed85e9692124a2b862e06bf98e9d2397fed98f478c014346a3",
-      "sha256": "492875ed5581a5540503ba0d3a095360e2165d091b6f16be6efd57d39ef69269",
-      "scientific_ast_sha256": "f69d12c20fc1169c0335333e5f9b2af1676c13cb2f0e176aaecb3d1c6830f90b"
+      "sha256": "c7f40f26a3d7ed99643d28c92a635c5f073f03ad719b9ffff02c1603e9e11244",
+      "scientific_ast_sha256": "c23096b269e742e85117f359c36011117d64adca361098d603bab7531617f0d8"
     },
     {
       "path": "scripts/figures/make_figure_s5.py",
       "base_sha256": "e7bec197a5f3464817c724aad78aa6f60cc19eb2e5eec1ece79b5478f671edc0",
-      "sha256": "efc9248e675c2055a2cb471cadfd805b3850107ae26edf78e8260ae17bbcc82f",
-      "scientific_ast_sha256": "e760c7e46f04265a87e2a731db1350456bc41b62b971511fe3aefe79d9b31e0b"
+      "sha256": "5ccb58054dc36e454273dde0ef3b9acc6fb73c6239d11b9e63ee071bff3c588f",
+      "scientific_ast_sha256": "4cf9ff9814df9b60b4701909c745ad235a81d5a0be41889f24af440811ff455b"
+    },
+    {
+      "path": "scripts/figures/redraw_main_panels.py",
+      "sha256": "068f0bfa06107f226ee2d8c260f59beb92d83c8573e99ffc6d255dbb7f49273a",
+      "scientific_ast_sha256": "f9818f76e3f93ef72d68dda5b26c001bdf87d49400219caa4b8b03e1f31e8c2d"
+    },
+    {
+      "path": "scripts/figures/regenerate_umbaugh_panels.py",
+      "sha256": "ba72f98461a2dea9d94c4a569a143872d15b4948d383fa7de8346a79b73b33b1",
+      "scientific_ast_sha256": "6ceed2a0b73a310b3a1818afca9518c534a4ac87630cc2952bdcae476786f5c8"
     },
     {
       "path": "scripts/prepare_graph_inputs.py",
@@ -135,16 +145,26 @@
       "scientific_ast_sha256": "9b3ca885fb3b0b899331663758f18937481717f110263e3c7f1014731c9c5753"
     },
     {
+      "path": "scripts/rebuild_tables.py",
+      "sha256": "1986209abb3755f7b8789e042e59f269dc6af520c5fb3d39eedca403cdfa731a",
+      "scientific_ast_sha256": "c94b698e43d50920348d728e4f133220feaea49431d28dadb31c748d06e315a3"
+    },
+    {
       "path": "scripts/reproduce_frozen.py",
       "base_sha256": "aab5d2b30913c67eb27bed78f273781d075d1c5223324ab38de0c55bba047d02",
-      "sha256": "d2f82a1536ddbed69c4b7dbd256d944ccfaccceb3414d9b63dee2af699f4bf5b",
-      "scientific_ast_sha256": "61c14e12208b1ace6a8af3606bd692f84b04ddb452fd93470445b2c52358e939"
+      "sha256": "5268c06811381f95234555d9bc7eb2f6ed0d8d61b5a380c074f6ba0bef87b838",
+      "scientific_ast_sha256": "41873c273d3ae7a32f0dea455a19b7e3c36563bcc383eede364a93a41d07862f"
     },
     {
       "path": "scripts/train_reference_model.py",
       "base_sha256": "6803bdd2154ba8292156275e0d09dfaebe38b738a3a97de1f8606c309eaafa49",
       "sha256": "5e8c7490becf1279581dd71d2fb7121b8d2ffef39d6529787398b4503d57833a",
       "scientific_ast_sha256": "e8576f1e43a475ef36377d9878c3b05d7dc7f4fff116e20ed097da9b399b041a"
+    },
+    {
+      "path": "scripts/umbaugh_2h.py",
+      "sha256": "5e3545a2fc848968cea3879ef5e97a1d59513a6426c46e0debf1eadc64482052",
+      "scientific_ast_sha256": "4ce7578e173ba3b3f7c30e2d4a4cfcac1c5310d52ed9989ed24cb6058ed5c5a3"
     },
     {
       "path": "scripts/validate_human_transfer.py",
@@ -155,8 +175,8 @@
     {
       "path": "scripts/validate_mouse_transfer.py",
       "base_sha256": "2b6f367bc50432feb9a51f88291c85b99cdeba8896c527ba21d1d811737b6f8e",
-      "sha256": "63642bdc771dee1c8fd406953055cf1f8f4e7fda7acea212dc60b1c48f4ca869",
-      "scientific_ast_sha256": "a095e771a0c9d1cc439e353812cf312dd8d0ca100f892a19392add8de23c712e"
+      "sha256": "7cee3ef670586b26ed430051a2224a778ecbdbeb5ee6e12c0b86c04e33411c60",
+      "scientific_ast_sha256": "49ff5f9ba6c45d24801557ac2baaa2679912c8bef9916936933597bd25f035fd"
     },
     {
       "path": "scripts/verify_release_assets.py",
@@ -191,7 +211,7 @@
         "7d2a91c13c9c2690576a03fe8a22a42dc0aaf0ca95c5f16094ce8a4d48a772b8",
         "d58480e4d71fcfbe282672f07a4a57e2a898a72315c36e13f6c18fe33adab2fc",
         "ecf33cd8bdd5b1f7e3ec1918f4cf6ed5e043913dc476576cb6e08a15cb275a0d",
-        "ce436a6070b9dfa46e2fd8f76c7fdca2f4b43d0aefe62082dfc443e10dbbcb92",
+        "a3733e33a177a3473a425be662f0b7f9b4ea3858e65946601aaedcc88a8ea1f8",
         "fa875006ea2debbb980bd4222610a643e3fd12b9bb70d55a14cc3f13f38545df",
         "9c450a08963fa8c7171cc7c3c4d82eaab79ac466ad4800f213f7e157016afdf6",
         "21efee460020d555119f33af0e33bb40fd465c7b414c01fb70d655e77a13d9e5",
@@ -269,7 +289,7 @@
       "code_cell_hashes": [
         "de0a66c4b321d3468fb789ad309d6fbb9bb0cad0176243f3e88d5486c4879ba9",
         "436c2927c10ee348c1dac30739ffb405caf6fc3742e95f6dd34699e77348a2b8",
-        "14f0ae536fc1a0805c0eb051243491d62c518e4126a4d9760ea6f4c67e4b7958",
+        "28daf81c61a6d7cdf375f5ef081e3a2a85531455fe342b707d640064ed26b0cf",
         "cbd8cb3f407d8d16a838ccc8e034104789461e054a3a7ac25218c5cc2fc462d6",
         "abf18cdb175cc841d2e698b889eadefbcbefbae98554696f9da725bc74e7b484",
         "32383a6359b3ca95a425cb37cea3d117282aa332666616b2825ab0603c1fb5f7",

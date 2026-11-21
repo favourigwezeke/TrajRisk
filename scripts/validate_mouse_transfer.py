@@ -26,6 +26,8 @@ import torch.nn as nn
 from torch_geometric.nn import MessagePassing
 from xgboost import XGBRegressor
 
+from umbaugh_2h import annotate as annotate_early
+
 warnings.filterwarnings("ignore")
 
 logging.basicConfig(
@@ -276,11 +278,10 @@ def get_scale_and_anchors_for_cell(
     for a single external cell.
 
     Design rationale:
-    - Control cells should NOT receive messages from injured/recovery Walesky cells.
-      They anchor only to Walesky 0h control cells via Scale 1.
-    - APAP cells anchor to the Walesky trajectory states corresponding to
-      their approximate phase:
-        Umbaugh 2h APAP     → pre-peak phase  → Scale 1 (0h→6h)
+    - All Umbaugh 2 h cells use the same Scale 1 pool (0 h and 6 h).
+      The prediction therefore does not use the outcome label to select anchors.
+    - Controls in the other cohorts anchor to Walesky 0 h controls.
+    - Later APAP cells anchor to the corresponding reference phases:
         Late APAP at 48h    → fate decision   → Scale 3 (24h→48h)
         Late APAP at 72h    → resolution      → Scale 4 (48h→96h)
     - Cells not matching any pattern return empty lists (W_self path only).
@@ -293,13 +294,12 @@ def get_scale_and_anchors_for_cell(
     treatment = str(treatment)
     hour      = float(hour)
 
-    # Controls: anchor to Walesky 0h control cells only (Scale 1)
-    if treatment == "Control":
-        return [0], [0.0]
-
-    # Umbaugh 2h APAP: early injury phase, moving toward 6h peak
     if dataset == "Umbaugh_2h":
         return [0], [0.0, 6.0]
+
+    # Controls in the later cohorts use the Walesky 0 h controls (Scale 1).
+    if treatment == "Control":
+        return [0], [0.0]
 
     # Ben-Moshe and Umbaugh 48h/72h late-phase APAP cells
     if dataset in {"Ben_Moshe", "Umbaugh_48h72h"}:
@@ -674,15 +674,9 @@ def run_t2_umbaugh2h_early_detection(data: Dict, b1: XGBRegressor) -> List[Dict]
     Walesky training timepoints: 0h, 6h, 24h, 48h, 96h.
     The 2h timepoint was never in training data.
 
-    Label: APAP-treated (2h post-APAP) vs Control (0h).
-    Design: APAP cells anchor to Walesky 0h + 6h (early trajectory phase,
-    Scale 1: AcuteStress). This is the most biologically appropriate projection
-    for cells between the healthy baseline and the 6h peak.
-
-    This is the strongest TrajRisk cross-dataset generalisation result:
-    Reference-KNN TrajRisk AUROC 0.6909 vs Seeder 0.6465, B1 XGBoost 0.6422.
-    TrajRisk beats both expression-only baselines when trajectory context
-    is provided via reference projection.
+    Vehicle and APAP samples share the 2 h collection time. The GEO sample
+    key defines the evaluation labels; all queries use the same 0 h + 6 h
+    anchor pool in Scale 1.
     """
     log.info("\n" + "=" * 72)
     log.info("T2: Umbaugh 2h — Early Injury Detection (Timepoint Unseen in Training)")
@@ -691,7 +685,7 @@ def run_t2_umbaugh2h_early_detection(data: Dict, b1: XGBRegressor) -> List[Dict]
     adata  = data["adata"]
     sub    = adata[adata.obs["dataset"] == "Umbaugh_2h"]
     z_u2   = sub.obsm["X_scvi"].astype(np.float32)
-    obs_u2 = sub.obs.copy()
+    obs_u2 = annotate_early(sub.obs)
     y_u2   = (obs_u2["treatment"].astype(str).values == "APAP").astype(int)
 
     log.info(f"  APAP: {y_u2.sum():,} | Control: {(1-y_u2).sum():,}")

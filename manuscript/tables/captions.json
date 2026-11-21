@@ -36,7 +36,7 @@
     "parts": {
       "S3A": {
         "title": "External APAP-versus-control classification.",
-        "notes": "APAP treatment is the positive class. N includes all evaluated cells, including controls, in each cohort: Ben-Moshe, 2,770; Umbaugh 2 h, 21,409; Umbaugh 48/72 h, 5,306. N_positive counts APAP-treated cells. The Ben-Moshe label identifies the APAP sampling times and does not exclude its baseline controls. These tests distinguish treatment condition, rather than observed future cell fate. Pairwise significance tests between methods are not reported for these comparisons."
+        "notes": "APAP is the positive class. N and N_positive count evaluated and APAP-treated cells, respectively. Umbaugh 2 h includes 6,077 vehicle-control and 15,332 APAP-treated cells. All 2 h queries use the same Reference-KNN anchor pool; anchor selection is treatment-conditioned in the two later cohorts. Random average precision equals positive-class prevalence."
       },
       "S3B": {
         "title": "Cdkn1a expression association in 5,306 Umbaugh 48/72 h hepatocytes.",

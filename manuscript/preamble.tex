@@ -1,12 +1,9 @@
-% Portable Times-compatible body text; no licensed system fonts required.
+% Latin Modern is a scalable Computer Modern family for text and mathematics.
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{mathptmx}
-\usepackage[scaled=0.93]{helvet}
-% Scalable Latin Modern typewriter for file names and inline code.
-\renewcommand{\ttdefault}{lmtt}
+\usepackage{lmodern}
 \usepackage{amsmath,amssymb}
-\usepackage[letterpaper,left=0.65in,right=0.65in,top=0.68in,bottom=0.68in,headheight=12pt,headsep=10pt,footskip=22pt]{geometry}
+\usepackage[letterpaper,left=0.75in,right=0.75in,top=0.82in,bottom=0.78in,headheight=12pt,headsep=10pt,footskip=22pt]{geometry}
 \setlength{\columnsep}{0.27in}
 \usepackage{graphicx}
 \usepackage{float}
@@ -15,22 +12,23 @@
 \usepackage[numbers,square,sort&compress]{natbib}
 \usepackage{microtype}
 \usepackage{titlesec}
-\titleformat{\section}{\sffamily\bfseries\large}{}{0pt}{}
-\titleformat{\subsection}{\sffamily\bfseries\normalsize}{}{0pt}{}
-\titleformat{\subsubsection}{\sffamily\bfseries\normalsize}{}{0pt}{}
+\titleformat{\section}{\rmfamily\bfseries\large}{}{0pt}{}
+\titleformat{\subsection}{\rmfamily\bfseries\normalsize}{}{0pt}{}
+\titleformat{\subsubsection}{\rmfamily\bfseries\normalsize}{}{0pt}{}
 \titlespacing*{\section}{0pt}{15pt}{7pt}
 \titlespacing*{\subsection}{0pt}{11pt}{5pt}
 \titlespacing*{\subsubsection}{0pt}{10pt}{4pt}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\footnotesize\sffamily TrajRisk}
+\fancyhead[L]{\footnotesize TrajRisk}
 \fancyhead[R]{}
 \fancyfoot[C]{\footnotesize\thepage}
 \renewcommand{\headrulewidth}{0.3pt}
 \renewcommand{\footrulewidth}{0pt}
 \usepackage{xurl}
 \usepackage[hidelinks]{hyperref}
+\usepackage{orcidlink}
 \urlstyle{same}
 \hypersetup{pdftitle={TrajRisk: Treatment-Aware Multi-Scale Graph Neural Networks}}
 \ifdefined\CombinedReview

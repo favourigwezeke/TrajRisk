@@ -22,6 +22,8 @@ Run these commands from the repository root with expression and model inputs und
 
 Reference-KNN uses 15 reference neighbours. W_self-only is the primary human transfer configuration; Reference-KNN provides a sensitivity analysis. Human group comparisons use donors as biological units.
 
+Umbaugh 2 h treatment labels are assigned by [GEO sample accession](../metadata/umbaugh_2h_samples.csv). Reference-KNN uses the same 0 h and 6 h reference candidate pool for control and APAP cells in that cohort.
+
 ## Analyses with supplied checkpoints
 
-The [reproduction guide](reproduction.md) describes prediction, evaluation and supplementary figure generation using the [input archive](frozen_inputs.md). This workflow uses saved coordinates and checkpoints. Full preprocessing and training require the source expression data and additional model inputs.
+The [reproduction guide](reproduction.md) describes which analyses, figures and tables can be rebuilt from the [input archive](frozen_inputs.md). Preprocessing and training require the source expression data and additional model inputs.
